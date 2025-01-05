@@ -19,7 +19,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - Run `make` to build the game
 - Run `./Sandboxia` to play the game
 
-## Launc args
+## Launch args
 
 - `-w` to set the width of the window
 - `-h` to set the height of the window
