@@ -109,7 +109,7 @@ void Renderer::RenderViewport(Camera& camera, Player& player, Tile world[][WORLD
     }
 
     // Render the player
-    drawTile(player.playerTile, camera.width / TILE_SIZE / SCALER / 2, camera.height / TILE_SIZE / SCALER / 2);
+    drawTile(player.playerTile, (camera.width / TILE_SIZE / SCALER / 2), camera.height / TILE_SIZE / SCALER / 2);
     //drawPlayer(player);
     //drawPlayer(player, camera.width / TILE_SIZE / SCALER / 2, camera.height / TILE_SIZE / SCALER / 2);
 

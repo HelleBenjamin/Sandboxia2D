@@ -10,7 +10,7 @@ extern int SCREEN_HEIGHT;
 extern bool VSYNC;
 extern bool COLLISION;
 
-#define VERSION "0.0.1"
+#define VERSION "0.1.1-beta"
 
 #define TILE_SIZE 8 // 8x8 pixels per tile
 
