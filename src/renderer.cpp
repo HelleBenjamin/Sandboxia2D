@@ -25,6 +25,7 @@ void Renderer::clearScreen() {
 }
 
 void Renderer::drawTile(Tile tile, int x, int y) {
+    if (!tile.isVisible) return; // Skip invisible tiles for performance
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND); // Enable transparency
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -52,24 +53,6 @@ void Renderer::drawTile(Tile tile, int x, int y) {
             glBindTexture(GL_TEXTURE_2D, 0);
             break;
     }
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glBegin(GL_QUADS);
-    glTexCoord2f(0, 0); glVertex2f(x * TILE_SIZE * SCALER, y * TILE_SIZE * SCALER);
-    glTexCoord2f(0, 1); glVertex2f(x * TILE_SIZE * SCALER, (y + 1) * TILE_SIZE * SCALER);
-    glTexCoord2f(1, 1); glVertex2f((x + 1) * TILE_SIZE * SCALER, (y + 1) * TILE_SIZE * SCALER);
-    glTexCoord2f(1, 0); glVertex2f((x + 1) * TILE_SIZE * SCALER, y * TILE_SIZE * SCALER);
-    glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glDisable(GL_TEXTURE_2D);
-    glDisable(GL_BLEND);
-}
-
-void Renderer::drawPlayer(Player player, float x, float y) { // Now obsolete
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, PlayerTex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glBegin(GL_QUADS);
@@ -118,3 +101,4 @@ void Renderer::RenderViewport(Camera& camera, Player& player, Tile world[][WORLD
 
     glfwSwapBuffers(window);
 }
+

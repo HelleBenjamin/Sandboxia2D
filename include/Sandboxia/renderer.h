@@ -8,9 +8,7 @@ public:
     void loadTextures();
     void freeTextures();
     void clearScreen();
-    void swapBuffers();
     void drawTile(Tile tile, int x, int y);
-    void drawPlayer(Player player, float x, float y);
 
     void RenderViewport(Camera& camera, Player& player, Tile world[][WORLD_HEIGHT], GLFWwindow* window); 
 

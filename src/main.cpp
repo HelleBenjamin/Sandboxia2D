@@ -183,10 +183,12 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+    glfwMakeContextCurrent(window);
+
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     glfwSetCursorPosCallback(window, cursorPosCallback);
 
-    glfwMakeContextCurrent(window);
+    log("[INFO] Renderer device: " + string((const char*)glGetString(GL_RENDERER)));
 
     glClearColor(0.222f, 0.608f, 0.924f, 1.0f); // Background color
     glOrtho(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, -1, 1);
