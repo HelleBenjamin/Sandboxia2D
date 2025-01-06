@@ -25,6 +25,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - `-h` to set the height of the window
 - `-v` to set the VSYNC, Default is 1
 - `-c` to set the collision, Default is 1
+- `-d` to set the debug, Default is 0
 
 ## License
 Copyright (c) 2024-2025 Benjamin Helle

@@ -47,6 +47,7 @@ Camera camera;
 GLuint loadTexture(const char* filepath) {
     int width, height, nrChannels;
     unsigned char* data = stbi_load(filepath, &width, &height, &nrChannels, 0);
+
     if (!data) {
         log("[ERROR] Failed to load texture: " + string(filepath));
         return -1;
@@ -117,6 +118,28 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     player.SelectorY = ypos;
 }
 
+void saveWorld(Tile world[][WORLD_HEIGHT], std::string filename) {
+    /* Save format:
+        Save into a text file with the following format:
+        [Tile with data] [Another tile with data] ...
+
+        Tile with data: type isVisible tileState isSolid tileID
+    
+    */
+    std::ofstream file(filename + ".txt");
+    for (int x = 0; x < WORLD_WIDTH; ++x) {
+        for (int y = 0; y < WORLD_HEIGHT; ++y) {
+            file << "[ " << world[x][y].type << " " << world[x][y].isVisible << " " << world[x][y].tileState << " " << world[x][y].isSolid << " " << world[x][y].tileID << " ]";
+        }
+        file << endl;
+    }
+    file.close();
+    log("[INFO] Saved world to " + filename);
+}
+
+void loadWorld(Tile (&world)[WORLD_WIDTH][WORLD_HEIGHT], std::string filename) { // TODO
+}
+
 
 int main(int argc, char *argv[]) {
     std::string args;
@@ -145,7 +168,6 @@ int main(int argc, char *argv[]) {
             log("[INFO] DEBUG set to " + to_string(DEBUG));
         }
     }
-
 
     camera.posX = 0.0f;
     camera.posY = 0.0f;
@@ -190,6 +212,8 @@ int main(int argc, char *argv[]) {
 
     log("[INFO] Renderer device: " + string((const char*)glGetString(GL_RENDERER)));
 
+    // TODO: Make game initialization function
+
     glClearColor(0.222f, 0.608f, 0.924f, 1.0f); // Background color
     glOrtho(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, -1, 1);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -198,7 +222,7 @@ int main(int argc, char *argv[]) {
 
     generateWorld(world);
 
-    glfwSwapInterval(VSYNC); // Enable vsync
+    glfwSwapInterval(VSYNC); // Enable/disable vsync
 
     float lastFrame = 0.0f;
 
@@ -213,6 +237,8 @@ int main(int argc, char *argv[]) {
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) player.move(0, 1, deltaTime, world);
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) player.move(-1, 0, deltaTime, world);
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player.move(1, 0, deltaTime, world);
+        if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) saveWorld(world, "world"); // Does work
+        if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) loadWorld(world, "world"); // Currently doesn't work
 
         // Debug features
         if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && DEBUG) log("[INFO] Player position: (" + to_string(player.posX) + ", " + to_string(player.posY) + ")");
@@ -235,15 +261,13 @@ int main(int argc, char *argv[]) {
             };
         }
 
-        //cout << "Player position: " << player.posX << ", " << player.posY << endl;
-        //cout << "Camera position: " << camera.posX << ", " << camera.posY << endl;
-        //cout << "Current FPS: " << 1.0f / deltaTime << endl;
         renderer.RenderViewport(camera, player, world, window);
         glfwPollEvents();
     }
+
+    log("[INFO] Preparing to shutdown");
+
     renderer.freeTextures();
-    log("[INFO] Unloaded all textures");
-    log("[INFO] Deallocated renderer");
     glfwDestroyWindow(window);
     glfwTerminate();
     log("[INFO] Program shutting down");

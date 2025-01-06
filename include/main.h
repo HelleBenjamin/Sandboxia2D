@@ -11,7 +11,7 @@ extern bool VSYNC;
 extern bool COLLISION;
 extern bool DEBUG;
 
-#define VERSION "0.1.1-beta"
+#define VERSION "0.1.2-beta"
 
 #define TILE_SIZE 8 // 8x8 pixels per tile
 
@@ -31,6 +31,9 @@ typedef struct {
 } Tile;
 
 extern Tile world[WORLD_WIDTH][WORLD_HEIGHT];
+
+void saveWorld(Tile world[][WORLD_HEIGHT], std::string filename);
+void loadWorld(Tile (&world)[WORLD_WIDTH][WORLD_HEIGHT], std::string filename);
 
 GLuint loadTexture(const char* filepath);
 void unloadTexture(GLuint textureID);
