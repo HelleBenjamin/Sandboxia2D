@@ -1,6 +1,6 @@
 # Sandboxia2D
 
-Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a simple sandbox game that is easy to run on older machines. The game is still in early development.
+Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a simple sandbox game that is easy to run on older machines. The game is still in early development. OpenGL 3.3 will be supported in the future after the game's core development is complete.
 
 ## Features
 - Bugs may be present
@@ -14,7 +14,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - Right mouse button to place blocks
 
 ## Building
-
+- Currently only Linux is supported
 - Clone the repository
 - Run `make` to build the game
 - Run `./Sandboxia` to play the game

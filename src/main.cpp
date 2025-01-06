@@ -26,8 +26,9 @@ Tile world[WORLD_WIDTH][WORLD_HEIGHT] = {0};
 
 bool VSYNC = true;
 bool COLLISION = true;
+bool DEBUG = false;
 
-Renderer *renderer = new Renderer();
+Renderer renderer;
 Player player;
 Camera camera;
 
@@ -139,6 +140,9 @@ int main(int argc, char *argv[]) {
         } else if (arg == "-c" && i + 1 < argc) { // collision
             COLLISION = (argc > i + 1) ? atoi(argv[++i]) : 1;
             log("[INFO] COLLISION set to " + to_string(COLLISION));
+        } else if (arg == "-d") { // debug
+            DEBUG = 1;
+            log("[INFO] DEBUG set to " + to_string(DEBUG));
         }
     }
 
@@ -188,7 +192,7 @@ int main(int argc, char *argv[]) {
     glOrtho(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, -1, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    renderer->loadTextures();
+    renderer.loadTextures();
 
     generateWorld(world);
 
@@ -207,9 +211,12 @@ int main(int argc, char *argv[]) {
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) player.move(0, 1, deltaTime, world);
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) player.move(-1, 0, deltaTime, world);
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player.move(1, 0, deltaTime, world);
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) log("[INFO] Player position: (" + to_string(player.posX) + ", " + to_string(player.posY) + ")");
-        if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) log("[INFO] Selector position: (" + to_string((player.SelectorX / TILE_SIZE / SCALER) + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)) +  ", " + to_string((player.SelectorY / TILE_SIZE / SCALER) + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)) + ")");
-        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) log("[INFO] Current Tile at cursor: " + to_string(world[SelX][SelY].type) + " " + to_string(world[SelX][SelY].isVisible) + " " + to_string(world[SelX][SelY].isSolid));
+
+        // Debug features
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && DEBUG) log("[INFO] Player position: (" + to_string(player.posX) + ", " + to_string(player.posY) + ")");
+        if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && DEBUG) log("[INFO] Selector position: (" + to_string((player.SelectorX / TILE_SIZE / SCALER) + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)) +  ", " + to_string((player.SelectorY / TILE_SIZE / SCALER) + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)) + ")");
+        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && DEBUG) log("[INFO] Current Tile at cursor: " + to_string(world[SelX][SelY].type) + " " + to_string(world[SelX][SelY].isVisible) + " " + to_string(world[SelX][SelY].isSolid));
+        if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && DEBUG) log("[INFO] Current FPS: " + to_string(1.0f / deltaTime));
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) { // destroy block
             if (SelX < 0 || SelX >= WORLD_WIDTH || SelY < 0 || SelY >= WORLD_HEIGHT) log("[ERROR] Tried to destroy block out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
             else{
@@ -229,12 +236,11 @@ int main(int argc, char *argv[]) {
         //cout << "Player position: " << player.posX << ", " << player.posY << endl;
         //cout << "Camera position: " << camera.posX << ", " << camera.posY << endl;
         //cout << "Current FPS: " << 1.0f / deltaTime << endl;
-        renderer->RenderViewport(camera, player, world, window);
+        renderer.RenderViewport(camera, player, world, window);
         glfwPollEvents();
     }
-    renderer->freeTextures();
+    renderer.freeTextures();
     log("[INFO] Unloaded all textures");
-    delete renderer;
     log("[INFO] Deallocated renderer");
     glfwDestroyWindow(window);
     glfwTerminate();

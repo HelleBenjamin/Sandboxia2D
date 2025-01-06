@@ -9,6 +9,7 @@ extern int SCREEN_WIDTH;
 extern int SCREEN_HEIGHT;
 extern bool VSYNC;
 extern bool COLLISION;
+extern bool DEBUG;
 
 #define VERSION "0.1.1-beta"
 
