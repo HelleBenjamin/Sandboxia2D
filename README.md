@@ -28,4 +28,5 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 
 ## License
 Copyright (c) 2024-2025 Benjamin Helle
+
 Sandboxia2D is licensed under the GPL-3.0 license.
