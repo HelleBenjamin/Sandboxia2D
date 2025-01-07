@@ -29,6 +29,10 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - `-c` to set the collision, Default is 1
 - `-d` to set the debug, Default is 0
 
+#### Example
+
+`./Sandboxia -v 1 -d 1`
+
 ### For debug
 
 Debug keys:
