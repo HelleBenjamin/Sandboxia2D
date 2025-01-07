@@ -140,6 +140,41 @@ void saveWorld(Tile world[][WORLD_HEIGHT], std::string filename) {
 void loadWorld(Tile (&world)[WORLD_WIDTH][WORLD_HEIGHT], std::string filename) { // TODO
 }
 
+void InputHandler(GLFWwindow* window, Player& player, Tile world[][WORLD_HEIGHT], float deltaTime) {
+    int SelX = static_cast<int>((player.SelectorX / TILE_SIZE / SCALER)  + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)); // Calculate x + offset
+    int SelY = static_cast<int>((player.SelectorY / TILE_SIZE / SCALER)  + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)); // Calculate y + offset
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) player.move(0, -1, deltaTime, world);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) player.move(0, 1, deltaTime, world);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) player.move(-1, 0, deltaTime, world);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player.move(1, 0, deltaTime, world);
+    if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) saveWorld(world, "world"); // Does work
+    //if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) loadWorld(world, "world"); // Currently doesn't work
+
+    // Debug features
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && DEBUG) log("[INFO] Player position: (" + to_string(player.posX) + ", " + to_string(player.posY) + ")");
+    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && DEBUG) log("[INFO] Selector position: (" + to_string((player.SelectorX / TILE_SIZE / SCALER) + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)) +  ", " + to_string((player.SelectorY / TILE_SIZE / SCALER) + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)) + ")");
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && DEBUG) log("[INFO] Current Tile at cursor: " + to_string(world[SelX][SelY].type) + " " + to_string(world[SelX][SelY].isVisible) + " " + to_string(world[SelX][SelY].isSolid));
+    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && DEBUG) log("[INFO] Current FPS: " + to_string(1.0f / deltaTime));
+
+    // Place and destroy
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) { // destroy tile
+        if (SelX < 0 || SelX >= WORLD_WIDTH || SelY < 0 || SelY >= WORLD_HEIGHT) log("[ERROR] Tried to destroy tile out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
+        else{
+            world[SelX][SelY].type = 0;
+            world[SelX][SelY].isVisible = false;
+            world[SelX][SelY].isSolid = false;
+        };
+    } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) { // place block
+        if (SelX < 0 || SelX >= WORLD_WIDTH || SelY < 0 || SelY >= WORLD_HEIGHT) log("[ERROR] Tried to place block out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
+        else {
+        world[SelX][SelY].type = 2;
+        world[SelX][SelY].isVisible = true;
+        world[SelX][SelY].isSolid = true;
+        };
+    }
+}
+
 
 int main(int argc, char *argv[]) {
     std::string args;
@@ -230,39 +265,11 @@ int main(int argc, char *argv[]) {
         float currentFrame = glfwGetTime();
         float deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        int SelX = static_cast<int>((player.SelectorX / TILE_SIZE / SCALER)  + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)); // Calculate x + offset
-        int SelY = static_cast<int>((player.SelectorY / TILE_SIZE / SCALER)  + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)); // Calculate y + offset
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true);
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) player.move(0, -1, deltaTime, world);
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) player.move(0, 1, deltaTime, world);
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) player.move(-1, 0, deltaTime, world);
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player.move(1, 0, deltaTime, world);
-        if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) saveWorld(world, "world"); // Does work
-        if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) loadWorld(world, "world"); // Currently doesn't work
+        glfwPollEvents();
 
-        // Debug features
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && DEBUG) log("[INFO] Player position: (" + to_string(player.posX) + ", " + to_string(player.posY) + ")");
-        if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && DEBUG) log("[INFO] Selector position: (" + to_string((player.SelectorX / TILE_SIZE / SCALER) + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)) +  ", " + to_string((player.SelectorY / TILE_SIZE / SCALER) + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)) + ")");
-        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && DEBUG) log("[INFO] Current Tile at cursor: " + to_string(world[SelX][SelY].type) + " " + to_string(world[SelX][SelY].isVisible) + " " + to_string(world[SelX][SelY].isSolid));
-        if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && DEBUG) log("[INFO] Current FPS: " + to_string(1.0f / deltaTime));
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) { // destroy block
-            if (SelX < 0 || SelX >= WORLD_WIDTH || SelY < 0 || SelY >= WORLD_HEIGHT) log("[ERROR] Tried to destroy block out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
-            else{
-                world[SelX][SelY].type = 0;
-                world[SelX][SelY].isVisible = false;
-                world[SelX][SelY].isSolid = false;
-            };
-        } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) { // place block
-            if (SelX < 0 || SelX >= WORLD_WIDTH || SelY < 0 || SelY >= WORLD_HEIGHT) log("[ERROR] Tried to place block out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
-            else {
-            world[SelX][SelY].type = 2;
-            world[SelX][SelY].isVisible = true;
-            world[SelX][SelY].isSolid = true;
-            };
-        }
+        InputHandler(window, player, world, deltaTime);
 
         renderer.RenderViewport(camera, player, world, window);
-        glfwPollEvents();
     }
 
     log("[INFO] Preparing to shutdown");

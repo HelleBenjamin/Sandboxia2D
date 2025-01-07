@@ -5,6 +5,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 ## Features
 - Bugs may be present
 - 2D World
+- 
 - OpenGL 2.1
 
 ## How to play
@@ -12,6 +13,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - W, A, S, D to move
 - Left mouse button to destroy blocks
 - Right mouse button to place blocks
+- F1 to save the world
 
 ## Building
 - Currently only Linux is supported
@@ -26,6 +28,15 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - `-v` to set the VSYNC, Default is 1
 - `-c` to set the collision, Default is 1
 - `-d` to set the debug, Default is 0
+
+### For debug
+
+Debug keys:
+
+- P to print the player position
+- O to print the selector position
+- T to print the current tile data at the cursor
+- F to print the current FPS
 
 ## License
 Copyright (c) 2024-2025 Benjamin Helle

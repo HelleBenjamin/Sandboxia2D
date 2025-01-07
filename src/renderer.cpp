@@ -2,6 +2,15 @@
 #include "../include/main.h"
 #include <iostream>
 
+/* 
+    OpenGL 2.1 Compatibility based renderer
+    Uses immediate mode to draw tiles.
+
+    Will be used in legacy mode when OpenGl 3.3 renderer will be available.
+
+*/
+
+
 void Renderer::loadTextures(){
     AirTex = loadTexture("assets/air.png");
     GrassTex = loadTexture("assets/grass.png");
@@ -93,8 +102,6 @@ void Renderer::RenderViewport(Camera& camera, Player& player, Tile world[][WORLD
 
     // Render the player
     drawTile(player.playerTile, (camera.width / TILE_SIZE / SCALER / 2), camera.height / TILE_SIZE / SCALER / 2);
-    //drawPlayer(player);
-    //drawPlayer(player, camera.width / TILE_SIZE / SCALER / 2, camera.height / TILE_SIZE / SCALER / 2);
 
     // Render the selector
     drawTile(player.SelectorTile, player.SelectorX / TILE_SIZE / SCALER, player.SelectorY / TILE_SIZE / SCALER);

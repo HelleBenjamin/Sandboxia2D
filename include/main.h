@@ -14,15 +14,13 @@ extern bool DEBUG;
 #define VERSION "0.1.2-beta"
 
 #define TILE_SIZE 8 // 8x8 pixels per tile
-
-#define WORLD_SIZE 64 // 64x64 tiles
 #define SCALER 5 // Scaler for tile size
 
 // WORLD SIZE
 #define WORLD_WIDTH 128
 #define WORLD_HEIGHT 128
 
-typedef struct {
+typedef struct { // Tile structure
     int type;
     bool isVisible;
     bool tileState;
