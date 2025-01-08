@@ -50,7 +50,7 @@ GLuint loadTexture(const char* filepath) {
 
     if (!data) {
         log("[ERROR] Failed to load texture: " + string(filepath));
-        return -1;
+        return 0;
     }
 
     GLuint textureID;
@@ -59,14 +59,16 @@ GLuint loadTexture(const char* filepath) {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
 
     GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
-    gluBuild2DMipmaps(GL_TEXTURE_2D, format, width, height, format, GL_UNSIGNED_BYTE, data);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(data);
-    log("[INFO] Loaded texture: " + string(filepath) + " with ID: " + to_string(textureID));
+    log("[INFO] Loaded texture: '" + string(filepath) + "' with ID: " + to_string(textureID));
     return textureID;
 }
 
@@ -227,8 +229,10 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    // If using legacy renderer(2.1), change major to 2 and minor to 1
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
 
     log("[INFO] Window size: " + to_string(SCREEN_WIDTH) + 'x' + to_string(SCREEN_HEIGHT));
@@ -242,6 +246,12 @@ int main(int argc, char *argv[]) {
 
     glfwMakeContextCurrent(window);
 
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }  
+
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     glfwSetCursorPosCallback(window, cursorPosCallback);
 
@@ -250,20 +260,20 @@ int main(int argc, char *argv[]) {
     // TODO: Make game initialization function
 
     glClearColor(0.222f, 0.608f, 0.924f, 1.0f); // Background color
-    glOrtho(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, -1, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glfwSwapBuffers(window);
 
-    renderer.loadTextures();
+
+    renderer.init();
 
     generateWorld(world);
 
     glfwSwapInterval(VSYNC); // Enable/disable vsync
 
-    float lastFrame = 0.0f;
+    float lastFrame, currentFrame, deltaTime = 0.0f;
 
     while (!glfwWindowShouldClose(window)) { // Main game loop
-        float currentFrame = glfwGetTime();
-        float deltaTime = currentFrame - lastFrame;
+        currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         glfwPollEvents();
 
@@ -274,7 +284,7 @@ int main(int argc, char *argv[]) {
 
     log("[INFO] Preparing to shutdown");
 
-    renderer.freeTextures();
+    renderer.exit();
     glfwDestroyWindow(window);
     glfwTerminate();
     log("[INFO] Program shutting down");

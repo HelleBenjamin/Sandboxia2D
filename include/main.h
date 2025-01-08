@@ -1,8 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <GL/glu.h>
 #include <string>
 
 extern int SCREEN_WIDTH;
