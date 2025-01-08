@@ -5,6 +5,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
+using namespace std;
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 using namespace glm;
 
 /* 
@@ -135,22 +140,52 @@ void Renderer::init() {
     
 }
 
+GLuint Renderer::loadTexture(const char* filepath) {
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load(filepath, &width, &height, &nrChannels, 0);
+
+    if (!data) {
+        log("[ERROR] Failed to load texture: " + string(filepath));
+        return 0;
+    }
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+
+    GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(data);
+    log("[RENDERER] Loaded texture: '" + string(filepath) + "' with ID: " + to_string(textureID));
+    return textureID;
+}
+
+void Renderer::unloadTexture(GLuint textureID) {
+    glDeleteTextures(1, &textureID);
+    log("[RENDERER] Unloaded texture with ID: " + to_string(textureID));
+}
+
 void Renderer::loadTextures(){
-    AirTex = loadTexture("assets/air.png");
-    GrassTex = loadTexture("assets/grass.png");
-    StoneTex = loadTexture("assets/stone.png");
-    DirtTex = loadTexture("assets/dirt.png");
-    PlayerTex = loadTexture("assets/player.png");
-    SelectorTex = loadTexture("assets/selection.png");
+    const char* filenames[TEXTURE_COUNT] = {"assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/player.png", "assets/selection.png"};
+    glGenTextures(TEXTURE_COUNT, textures);
+
+    for (int i = 0; i < TEXTURE_COUNT; i++) {
+        textures[i] = loadTexture(filenames[i]);
+    }
 }
 
 void Renderer::freeTextures(){
-    unloadTexture(AirTex);
-    unloadTexture(GrassTex);
-    unloadTexture(StoneTex);
-    unloadTexture(PlayerTex);
-    unloadTexture(DirtTex);
-    unloadTexture(SelectorTex);
+    for (int i = 0; i < TEXTURE_COUNT; i++) {
+        unloadTexture(textures[i]);
+    }
 }
 
 void Renderer::exit() {
@@ -164,34 +199,10 @@ void Renderer::exit() {
 void Renderer::drawTile(Tile tile, int x, int y) {
     if (!tile.isVisible) return;
 
-    glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND); // Enable transparency
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    switch (tile.type) { // Bind right texture according to tile type, TODO: Replace with enum
-        case 0:
-            glBindTexture(GL_TEXTURE_2D, AirTex);
-            break;
-        case 1:
-            glBindTexture(GL_TEXTURE_2D, GrassTex);
-            break;
-        case 2:
-            glBindTexture(GL_TEXTURE_2D, StoneTex);
-            break;
-        case 3:
-            glBindTexture(GL_TEXTURE_2D, PlayerTex);
-            break;
-        case 4:
-            glBindTexture(GL_TEXTURE_2D, DirtTex);
-            break;
-        case 5:
-            glBindTexture(GL_TEXTURE_2D, SelectorTex);
-            break;
-        default:
-            log("[ERROR] Invalid tile texture type: " + std::to_string(tile.type));
-            glBindTexture(GL_TEXTURE_2D, 0);
-            break;
-    }
+    glBindTexture(GL_TEXTURE_2D, textures[tile.type]);
 
     mat4 model = mat4(1.0f);
     model = translate(model, vec3(x * TILE_SIZE * SCALER, y * TILE_SIZE * SCALER, 0.0f));
@@ -205,6 +216,7 @@ void Renderer::drawTile(Tile tile, int x, int y) {
     glBindVertexArray(0);
 
     glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_BLEND);
 }
 
 void Renderer::RenderViewport(Camera& camera, Player& player, Tile world[][WORLD_HEIGHT], GLFWwindow* window) {

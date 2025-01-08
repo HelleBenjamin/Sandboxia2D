@@ -3,6 +3,7 @@
 #include "../include/Sandboxia/renderer.h"
 #include "../include/Sandboxia/player.h"
 #include <fstream>
+#include <cmath>
 #include <iomanip>
 
 /*  Sandboxia2D by Benjamin Helle (C) 2024-2025
@@ -12,9 +13,6 @@
     Other functions are defined in other files.
 
 */
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 
 using namespace std;
 
@@ -32,50 +30,6 @@ Renderer renderer;
 Player player;
 Camera camera;
 
-/* TILE TYPES:
-
-    0: Air
-    1: Grass
-    2: Stone
-    3: Player
-    4: Dirt
-    5: Selector
-
-*/
-
-
-GLuint loadTexture(const char* filepath) {
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load(filepath, &width, &height, &nrChannels, 0);
-
-    if (!data) {
-        log("[ERROR] Failed to load texture: " + string(filepath));
-        return 0;
-    }
-
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-
-    GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
-
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    stbi_image_free(data);
-    log("[INFO] Loaded texture: '" + string(filepath) + "' with ID: " + to_string(textureID));
-    return textureID;
-}
-
-void unloadTexture(GLuint textureID) {
-    glDeleteTextures(1, &textureID);
-    log("[INFO] Unloaded texture with ID: " + to_string(textureID));
-}
 
 void log(string msg) {
     logFile << fixed << setprecision(2) << "[" << glfwGetTime() << "] " << msg << endl;
@@ -103,7 +57,7 @@ void generateWorld(Tile world[][WORLD_HEIGHT]) {
                 world[x][y].isVisible = true;
                 world[x][y].isSolid = true;
             } else if (terrainY > terrainHeight[x] - 4) {
-                world[x][y].type = 4; // Dirt
+                world[x][y].type = 3; // Dirt
                 world[x][y].isVisible = true;
                 world[x][y].isSolid = true;
             } else {
@@ -214,13 +168,13 @@ int main(int argc, char *argv[]) {
     player.posX = 1.0f;
     player.posY = WORLD_HEIGHT - 70.0f;
     player.PlayerSpeed = 10.0f;
-    player.playerTile.type = 3;
+    player.playerTile.type = T_Player;
     player.playerTile.isVisible = true;
     player.playerTile.isSolid = false;
 
     player.SelectorX = 0.0f;
     player.SelectorY = 0.0f;
-    player.SelectorTile.type = 5;
+    player.SelectorTile.type = T_Selector;
     player.SelectorTile.isVisible = true;
     player.SelectorTile.isSolid = false;
 
