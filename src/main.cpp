@@ -107,6 +107,16 @@ void InputHandler(GLFWwindow* window, Player& player, Tile world[][WORLD_HEIGHT]
     if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) saveWorld(world, "world"); // Does work
     //if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) loadWorld(world, "world"); // Currently doesn't work
 
+    // Set placable tile type
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) { // Grass
+        player.SelectedTileType = T_Grass;
+    } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) { // Stone
+        player.SelectedTileType = T_Stone;
+    } else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) { // Dirt
+        player.SelectedTileType = T_Dirt;
+    }
+
+
     // Debug features
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && DEBUG) log("[INFO] Player position: (" + to_string(player.posX) + ", " + to_string(player.posY) + ")");
     if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && DEBUG) log("[INFO] Selector position: (" + to_string((player.SelectorX / TILE_SIZE / SCALER) + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)) +  ", " + to_string((player.SelectorY / TILE_SIZE / SCALER) + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)) + ")");
@@ -121,12 +131,12 @@ void InputHandler(GLFWwindow* window, Player& player, Tile world[][WORLD_HEIGHT]
             world[SelX][SelY].isVisible = false;
             world[SelX][SelY].isSolid = false;
         };
-    } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) { // place block
-        if (SelX < 0 || SelX >= WORLD_WIDTH || SelY < 0 || SelY >= WORLD_HEIGHT) log("[ERROR] Tried to place block out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
-        else {
-        world[SelX][SelY].type = 2;
-        world[SelX][SelY].isVisible = true;
-        world[SelX][SelY].isSolid = true;
+    } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) { // place tile
+        if (SelX < 0 || SelX >= WORLD_WIDTH || SelY < 0 || SelY >= WORLD_HEIGHT) log("[ERROR] Tried to place tile out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
+        else if (world[SelX][SelY].type == 0){ // Only place if tile is air
+            world[SelX][SelY].type = player.SelectedTileType;
+            world[SelX][SelY].isVisible = true;
+            world[SelX][SelY].isSolid = true;
         };
     }
 }
@@ -174,6 +184,7 @@ int main(int argc, char *argv[]) {
 
     player.SelectorX = 0.0f;
     player.SelectorY = 0.0f;
+    player.SelectedTileType = T_Grass;
     player.SelectorTile.type = T_Selector;
     player.SelectorTile.isVisible = true;
     player.SelectorTile.isSolid = false;

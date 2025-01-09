@@ -9,8 +9,9 @@ public:
     float PlayerSpeed;
 
     double SelectorX, SelectorY;
-    Tile SelectorTile; 
+    Tile SelectorTile;
 
+    unsigned int SelectedTileType;
     Tile playerTile; // Used for rendering
 
     void move(int dx, int dy, float deltaTime, Tile world[][WORLD_HEIGHT]);
