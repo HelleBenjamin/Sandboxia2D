@@ -30,7 +30,6 @@ Renderer renderer;
 Player player;
 Camera camera;
 
-
 void log(string msg) {
     logFile << fixed << setprecision(2) << "[" << glfwGetTime() << "] " << msg << endl;
     cout << fixed << setprecision(2) << " [" << glfwGetTime()  << "] " << msg << endl;
@@ -49,19 +48,19 @@ void generateWorld(Tile world[][WORLD_HEIGHT]) {
         for (int y = 0; y < WORLD_HEIGHT; ++y) {
             int terrainY = WORLD_HEIGHT - 1 - y;
             if (terrainY > terrainHeight[x]) {
-                world[x][y].type = 0; // Air
+                world[x][y].type = T_Air; // Air
                 world[x][y].isVisible = false;
                 world[x][y].isSolid = false;
             } else if (terrainY == terrainHeight[x]) {
-                world[x][y].type = 1; // Grass
+                world[x][y].type = T_Grass; // Grass
                 world[x][y].isVisible = true;
                 world[x][y].isSolid = true;
             } else if (terrainY > terrainHeight[x] - 4) {
-                world[x][y].type = 3; // Dirt
+                world[x][y].type = T_Dirt; // Dirt
                 world[x][y].isVisible = true;
                 world[x][y].isSolid = true;
             } else {
-                world[x][y].type = 2; // Stone
+                world[x][y].type = T_Stone; // Stone
                 world[x][y].isVisible = true;
                 world[x][y].isSolid = true;
             }
@@ -107,7 +106,7 @@ void InputHandler(GLFWwindow* window, Player& player, Tile world[][WORLD_HEIGHT]
     if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) saveWorld(world, "world"); // Does work
     //if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) loadWorld(world, "world"); // Currently doesn't work
 
-    // Set placable tile type
+    // Tile selection
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) { // Grass
         player.SelectedTileType = T_Grass;
     } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) { // Stone
@@ -127,7 +126,7 @@ void InputHandler(GLFWwindow* window, Player& player, Tile world[][WORLD_HEIGHT]
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) { // destroy tile
         if (SelX < 0 || SelX >= WORLD_WIDTH || SelY < 0 || SelY >= WORLD_HEIGHT) log("[ERROR] Tried to destroy tile out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
         else{
-            world[SelX][SelY].type = 0;
+            world[SelX][SelY].type = T_Air;
             world[SelX][SelY].isVisible = false;
             world[SelX][SelY].isSolid = false;
         };
@@ -199,7 +198,6 @@ int main(int argc, char *argv[]) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-
     log("[INFO] Window size: " + to_string(SCREEN_WIDTH) + 'x' + to_string(SCREEN_HEIGHT));
 
     GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Sandboxia2D", NULL, NULL);
@@ -213,7 +211,7 @@ int main(int argc, char *argv[]) {
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
+        log("[ERROR] Failed to initialize GLAD");
         return -1;
     }  
 
@@ -226,7 +224,6 @@ int main(int argc, char *argv[]) {
 
     glClearColor(0.222f, 0.608f, 0.924f, 1.0f); // Background color
     glfwSwapBuffers(window);
-
 
     renderer.init();
 
@@ -247,12 +244,10 @@ int main(int argc, char *argv[]) {
         renderer.RenderViewport(camera, player, world, window);
     }
 
-    log("[INFO] Preparing to shutdown");
-
     renderer.exit();
     glfwDestroyWindow(window);
-    glfwTerminate();
     log("[INFO] Program shutting down");
+    glfwTerminate();
     logFile.close();
     return 0;
 }

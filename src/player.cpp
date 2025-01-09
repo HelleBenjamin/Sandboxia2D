@@ -21,14 +21,15 @@ void Player::move(int dx, int dy, float deltaTime, Tile world[][WORLD_HEIGHT]) {
     float newX = posX + moveAmountX;
     float newY = posY + moveAmountY;
 
-    if (!checkCollision(newX, posY, world) && COLLISION) {
-        posX = newX;
-    }
-    if (!checkCollision(posX, newY, world) && COLLISION) {
-        posY = newY;
-    }
     if (!COLLISION) { // Skip if collision is disabled
         posX = newX;
         posY = newY;
+        return;
     } 
+    if (!checkCollision(newX, posY, world)) {
+        posX = newX;
+    }
+    if (!checkCollision(posX, newY, world)) {
+        posY = newY;
+    }
 }
