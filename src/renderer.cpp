@@ -174,7 +174,7 @@ void Renderer::unloadTexture(GLuint textureID) {
 }
 
 void Renderer::loadTextures(){
-    const char* filenames[TEXTURE_COUNT] = {"assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/player.png", "assets/selection.png"};
+    const char* filenames[TEXTURE_COUNT] = {"assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/player.png", "assets/selection.png", "assets/sand.png"};
     glGenTextures(TEXTURE_COUNT, textures);
 
     for (int i = 0; i < TEXTURE_COUNT; i++) {
@@ -197,8 +197,6 @@ void Renderer::exit() {
 }
 
 void Renderer::drawTile(Tile tile, int x, int y) {
-    if (!tile.isVisible) return;
-
     glEnable(GL_BLEND); // Enable transparency
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -219,7 +217,7 @@ void Renderer::drawTile(Tile tile, int x, int y) {
     glDisable(GL_BLEND);
 }
 
-void Renderer::RenderViewport(Camera& camera, Player& player, Tile world[][WORLD_HEIGHT], GLFWwindow* window) {
+void Renderer::RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     camera.posX += (player.posX - camera.posX);
@@ -236,17 +234,17 @@ void Renderer::RenderViewport(Camera& camera, Player& player, Tile world[][WORLD
         for (int y = startY; y < endY; ++y) {
             int tileX = (int)x;
             int tileY = (int)y;
-            if (tileX >= 0 && tileX < WORLD_WIDTH && tileY >= 0 && tileY < WORLD_HEIGHT && world[tileX][tileY].isVisible) {
-                drawTile(world[tileX][tileY], x - startX, y - startY);
+            if (tileX >= 0 && tileX < world.width && tileY >= 0 && tileY < world.height && world.tiles[tileX][tileY].type != T_Air) {
+                drawTile(world.tiles[tileX][tileY], x - startX, y - startY);
             }
         }
     }
 
-    // Render the player
+    // Render the player at the center of the screen
     drawTile(player.playerTile, (camera.width / TILE_SIZE / SCALER / 2), camera.height / TILE_SIZE / SCALER / 2);
 
     // Render the selector
-    drawTile(player.SelectorTile, player.SelectorX / TILE_SIZE / SCALER, player.SelectorY / TILE_SIZE / SCALER);
+    drawTile(player.SelectorTile, (player.SelectorX / TILE_SIZE / SCALER), (player.SelectorY / TILE_SIZE / SCALER));
 
     glfwSwapBuffers(window);
 }

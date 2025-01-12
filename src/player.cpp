@@ -1,11 +1,11 @@
 #include "../include/Sandboxia/player.h"
 
-bool checkCollision(int x, int y, Tile world[][WORLD_HEIGHT]) {
-    if (x < 0 || x >= WORLD_WIDTH || y < 0 || y >= WORLD_HEIGHT) {
+bool checkCollision(int x, int y, World& world) {
+    if (x < 0 || x >= world.width || y < 0 || y >= world.height) {
         return true; // Return 1 if out of bounds
     }
 
-    return world[x][y].isSolid; // Return 1 if solid
+    return world.tiles[x][y].isSolid; // Return 1 if solid
 }
 
 
@@ -14,7 +14,7 @@ void Camera::updateCamera(Camera& camera, Player player) { // Update camera to f
     camera.posY = player.posY / 2;
 }
 
-void Player::move(int dx, int dy, float deltaTime, Tile world[][WORLD_HEIGHT]) {
+void Player::move(int dx, int dy, float deltaTime, World& world) {
     float moveAmountX = dx * PlayerSpeed * deltaTime;
     float moveAmountY = dy * PlayerSpeed * deltaTime;
 

@@ -5,7 +5,7 @@
 
 /* Modern renderer */
 
-#define TEXTURE_COUNT 6
+#define TEXTURE_COUNT 7
 
 enum TextureType {
     T_Air = 0,
@@ -13,8 +13,10 @@ enum TextureType {
     T_Stone = 2,
     T_Dirt = 3,
     T_Player = 4,
-    T_Selector = 5
+    T_Selector = 5,
+    T_Sand = 6
 };
+
 
 class Renderer {
 public:
@@ -31,7 +33,7 @@ public:
     unsigned int compileShader(GLenum type, const char* source);
     unsigned int createShaderProgram();
 
-    void RenderViewport(Camera& camera, Player& player, Tile world[][WORLD_HEIGHT], GLFWwindow* window);
+    void RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window);
 
 private:
     unsigned int VAO, VBO, EBO;

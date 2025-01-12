@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cmath>
 #include <iomanip>
+#include <cstring>
 
 /*  Sandboxia2D by Benjamin Helle (C) 2024-2025
 
@@ -20,7 +21,6 @@ ofstream logFile("log.txt"); // Log file
 
 int SCREEN_WIDTH = 800;
 int SCREEN_HEIGHT = 600;
-Tile world[WORLD_WIDTH][WORLD_HEIGHT] = {0};
 
 bool VSYNC = true;
 bool COLLISION = true;
@@ -35,34 +35,34 @@ void log(string msg) {
     cout << fixed << setprecision(2) << " [" << glfwGetTime()  << "] " << msg << endl;
 }
 
-void generateWorld(Tile world[][WORLD_HEIGHT]) {
-    srand(time(nullptr));
+void generateWorld(World& world) {
+    if (world.seed == 0) {
+        srand(time(NULL));
+        world.seed = rand();
+    } else srand(world.seed);
+
 
     int terrainHeight[WORLD_WIDTH];
     for (int x = 0; x < WORLD_WIDTH; ++x) {
-        double noise = sin((double)x / 16.0) * 8.0 + cos((double)x / 32.0) * 4.0; // Combine waves for variation
-        terrainHeight[x] = (WORLD_HEIGHT / 2) + (int)(noise);
+        double noise = sin((double)x / 16.0 + world.seed) * 8.0 + cos((double)x / 32.0 + world.seed) * 4.0; // Combine waves for variation
+        terrainHeight[x] = (WORLD_HEIGHT / 2) + static_cast<int>(noise);
     }
 
     for (int x = 0; x < WORLD_WIDTH; ++x) {
         for (int y = 0; y < WORLD_HEIGHT; ++y) {
             int terrainY = WORLD_HEIGHT - 1 - y;
             if (terrainY > terrainHeight[x]) {
-                world[x][y].type = T_Air; // Air
-                world[x][y].isVisible = false;
-                world[x][y].isSolid = false;
+                world.tiles[x][y].type = T_Air; // Air
+                world.tiles[x][y].isSolid = false;
             } else if (terrainY == terrainHeight[x]) {
-                world[x][y].type = T_Grass; // Grass
-                world[x][y].isVisible = true;
-                world[x][y].isSolid = true;
+                world.tiles[x][y].type = T_Grass; // Grass
+                world.tiles[x][y].isSolid = true;
             } else if (terrainY > terrainHeight[x] - 4) {
-                world[x][y].type = T_Dirt; // Dirt
-                world[x][y].isVisible = true;
-                world[x][y].isSolid = true;
+                world.tiles[x][y].type = T_Dirt; // Dirt
+                world.tiles[x][y].isSolid = true;
             } else {
-                world[x][y].type = T_Stone; // Stone
-                world[x][y].isVisible = true;
-                world[x][y].isSolid = true;
+                world.tiles[x][y].type = T_Stone; // Stone
+                world.tiles[x][y].isSolid = true;
             }
         }
     }
@@ -73,29 +73,33 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     player.SelectorY = ypos;
 }
 
-void saveWorld(Tile world[][WORLD_HEIGHT], std::string filename) {
-    /* Save format:
-        Save into a text file with the following format:
-        [Tile with data] [Another tile with data] ...
 
-        Tile with data: type isVisible tileState isSolid tileID
-    
-    */
-    std::ofstream file(filename + ".txt");
-    for (int x = 0; x < WORLD_WIDTH; ++x) {
-        for (int y = 0; y < WORLD_HEIGHT; ++y) {
-            file << "[ " << world[x][y].type << " " << world[x][y].isVisible << " " << world[x][y].tileState << " " << world[x][y].isSolid << " " << world[x][y].tileID << " ]";
-        }
-        file << endl;
+void loadWorld(const char* filePath, World* world) {
+    FILE* file = fopen(filePath, "rb");
+    if (!file) {
+        log("[ERROR] Failed to open file for loading");
+        return;
     }
-    file.close();
-    log("[INFO] Saved world to " + filename);
+    fread(world, sizeof(World), 1, file); // Read the entire World structure
+    log("[INFO] Loaded world");
+    log("[INFO] World name: " + string(world->name));
+    log("[INFO] World size: " + to_string(world->width) + "x" + to_string(world->height));
+    log("[INFO] World seed: " + to_string(world->seed));
+    fclose(file);
 }
 
-void loadWorld(Tile (&world)[WORLD_WIDTH][WORLD_HEIGHT], std::string filename) { // TODO
+void saveWorld(const char* filePath, const World* world) {
+    FILE* file = fopen(filePath, "wb");
+    if (!file) {
+        log("[ERROR] Failed to open file for saving");
+        return;
+    }
+    fwrite(world, sizeof(World), 1, file); // Write the entire World structure
+    log("[INFO] Saved world");
+    fclose(file);
 }
 
-void InputHandler(GLFWwindow* window, Player& player, Tile world[][WORLD_HEIGHT], float deltaTime) {
+void InputHandler(GLFWwindow* window, Player& player, World& world, float deltaTime) {
     int SelX = static_cast<int>((player.SelectorX / TILE_SIZE / SCALER)  + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)); // Calculate x + offset
     int SelY = static_cast<int>((player.SelectorY / TILE_SIZE / SCALER)  + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)); // Calculate y + offset
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true);
@@ -103,8 +107,8 @@ void InputHandler(GLFWwindow* window, Player& player, Tile world[][WORLD_HEIGHT]
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) player.move(0, 1, deltaTime, world);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) player.move(-1, 0, deltaTime, world);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player.move(1, 0, deltaTime, world);
-    if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) saveWorld(world, "world"); // Does work
-    //if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) loadWorld(world, "world"); // Currently doesn't work
+    if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) saveWorld("world", &world);
+    if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) loadWorld("world", &world);
 
     // Tile selection
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) { // Grass
@@ -113,36 +117,41 @@ void InputHandler(GLFWwindow* window, Player& player, Tile world[][WORLD_HEIGHT]
         player.SelectedTileType = T_Stone;
     } else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) { // Dirt
         player.SelectedTileType = T_Dirt;
+    } else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) { // Sand
+        player.SelectedTileType = T_Sand;
     }
 
 
     // Debug features
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && DEBUG) log("[INFO] Player position: (" + to_string(player.posX) + ", " + to_string(player.posY) + ")");
     if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && DEBUG) log("[INFO] Selector position: (" + to_string((player.SelectorX / TILE_SIZE / SCALER) + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)) +  ", " + to_string((player.SelectorY / TILE_SIZE / SCALER) + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)) + ")");
-    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && DEBUG) log("[INFO] Current Tile at cursor: " + to_string(world[SelX][SelY].type) + " " + to_string(world[SelX][SelY].isVisible) + " " + to_string(world[SelX][SelY].isSolid));
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && DEBUG) log("[INFO] Current Tile at cursor: " + to_string(world.tiles[SelX][SelY].type) + " " + " " + to_string(world.tiles[SelX][SelY].isSolid));
     if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && DEBUG) log("[INFO] Current FPS: " + to_string(1.0f / deltaTime));
 
     // Place and destroy
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) { // destroy tile
-        if (SelX < 0 || SelX >= WORLD_WIDTH || SelY < 0 || SelY >= WORLD_HEIGHT) log("[ERROR] Tried to destroy tile out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
+        if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log("[ERROR] Tried to destroy tile out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
         else{
-            world[SelX][SelY].type = T_Air;
-            world[SelX][SelY].isVisible = false;
-            world[SelX][SelY].isSolid = false;
+            world.tiles[SelX][SelY].type = T_Air;
+            world.tiles[SelX][SelY].isSolid = false;
         };
     } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) { // place tile
-        if (SelX < 0 || SelX >= WORLD_WIDTH || SelY < 0 || SelY >= WORLD_HEIGHT) log("[ERROR] Tried to place tile out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
-        else if (world[SelX][SelY].type == 0){ // Only place if tile is air
-            world[SelX][SelY].type = player.SelectedTileType;
-            world[SelX][SelY].isVisible = true;
-            world[SelX][SelY].isSolid = true;
+        if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log("[ERROR] Tried to place tile out of bounds at " + to_string(SelX) + ", " + to_string(SelY));
+        else if (world.tiles[SelX][SelY].type == 0){ // Only place if tile is air
+            world.tiles[SelX][SelY].type = player.SelectedTileType;
+            world.tiles[SelX][SelY].isSolid = true;
         };
     }
 }
 
 
 int main(int argc, char *argv[]) {
-    std::string args;
+    World world;
+
+    world.width = WORLD_WIDTH;
+    world.height = WORLD_HEIGHT;
+    strcpy(world.name, "Test world");
+    string args;
     for (int i = 0; i < argc; i++) {
         args += argv[i];
         if (i < argc - 1) {
@@ -166,6 +175,9 @@ int main(int argc, char *argv[]) {
         } else if (arg == "-d") { // debug
             DEBUG = 1;
             log("[INFO] DEBUG set to " + to_string(DEBUG));
+        } else if (arg == "-W" && i + 1 < argc) { // world
+            char *worldPath = argv[++i];
+            loadWorld(worldPath, &world);
         }
     }
 
@@ -178,14 +190,12 @@ int main(int argc, char *argv[]) {
     player.posY = WORLD_HEIGHT - 70.0f;
     player.PlayerSpeed = 10.0f;
     player.playerTile.type = T_Player;
-    player.playerTile.isVisible = true;
     player.playerTile.isSolid = false;
 
     player.SelectorX = 0.0f;
     player.SelectorY = 0.0f;
     player.SelectedTileType = T_Grass;
     player.SelectorTile.type = T_Selector;
-    player.SelectorTile.isVisible = true;
     player.SelectorTile.isSolid = false;
 
     if (!glfwInit()) {
@@ -215,7 +225,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }  
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     glfwSetCursorPosCallback(window, cursorPosCallback);
 
     log("[INFO] Renderer device: " + string((const char*)glGetString(GL_RENDERER)));

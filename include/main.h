@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string>
+#include <vector>
 
 extern int SCREEN_WIDTH;
 extern int SCREEN_HEIGHT;
@@ -22,16 +23,20 @@ extern bool DEBUG;
 
 typedef struct { // Tile structure
     int type;
-    bool isVisible;
     bool tileState;
     bool isSolid;
     int tileID;
 } Tile;
 
-extern Tile world[WORLD_WIDTH][WORLD_HEIGHT];
+typedef struct {
+    char name[32]; // World name
+    int seed; // World seed
+    int width, height;
+    Tile tiles[WORLD_WIDTH][WORLD_HEIGHT];
+} World;
 
-void saveWorld(Tile world[][WORLD_HEIGHT], std::string filename);
-void loadWorld(Tile (&world)[WORLD_WIDTH][WORLD_HEIGHT], std::string filename);
+void saveWorld(const char* filePath, const World* world);
+void loadWorld(const char* filePath, World* world);
 
 int main(int argc, char *argv[]);
 void log(std::string msg);

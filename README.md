@@ -7,6 +7,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - 2D World
 - OpenGL 3.0
 - VSYNC
+- World saving/loading (WIP)
 
 ## How to play
 
@@ -31,7 +32,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 
 #### Example
 
-`./Sandboxia -v 1 -d 1`
+`./Sandboxia -v 1 -d`
 
 ### For debug
 

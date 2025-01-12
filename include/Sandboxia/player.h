@@ -8,13 +8,13 @@ public:
     float posX, posY;
     float PlayerSpeed;
 
-    double SelectorX, SelectorY;
+    float SelectorX, SelectorY;
     Tile SelectorTile;
 
     unsigned int SelectedTileType;
     Tile playerTile; // Used for rendering
 
-    void move(int dx, int dy, float deltaTime, Tile world[][WORLD_HEIGHT]);
+    void move(int dx, int dy, float deltaTime, World& world);
 };
 
 class Camera{
