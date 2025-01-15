@@ -1,6 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-#include "main.h"
+#include "../main.h"
 
 
 class Player{

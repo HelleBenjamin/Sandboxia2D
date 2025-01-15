@@ -8,7 +8,7 @@
 using namespace std;
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "../include/stb_image.h"
 
 using namespace glm;
 
@@ -21,9 +21,9 @@ using namespace glm;
 
 // Vertex and fragment shaders
 const char* vertexShaderSource = R"glsl(
-#version 330 core
-layout(location = 0) in vec2 aPos;
-layout(location = 1) in vec2 aTexCoord;
+#version 130
+in vec2 aPos;
+in vec2 aTexCoord;
 
 out vec2 TexCoord;
 
@@ -37,7 +37,7 @@ void main() {
 )glsl";
 
 const char* fragmentShaderSource = R"glsl(
-#version 330 core
+#version 130
 out vec4 FragColor;
 
 in vec2 TexCoord;
@@ -45,7 +45,7 @@ in vec2 TexCoord;
 uniform sampler2D texture1;
 
 void main() {
-    FragColor = texture(texture1, TexCoord);
+    FragColor = texture2D(texture1, TexCoord);
 }
 )glsl";
 
@@ -218,7 +218,7 @@ void Renderer::drawTile(Tile tile, int x, int y) {
 }
 
 void Renderer::RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window) {
-    glClear(GL_COLOR_BUFFER_BIT);
+    //glClear(GL_COLOR_BUFFER_BIT);
 
     camera.posX += (player.posX - camera.posX);
     camera.posY += (player.posY - camera.posY);
@@ -246,5 +246,5 @@ void Renderer::RenderViewport(Camera& camera, Player& player, World& world, GLFW
     // Render the selector
     drawTile(player.SelectorTile, (player.SelectorX / TILE_SIZE / SCALER), (player.SelectorY / TILE_SIZE / SCALER));
 
-    glfwSwapBuffers(window);
+    //glfwSwapBuffers(window);
 }

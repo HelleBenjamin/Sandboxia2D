@@ -2,6 +2,7 @@
 #include "../include/main.h"
 #include "../include/Sandboxia/renderer.h"
 #include "../include/Sandboxia/player.h"
+#include "../include/Sandboxia/ui.h"
 #include <fstream>
 #include <cmath>
 #include <iomanip>
@@ -16,6 +17,7 @@
 */
 
 using namespace std;
+using namespace ImGui;
 
 ofstream logFile("log.txt"); // Log file
 
@@ -29,10 +31,21 @@ bool DEBUG = false;
 Renderer renderer;
 Player player;
 Camera camera;
+World world;
 
 void log(string msg) {
     logFile << fixed << setprecision(2) << "[" << glfwGetTime() << "] " << msg << endl;
     cout << fixed << setprecision(2) << " [" << glfwGetTime()  << "] " << msg << endl;
+}
+
+string handleConsoleCommand(std::string command) {
+    istringstream iss(command);
+    string cmd;
+    iss >> cmd;
+    if (cmd == "/seed") {
+        return "Current world seed: " + to_string(world.seed);
+    }
+    return "Unknown command";
 }
 
 void generateWorld(World& world) {
@@ -73,6 +86,15 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     player.SelectorY = ypos;
 }
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) { // TODO: Fix the streching
+    glViewport(0, 0, width, height);
+    camera.width = width;
+    camera.height = height;
+    SCREEN_WIDTH = width;
+    SCREEN_HEIGHT = height;
+}
+
+
 
 void loadWorld(const char* filePath, World* world) {
     FILE* file = fopen(filePath, "rb");
@@ -99,18 +121,51 @@ void saveWorld(const char* filePath, const World* world) {
     fclose(file);
 }
 
+// Keyboard and UI input
+void InputHandlerUI(GLFWwindow* window, Player& player, World& world, float deltaTime) {
+    static bool pressed = false; // Prevent spamming the input
+
+    // UI and other input
+    if (!pressed) {
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+            isMenuOpen = !isMenuOpen;
+            pressed = true;
+        } else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) { 
+            isConsoleOpen = !isConsoleOpen;
+            pressed = true;
+        } else if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
+            saveWorld("world", &world);
+            pressed = true;
+        } 
+        
+        // Debug only
+        else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && DEBUG) {
+            log("[INFO] Player position: (" + to_string(player.posX) + ", " + to_string(player.posY) + ")");
+            pressed = true;
+        } else if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && DEBUG) {
+            log("[INFO] Selector position: (" + to_string((player.SelectorX / TILE_SIZE / SCALER) + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)) +  ", " + to_string((player.SelectorY / TILE_SIZE / SCALER) + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)) + ")");
+            pressed = true;
+        } else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && DEBUG) {
+            log("[INFO] Current FPS: " + to_string(1.0f / deltaTime));
+            pressed = true;
+        }
+
+    } else if (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && 
+               glfwGetKey(window, GLFW_KEY_T) != GLFW_PRESS && 
+               glfwGetKey(window, GLFW_KEY_F1) != GLFW_PRESS && 
+               glfwGetKey(window, GLFW_KEY_P) != GLFW_PRESS && 
+               glfwGetKey(window, GLFW_KEY_O) != GLFW_PRESS && 
+               glfwGetKey(window, GLFW_KEY_F) != GLFW_PRESS) {
+        pressed = false;
+    }
+}
+
+// Player movement
 void InputHandler(GLFWwindow* window, Player& player, World& world, float deltaTime) {
     int SelX = static_cast<int>((player.SelectorX / TILE_SIZE / SCALER)  + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)); // Calculate x + offset
     int SelY = static_cast<int>((player.SelectorY / TILE_SIZE / SCALER)  + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)); // Calculate y + offset
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) player.move(0, -1, deltaTime, world);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) player.move(0, 1, deltaTime, world);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) player.move(-1, 0, deltaTime, world);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player.move(1, 0, deltaTime, world);
-    if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) saveWorld("world", &world);
-    if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) loadWorld("world", &world);
 
-    // Tile selection
+     // Tile selection & player movement
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) { // Grass
         player.SelectedTileType = T_Grass;
     } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) { // Stone
@@ -121,12 +176,13 @@ void InputHandler(GLFWwindow* window, Player& player, World& world, float deltaT
         player.SelectedTileType = T_Sand;
     }
 
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) player.move(0, -1, deltaTime, world);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) player.move(0, 1, deltaTime, world);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) player.move(-1, 0, deltaTime, world);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player.move(1, 0, deltaTime, world);
 
-    // Debug features
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && DEBUG) log("[INFO] Player position: (" + to_string(player.posX) + ", " + to_string(player.posY) + ")");
-    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && DEBUG) log("[INFO] Selector position: (" + to_string((player.SelectorX / TILE_SIZE / SCALER) + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)) +  ", " + to_string((player.SelectorY / TILE_SIZE / SCALER) + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)) + ")");
-    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS && DEBUG) log("[INFO] Current Tile at cursor: " + to_string(world.tiles[SelX][SelY].type) + " " + " " + to_string(world.tiles[SelX][SelY].isSolid));
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && DEBUG) log("[INFO] Current FPS: " + to_string(1.0f / deltaTime));
+
+
 
     // Place and destroy
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) { // destroy tile
@@ -146,7 +202,6 @@ void InputHandler(GLFWwindow* window, Player& player, World& world, float deltaT
 
 
 int main(int argc, char *argv[]) {
-    World world;
 
     world.width = WORLD_WIDTH;
     world.height = WORLD_HEIGHT;
@@ -227,6 +282,7 @@ int main(int argc, char *argv[]) {
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     glfwSetCursorPosCallback(window, cursorPosCallback);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     log("[INFO] Renderer device: " + string((const char*)glGetString(GL_RENDERER)));
 
@@ -243,17 +299,29 @@ int main(int argc, char *argv[]) {
 
     float lastFrame, currentFrame, deltaTime = 0.0f;
 
+    InitUI(window);
+
     while (!glfwWindowShouldClose(window)) { // Main game loop
+        glClear(GL_COLOR_BUFFER_BIT);
         currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        glfwPollEvents();
 
-        InputHandler(window, player, world, deltaTime);
+        if (const auto& io = ImGui::GetIO(); !io.WantCaptureMouse && !io.WantCaptureKeyboard) { // If is typing or using UI prevent player movement
+            InputHandler(window, player, world, deltaTime); 
+        }
+
+        InputHandlerUI(window, player, world, deltaTime); // Always check for input for UI and other stuff
 
         renderer.RenderViewport(camera, player, world, window);
+
+        HandleUI(window, world, player, renderer);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
 
+    ExitUI();
     renderer.exit();
     glfwDestroyWindow(window);
     log("[INFO] Program shutting down");

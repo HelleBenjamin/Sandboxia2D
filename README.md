@@ -1,6 +1,6 @@
 # Sandboxia2D
 
-Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a simple sandbox game that is easy to run on older machines. The game is still in early development. The render engine was upgraded to OpenGL 3.0. The 'Legacy' render engine is still included for backwards compatibility.
+Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a simple sandbox game that is easy to run on older machines. The game is still in early development. The render engine was upgraded to OpenGL 3.0. The 'Legacy' render engine is still included for backwards compatibility. Using ImGui for the GUI.
 
 ## Features
 - Bugs may be present
@@ -15,12 +15,13 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - Left mouse button to destroy blocks
 - Right mouse button to place blocks
 - F1 to save the world
+- F2 to load the world
 
 ## Building
 - Currently only Linux is supported
 - Clone the repository
-- Run `make` to build the game
-- Run `./Sandboxia` to play the game
+- Run `make -j(number of threads)` to build the game. You can also run `make clean` to clean the build directory
+- Run `./build/Sandboxia` to play the game
 
 ## Launch args
 

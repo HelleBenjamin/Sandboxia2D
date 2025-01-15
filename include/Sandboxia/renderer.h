@@ -1,6 +1,6 @@
 #ifndef RENDERER_H
 #define RENDERER_H
-#include "main.h"
+#include "../main.h"
 #include "player.h"
 
 /* Modern renderer */
@@ -33,13 +33,13 @@ public:
     unsigned int compileShader(GLenum type, const char* source);
     unsigned int createShaderProgram();
 
+    GLuint textures[TEXTURE_COUNT] = {0};
+
     void RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window);
 
 private:
     unsigned int VAO, VBO, EBO;
     unsigned int shaderProgram;
-
-    GLuint textures[TEXTURE_COUNT] = {0};
 
 };
 

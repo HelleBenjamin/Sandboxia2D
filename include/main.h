@@ -1,7 +1,11 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <glad/glad.h>
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
+#include "glad/glad.h"
 #include <GLFW/glfw3.h>
 #include <string>
 #include <vector>
@@ -37,6 +41,8 @@ typedef struct {
 
 void saveWorld(const char* filePath, const World* world);
 void loadWorld(const char* filePath, World* world);
+
+std::string handleConsoleCommand(std::string command); // Returns the output of the command to the console
 
 int main(int argc, char *argv[]);
 void log(std::string msg);
