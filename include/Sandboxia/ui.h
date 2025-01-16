@@ -15,7 +15,7 @@ extern bool isMenuOpen;
 void InitUI(GLFWwindow* window);
 void HandleUI(GLFWwindow* window, World &world, Player &player, Renderer &renderer);
 void ConsoleUI();
-void DebugUI();
+void DebugUI(GLFWwindow* window, Player &player, World &world, Renderer &renderer);
 void MenuUI(GLFWwindow* window ,World &world);
 void ExitUI();
 

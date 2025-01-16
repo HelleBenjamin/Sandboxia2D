@@ -1,9 +1,21 @@
 #ifndef RENDERER_H
 #define RENDERER_H
-#include "main.h"
+#include "../main.h"
 #include "player.h"
 
 /* Legacy renderer */
+
+#define TEXTURE_COUNT 7
+
+enum TextureType {
+    T_Air = 0,
+    T_Grass = 1,
+    T_Stone = 2,
+    T_Dirt = 3,
+    T_Player = 4,
+    T_Selector = 5,
+    T_Sand = 6
+};
 
 class Renderer {
 public:
@@ -14,10 +26,16 @@ public:
     void clearScreen();
     void drawTile(Tile tile, int x, int y);
 
-    void RenderViewport(Camera& camera, Player& player, Tile world[][WORLD_HEIGHT], GLFWwindow* window); 
+    GLuint loadTexture(const char* filepath);
+    void unloadTexture(GLuint textureID);
 
-private:
-    GLuint AirTex, GrassTex, StoneTex, DirtTex, PlayerTex, SelectorTex;
+    unsigned int compileShader(GLenum type, const char* source);
+    unsigned int createShaderProgram();
+
+    GLuint textures[TEXTURE_COUNT] = {0};
+
+    void RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window);
+
 };
 
 #endif

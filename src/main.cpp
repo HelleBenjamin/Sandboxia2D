@@ -44,6 +44,9 @@ string handleConsoleCommand(std::string command) {
     iss >> cmd;
     if (cmd == "/seed") {
         return "Current world seed: " + to_string(world.seed);
+    } else if (cmd == "/debug") {
+        DEBUG = !DEBUG;
+        return "DEBUG set to " + to_string(DEBUG);
     }
     return "Unknown command";
 }

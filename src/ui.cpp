@@ -32,7 +32,7 @@ void HandleUI(GLFWwindow* window, World &world, Player &player, Renderer &render
 
 
     // Debug
-    if (DEBUG) DebugUI();
+    if (DEBUG) DebugUI(window, player, world, renderer);
 
     Render();
     ImGui_ImplOpenGL3_RenderDrawData(GetDrawData());
@@ -53,9 +53,12 @@ void ConsoleUI() {
     End();
 }
 
-void DebugUI() {
+void DebugUI(GLFWwindow* window, Player &player, World &world, Renderer &renderer) {
+    SetNextWindowSize(ImVec2(400, 100), ImGuiCond_FirstUseEver);
     Begin("Debug");
+    Text("Version: %s", VERSION);
     Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / GetIO().Framerate, GetIO().Framerate); // Display FPS
+    Text("Player position: (%.2f, %.2f)", player.posX, player.posY);
     End();
 }
 

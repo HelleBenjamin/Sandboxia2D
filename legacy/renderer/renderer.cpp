@@ -2,6 +2,7 @@
 #include "../include/main.h"
 #include <iostream>
 
+
 /* 
     OpenGL 2.1 Compatibility based renderer
     Uses immediate mode to draw tiles.
@@ -13,30 +14,61 @@ void Renderer::init() {
     loadTextures(); 
 }
 
+GLuint Renderer::loadTexture(const char* filepath) {
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load(filepath, &width, &height, &nrChannels, 0);
+
+    if (!data) {
+        log("[ERROR] Failed to load texture: " + string(filepath));
+        return 0;
+    }
+
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+
+    GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    //glGenerateMipmap(GL_TEXTURE_2D);
+    glad_glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(data);
+    log("[RENDERER] Loaded texture: '" + string(filepath) + "' with ID: " + to_string(textureID));
+    return textureID;
+}
+
+void Renderer::unloadTexture(GLuint textureID) {
+    glDeleteTextures(1, &textureID);
+    log("[RENDERER] Unloaded texture with ID: " + to_string(textureID));
+}
+
+void Renderer::loadTextures(){
+    const char* filenames[TEXTURE_COUNT] = {"assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/player.png", "assets/selection.png", "assets/sand.png"};
+    glGenTextures(TEXTURE_COUNT, textures);
+
+    for (int i = 0; i < TEXTURE_COUNT; i++) {
+        textures[i] = loadTexture(filenames[i]);
+    }
+}
+
+void Renderer::freeTextures(){
+    for (int i = 0; i < TEXTURE_COUNT; i++) {
+        unloadTexture(textures[i]);
+    }
+}
+
 void Renderer::exit() {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
     glDeleteProgram(shaderProgram);
     freeTextures();
-}
-
-void Renderer::loadTextures(){
-    AirTex = loadTexture("assets/air.png");
-    GrassTex = loadTexture("assets/grass.png");
-    StoneTex = loadTexture("assets/stone.png");
-    DirtTex = loadTexture("assets/dirt.png");
-    PlayerTex = loadTexture("assets/player.png");
-    SelectorTex = loadTexture("assets/selection.png");
-}
-
-void Renderer::freeTextures(){
-    unloadTexture(AirTex);
-    unloadTexture(GrassTex);
-    unloadTexture(StoneTex);
-    unloadTexture(PlayerTex);
-    unloadTexture(DirtTex);
-    unloadTexture(SelectorTex);
 }
 
 
@@ -49,46 +81,27 @@ void Renderer::drawTile(Tile tile, int x, int y) {
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND); // Enable transparency
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    switch (tile.type) { // Bind right texture according to tile type
-        case 0:
-            glBindTexture(GL_TEXTURE_2D, AirTex);
-            break;
-        case 1:
-            glBindTexture(GL_TEXTURE_2D, GrassTex);
-            break;
-        case 2:
-            glBindTexture(GL_TEXTURE_2D, StoneTex);
-            break;
-        case 3:
-            glBindTexture(GL_TEXTURE_2D, PlayerTex);
-            break;
-        case 4:
-            glBindTexture(GL_TEXTURE_2D, DirtTex);
-            break;
-        case 5:
-            glBindTexture(GL_TEXTURE_2D, SelectorTex);
-            break;
-        default:
-            log("[ERROR] Invalid tile texture type: " + std::to_string(tile.type));
-            glBindTexture(GL_TEXTURE_2D, 0);
-            break;
-    }
+
+    glBindTexture(GL_TEXTURE_2D, textures[tile.type]);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0); glVertex2f(x * TILE_SIZE * SCALER, y * TILE_SIZE * SCALER);
     glTexCoord2f(0, 1); glVertex2f(x * TILE_SIZE * SCALER, (y + 1) * TILE_SIZE * SCALER);
     glTexCoord2f(1, 1); glVertex2f((x + 1) * TILE_SIZE * SCALER, (y + 1) * TILE_SIZE * SCALER);
     glTexCoord2f(1, 0); glVertex2f((x + 1) * TILE_SIZE * SCALER, y * TILE_SIZE * SCALER);
     glEnd();
+    
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
 }
 
-void Renderer::RenderViewport(Camera& camera, Player& player, Tile world[][WORLD_HEIGHT], GLFWwindow* window) {
-    glClear(GL_COLOR_BUFFER_BIT);
-    // Update the camera position to follow the player
+void Renderer::RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window) {
+    //glClear(GL_COLOR_BUFFER_BIT);
+
     camera.posX += (player.posX - camera.posX);
     camera.posY += (player.posY - camera.posY);
 
@@ -98,25 +111,22 @@ void Renderer::RenderViewport(Camera& camera, Player& player, Tile world[][WORLD
     float endX = startX + camera.width / TILE_SIZE / SCALER;
     float endY = startY + camera.height / TILE_SIZE / SCALER;
 
-    //std::cout << "startX: " << startX << ", startY: " << startY << ", endX: " << endX << ", endY: " << endY << std::endl;
-
     // Render visible tiles
     for (int x = startX; x < endX; ++x) {
         for (int y = startY; y < endY; ++y) {
             int tileX = (int)x;
             int tileY = (int)y;
-            if (tileX >= 0 && tileX < WORLD_WIDTH && tileY >= 0 && tileY < WORLD_HEIGHT && world[tileX][tileY].isVisible) {
-                drawTile(world[tileX][tileY], x - startX, y - startY);
+            if (tileX >= 0 && tileX < world.width && tileY >= 0 && tileY < world.height && world.tiles[tileX][tileY].type != T_Air) {
+                drawTile(world.tiles[tileX][tileY], x - startX, y - startY);
             }
         }
     }
 
-    // Render the player
+    // Render the player at the center of the screen
     drawTile(player.playerTile, (camera.width / TILE_SIZE / SCALER / 2), camera.height / TILE_SIZE / SCALER / 2);
 
     // Render the selector
-    drawTile(player.SelectorTile, player.SelectorX / TILE_SIZE / SCALER, player.SelectorY / TILE_SIZE / SCALER);
+    drawTile(player.SelectorTile, (player.SelectorX / TILE_SIZE / SCALER), (player.SelectorY / TILE_SIZE / SCALER));
 
-    glfwSwapBuffers(window);
+    //glfwSwapBuffers(window);
 }
-

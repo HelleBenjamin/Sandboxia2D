@@ -16,7 +16,7 @@ extern bool VSYNC;
 extern bool COLLISION;
 extern bool DEBUG;
 
-#define VERSION "0.1.3-beta"
+#define VERSION "0.1.4-beta"
 
 #define TILE_SIZE 8 // 8x8 pixels per tile
 #define SCALER 5 // Scaler for tile size
