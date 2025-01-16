@@ -31,6 +31,9 @@ set(LIBS_FILES
 
 add_executable(Sandboxia ${SRC_FILES} ${LIBS_FILES})
 
-target_link_libraries(Sandboxia GL glfw)
+if(UNIX)
+    target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib)
+    target_link_libraries(Sandboxia PRIVATE GL glfw)
+endif()
 
 set_target_properties(Sandboxia PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
