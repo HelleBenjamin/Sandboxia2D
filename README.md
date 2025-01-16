@@ -7,21 +7,22 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - 2D World
 - OpenGL 3.0
 - VSYNC
-- World saving/loading (WIP)
+- World saving/loading
+- Debug mode
 
 ## How to play
 
 - W, A, S, D to move
 - Left mouse button to destroy blocks
 - Right mouse button to place blocks
-- F1 to save the world
-- F2 to load the world
+- T to open console
 
 ## Building
 - Currently only Linux is supported
-- Clone the repository
-- Run `make -j(number of threads)` to build the game. You can also run `make clean` to clean the build directory
-- Run `./build/Sandboxia` to play the game
+    1. Run `mkdir build`  
+    2. Run `cmake -B build` This will generate the Makefile
+    3. Run `cmake --build build -j(number of threads)` to build the game.
+- Run `./build/Sandboxia` to play the game.
 
 ## Launch args
 
@@ -43,6 +44,15 @@ Debug keys:
 - O to print the selector position
 - T to print the current tile data at the cursor
 - F to print the current FPS
+
+
+## Third-party libraries used
+- [ImGui](https://github.com/ocornut/imgui)
+- [GLFW](https://github.com/glfw/glfw)
+- [GLAD](https://github.com/Dav1dde/glad)
+- [stb_image](https://github.com/nothings/stb)
+- [GLM](https://github.com/g-truc/glm)
+
 
 ## License
 Copyright (c) 2024-2025 Benjamin Helle

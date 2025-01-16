@@ -1,8 +1,8 @@
 #include "../include/Sandboxia/renderer.h"
 #include "../include/main.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "../include/glm/glm.hpp"
+#include "../include/glm/gtc/matrix_transform.hpp"
+#include "../include/glm/gtc/type_ptr.hpp"
 #include <iostream>
 
 using namespace std;

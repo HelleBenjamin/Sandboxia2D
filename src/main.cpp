@@ -99,8 +99,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) { // T
     SCREEN_HEIGHT = height;
 }
 
-
-
 void loadWorld(const char* filePath, World* world) {
     FILE* file = fopen(filePath, "rb");
     if (!file) {
@@ -312,7 +310,9 @@ int main(int argc, char *argv[]) {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        if (const auto& io = ImGui::GetIO(); !io.WantCaptureMouse && !io.WantCaptureKeyboard) { // If is typing or using UI prevent player movement
+        const auto& io = ImGui::GetIO();
+
+        if (!io.WantCaptureMouse && !io.WantCaptureKeyboard) { // If is typing or using UI prevent player movement
             InputHandler(window, player, world, deltaTime); 
         }
 
