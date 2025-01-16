@@ -183,9 +183,7 @@ void InputHandler(GLFWwindow* window, Player& player, World& world, float deltaT
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) player.move(0, 1, deltaTime, world);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) player.move(-1, 0, deltaTime, world);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player.move(1, 0, deltaTime, world);
-
-
-
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) player.jump(player);
 
     // Place and destroy
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) { // destroy tile
@@ -289,7 +287,7 @@ int main(int argc, char *argv[]) {
 
     log("[INFO] Renderer device: " + string((const char*)glGetString(GL_RENDERER)));
 
-    // TODO: Make game initialization function
+    // TODO: Make game initialization function, invert the y-axis
 
     glClearColor(0.222f, 0.608f, 0.924f, 1.0f); // Background color
     glfwSwapBuffers(window);
@@ -313,8 +311,10 @@ int main(int argc, char *argv[]) {
         const auto& io = ImGui::GetIO();
 
         if (!io.WantCaptureMouse && !io.WantCaptureKeyboard) { // If is typing or using UI prevent player movement
-            InputHandler(window, player, world, deltaTime); 
+            InputHandler(window, player, world, deltaTime);
         }
+
+        player.updatePlayer(player, world, deltaTime);
 
         InputHandlerUI(window, player, world, deltaTime); // Always check for input for UI and other stuff
 

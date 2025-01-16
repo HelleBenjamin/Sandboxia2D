@@ -1,11 +1,40 @@
 #include "../include/Sandboxia/player.h"
 
+float const GRAVITY = 20.0f;
+float const JUMP_POWER = 2.0f;
+
 bool checkCollision(int x, int y, World& world) {
     if (x < 0 || x >= world.width || y < 0 || y >= world.height) {
         return true; // Return 1 if out of bounds
     }
 
     return world.tiles[x][y].isSolid; // Return 1 if solid
+}
+
+void Player::updatePlayer(Player &player, World& world, float deltaTime) {
+    if (!player.onGround) {
+        player.accelY = +GRAVITY; // Apply gravity
+    } else {
+        player.accelY = 0;
+    }
+
+    player.velX += player.accelX * deltaTime; // Add because the y-axis is inverted
+    player.velY -= player.accelY * deltaTime;
+
+    player.posX += player.velX * deltaTime;
+    player.posY -= player.velY * deltaTime;
+
+    if (player.posY >= WORLD_HEIGHT || checkCollision(player.posX, player.posY+1, world)) {
+        player.velY = 0;
+        player.onGround = true;
+    } else {
+        player.onGround = false;
+    }
+}
+
+void Player::jump(Player &player) {
+    player.velY = +JUMP_POWER;
+    player.onGround = false;
 }
 
 

@@ -2,11 +2,17 @@
 #define PLAYER_H
 #include "../main.h"
 
+extern const float GRAVITY;
+extern float const JUMP_POWER;
 
 class Player{
 public:
     float posX, posY;
     float PlayerSpeed;
+
+    float velX, velY; // velocity
+    float accelX, accelY; // acceleration
+    bool onGround;
 
     float SelectorX, SelectorY;
     Tile SelectorTile;
@@ -15,6 +21,8 @@ public:
     Tile playerTile; // Used for rendering
 
     void move(int dx, int dy, float deltaTime, World& world);
+    void updatePlayer(Player &player, World& world, float deltaTime);
+    void jump(Player &player);
 };
 
 class Camera{
