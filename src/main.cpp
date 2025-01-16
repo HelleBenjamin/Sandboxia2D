@@ -39,6 +39,7 @@ void log(string msg) {
 }
 
 string handleConsoleCommand(std::string command) {
+    log("[INFO] Executing command: " + command);
     istringstream iss(command);
     string cmd;
     iss >> cmd;
@@ -46,6 +47,7 @@ string handleConsoleCommand(std::string command) {
         return "Current world seed: " + to_string(world.seed);
     } else if (cmd == "/debug") {
         DEBUG = !DEBUG;
+        log("[INFO] DEBUG set to " + to_string(DEBUG));
         return "DEBUG set to " + to_string(DEBUG);
     }
     return "Unknown command";
