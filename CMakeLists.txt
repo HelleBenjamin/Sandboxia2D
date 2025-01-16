@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.10)
 
 project(Sandboxia)
 
-
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -32,6 +31,11 @@ set(LIBS_FILES
 
 add_executable(Sandboxia ${SRC_FILES} ${LIBS_FILES})
 
-target_link_libraries(Sandboxia GL glfw)
+if(WIN32)
+    target_link_libraries(Sandboxia opengl32 glfw3)
+endif()
+if (UNIX)
+    target_link_libraries(Sandboxia GL glfw)
+endif()
 
 set_target_properties(Sandboxia PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
