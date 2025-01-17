@@ -242,8 +242,8 @@ int main(int argc, char *argv[]) {
     camera.width = SCREEN_WIDTH;
     camera.height = SCREEN_HEIGHT;
 
-    player.posX = 0.0f;
-    player.posY = 0.0f;
+    player.posX = 1.0f;
+    player.posY = WORLD_HEIGHT - 70.0f;
     player.PlayerSpeed = 10.0f;
     player.playerTile.type = T_Player;
     player.playerTile.isSolid = false;
