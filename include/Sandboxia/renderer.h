@@ -17,6 +17,8 @@ enum TextureType {
     T_Sand = 6
 };
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+
 
 class Renderer {
 public:
@@ -36,6 +38,7 @@ public:
     GLuint textures[TEXTURE_COUNT] = {0};
 
     void RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window);
+    void updateViewport(int width, int height);
 
 private:
     unsigned int VAO, VBO, EBO;

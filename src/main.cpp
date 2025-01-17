@@ -92,9 +92,9 @@ void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) { // TODO: Fix the streching
-    glViewport(0, 0, width, height);
-    camera.width = width;
+    renderer.updateViewport(width, height);
     camera.height = height;
+    camera.width = width;
     SCREEN_WIDTH = width;
     SCREEN_HEIGHT = height;
 }
@@ -242,8 +242,8 @@ int main(int argc, char *argv[]) {
     camera.width = SCREEN_WIDTH;
     camera.height = SCREEN_HEIGHT;
 
-    player.posX = 1.0f;
-    player.posY = WORLD_HEIGHT - 70.0f;
+    player.posX = 0.0f;
+    player.posY = 0.0f;
     player.PlayerSpeed = 10.0f;
     player.playerTile.type = T_Player;
     player.playerTile.isSolid = false;
@@ -284,7 +284,7 @@ int main(int argc, char *argv[]) {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     glfwSetCursorPosCallback(window, cursorPosCallback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
+    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     log("[INFO] Renderer device: " + string((const char*)glGetString(GL_RENDERER)));
 
     // TODO: Make game initialization function, invert the y-axis

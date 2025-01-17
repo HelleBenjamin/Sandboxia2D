@@ -217,6 +217,15 @@ void Renderer::drawTile(Tile tile, int x, int y) {
     glDisable(GL_BLEND);
 }
 
+void Renderer::updateViewport(int width, int height) { // Update the viewport, fixes the streching bug
+    glViewport(0, 0, width, height);
+
+    mat4 projection = ortho(0.0f, (float)width, (float)height, 0.0f, -1.0f, 1.0f);
+
+    glUseProgram(shaderProgram);
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, value_ptr(projection));
+}
+
 void Renderer::RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window) {
     //glClear(GL_COLOR_BUFFER_BIT);
 
