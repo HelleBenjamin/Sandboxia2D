@@ -19,13 +19,6 @@ void HandleUI(GLFWwindow* window, World &world, Player &player, Renderer &render
     ImGui_ImplGlfw_NewFrame();
     NewFrame();
 
-    const auto& io = GetIO();
-    if (!io.WantCaptureMouse) {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-    } else {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    }
-
     if (isConsoleOpen) ConsoleUI();
     if (isMenuOpen) MenuUI(window, world);
 
