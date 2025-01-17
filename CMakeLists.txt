@@ -12,9 +12,9 @@ include_directories(include)
 # Main files
 set(SRC_FILES
     src/main.cpp
-    src/Renderer.cpp
-    src/Player.cpp
-    src/UI.cpp
+    src/renderer.cpp
+    src/player.cpp
+    src/ui.cpp
 )
 
 # Third-party libraries
