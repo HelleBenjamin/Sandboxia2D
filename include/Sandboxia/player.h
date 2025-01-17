@@ -1,6 +1,9 @@
+#pragma once
 #ifndef PLAYER_H
 #define PLAYER_H
+
 #include "../main.h"
+#include "world.h"
 
 extern const float GRAVITY;
 extern float const JUMP_POWER;

@@ -15,6 +15,8 @@ set(SRC_FILES
     src/renderer.cpp
     src/player.cpp
     src/ui.cpp
+    src/input.cpp
+    src/world.cpp
 )
 
 # Third-party libraries
@@ -35,5 +37,7 @@ if(UNIX)
     target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib)
     target_link_libraries(Sandboxia PRIVATE GL glfw)
 endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2") # Use -O2 or -O3 for better performance, may increase compile time, default is -O1
 
 set_target_properties(Sandboxia PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

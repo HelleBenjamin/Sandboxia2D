@@ -1,7 +1,10 @@
+#pragma once
 #ifndef RENDERER_H
 #define RENDERER_H
+
 #include "../main.h"
 #include "player.h"
+#include "world.h"
 
 /* Modern renderer */
 

@@ -1,9 +1,11 @@
+#pragma once
 #ifndef UI_H
 #define UI_H
 
 #include "../main.h"
 #include "player.h"
 #include "renderer.h"
+#include "world.h"
 
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_glfw.h"
