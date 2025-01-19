@@ -4,7 +4,7 @@
 
 #include "../include/mod_api.h"
 
-#ifdef _WIN32 // Definitions for OS specific functions
+#ifdef _WIN32
     #include <windows.h>
     #define LOAD_LIBRARY(lib) LoadLibrary(lib)
     #define GET_PROC_ADDRESS GetProcAddress
@@ -91,20 +91,34 @@ void LoadMods() {
 
     for (const auto& entry : fs::directory_iterator(modfp)) {
         string modPath = entry.path().string();
+
+        #ifdef _WIN32
+            HMODULE handle = LOAD_LIBRARY(modPath.c_str());
+        #else
+            void* handle = LOAD_LIBRARY(modPath.c_str());
+        #endif
         
         if (entry.path().extension() == LIBRARY_EXTENSION) {
-            void* handle = LOAD_LIBRARY(modPath.c_str());
+            #ifdef _WIN32
+                auto ModInitialize = (InitMod) GET_PROC_ADDRESS((HMODULE)handle, "ModInitialize");
+                auto ModUpdate = (UpdateMod) GET_PROC_ADDRESS((HMODULE)handle, "ModUpdate");
+            #else
+                auto ModInitialize = (InitMod) GET_PROC_ADDRESS(handle, "ModInitialize");
+                auto ModUpdate = (UpdateMod) GET_PROC_ADDRESS(handle, "ModUpdate");
+            #endif
+
             if (!handle) {
                 log("[ERROR] Failed to load mod: " + modPath);
                 continue;
             }
 
-            auto ModInitialize = (InitMod) GET_PROC_ADDRESS(handle, "ModInitialize");
-            auto ModUpdate = (UpdateMod) GET_PROC_ADDRESS(handle, "ModUpdate");
-
             if (!ModInitialize || !ModUpdate) { 
-                log("[ERROR] Invalid mod structure: " + modPath);
-                CLOSE_LIBRARY(handle);
+                log("[ERROR] Failed to load mod: " + modPath);
+                #ifdef _WIN32
+                    CLOSE_LIBRARY((HMODULE)handle);
+                #else
+                    CLOSE_LIBRARY(handle);
+                #endif
                 continue;
             }
 
@@ -126,3 +140,4 @@ void UpdateMods(float deltaTime) {
 const std::vector<std::string>& GetLoadedMods() {
     return loadedMods;
 }
+
