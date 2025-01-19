@@ -9,11 +9,13 @@
     #define LOAD_LIBRARY(lib) LoadLibrary(lib)
     #define GET_PROC_ADDRESS GetProcAddress
     #define CLOSE_LIBRARY FreeLibrary
+    #define LIBRARY_EXTENSION ".dll"
 #else
     #include <dlfcn.h>
     #define LOAD_LIBRARY(lib) dlopen(lib, RTLD_LAZY)
     #define GET_PROC_ADDRESS dlsym
     #define CLOSE_LIBRARY dlclose
+    #define LIBRARY_EXTENSION ".so"
 #endif
 
 
@@ -81,45 +83,35 @@ struct Mod {
 };
 
 vector<Mod> mods; // All mods are stored here
-ModAPI api = { &GetPlayerPos, &SetPlayerPos, &AddNewTile, LoadTexture, &FreeTexture, &SetTile, &GetTile, &GetCurrTileType, &GetTileTypeCount,  &GetAPIVersion, &GetGameVersion, &DebugLog };
+ModAPI api = { &GetPlayerPos, &SetPlayerPos, &AddNewTile, LoadTexture, &FreeTexture, &SetTile, &GetTile, &GetCurrTileType, &GetTileTypeCount, &GetAPIVersion, &GetGameVersion, &DebugLog };
 vector<string> loadedMods;
 
-void* LoadMod(const char* modPath) {
-    void* handle = LOAD_LIBRARY(modPath);
-    if (!handle) {
-        printf("Failed to load mod: %s\n", modPath);
-    }
-    return handle;
-}
-
 void LoadMods() {
-    string modfp = "mods/"; // Change if using a different directory
+    string modfp = "mods/";
 
-    for (const auto& entry : filesystem::directory_iterator(modfp)) {
+    for (const auto& entry : fs::directory_iterator(modfp)) {
         string modPath = entry.path().string();
         
-        if (entry.path().extension() == ".so" || entry.path().extension() == ".dll") { // .so for linux, .dll for windows
+        if (entry.path().extension() == LIBRARY_EXTENSION) {
             void* handle = LOAD_LIBRARY(modPath.c_str());
             if (!handle) {
                 log("[ERROR] Failed to load mod: " + modPath);
                 continue;
             }
 
-            void* hModule = handle;
-
-            auto ModInitialize = (InitMod) GET_PROC_ADDRESS(hModule, "ModInitialize");
-            auto ModUpdate = (UpdateMod) GET_PROC_ADDRESS(hModule, "ModUpdate");
+            auto ModInitialize = (InitMod) GET_PROC_ADDRESS(handle, "ModInitialize");
+            auto ModUpdate = (UpdateMod) GET_PROC_ADDRESS(handle, "ModUpdate");
 
             if (!ModInitialize || !ModUpdate) { 
                 log("[ERROR] Invalid mod structure: " + modPath);
-                CLOSE_LIBRARY(hModule);
+                CLOSE_LIBRARY(handle);
                 continue;
             }
 
             loadedMods.push_back(modPath);
-            mods.push_back({hModule, ModInitialize, ModUpdate});
+            mods.push_back({handle, ModInitialize, ModUpdate});
             
-            ModInitialize(&api); // Give access to API
+            ModInitialize(&api);
             log("[INFO] Loaded mod: " + modPath);
         }
     }
