@@ -36,7 +36,7 @@ add_executable(Sandboxia ${SRC_FILES} ${LIBS_FILES})
 
 if(UNIX)
     target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib)
-    target_link_libraries(Sandboxia PRIVATE GL glfw dl)
+    target_link_libraries(Sandboxia PRIVATE GL glfw3)
 elseif(WIN32)
     target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib)
     target_link_libraries(Sandboxia PRIVATE win32 gdi32 opengl32 glfw)
