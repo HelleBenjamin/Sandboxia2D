@@ -21,6 +21,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 
 ## Building
 - Currently only Linux is supported(Windows is still experimental)
+- You can use WSL to run the game on Windows.
 - Building instructions:
     1. Run `mkdir build`  
     2. Run `cmake -B build` This will generate the Makefile
