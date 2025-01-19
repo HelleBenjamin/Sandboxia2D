@@ -15,8 +15,10 @@ extern int SCREEN_HEIGHT;
 extern bool VSYNC;
 extern bool COLLISION;
 extern bool DEBUG;
+extern bool MODS_ENABLED;
 
-#define VERSION "0.1.4-beta"
+#define VERSION "0.1.5-beta"
+#define SANDBOXIA_VERSION_NUM 015
 
 std::string handleConsoleCommand(std::string command); // Returns the output of the command to the console
 

@@ -44,15 +44,20 @@ void InputHandler(GLFWwindow* window, Player& player, Camera& camera, World& wor
     int SelX = static_cast<int>((player.SelectorX / TILE_SIZE / SCALER)  + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)); // Calculate x + offset
     int SelY = static_cast<int>((player.SelectorY / TILE_SIZE / SCALER)  + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)); // Calculate y + offset
 
-     // Tile selection & player movement
+    // Tile selection & player movement, reserved tiles 0-6 (may change when new tiles are added)
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) { // Grass
-        player.SelectedTileType = T_Grass;
+        player.SelectedTileType = TypeGrass;
     } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) { // Stone
-        player.SelectedTileType = T_Stone;
+        player.SelectedTileType = TypeStone;
     } else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) { // Dirt
-        player.SelectedTileType = T_Dirt;
+        player.SelectedTileType = TypeDirt;
     } else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) { // Sand
-        player.SelectedTileType = T_Sand;
+        player.SelectedTileType = TypeSand;
+    }
+
+    // Modded tiles
+    else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) {
+        player.SelectedTileType = 7;
     }
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) player.move(0, -1, deltaTime, world);
@@ -70,9 +75,19 @@ void InputHandler(GLFWwindow* window, Player& player, Camera& camera, World& wor
         };
     } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) { // place tile
         if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log("[ERROR] Tried to place tile out of bounds at " + std::to_string(SelX) + ", " + std::to_string(SelY));
-        else if (world.tiles[SelX][SelY].type == 0){ // Only place if tile is air
+        else if (world.tiles[SelX][SelY].type == T_Air){ // Only place if tile is air
             world.tiles[SelX][SelY].type = player.SelectedTileType;
             world.tiles[SelX][SelY].isSolid = true;
         };
+    }
+}
+
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset){
+    if (yoffset > 0) {
+        player.SelectedTileType = (TileType)((player.SelectedTileType - 1 + tileCount) % tileCount);
+        if (player.SelectedTileType <= TypeAir) player.SelectedTileType = TypeGrass;
+    } else if (yoffset < 0) {
+        player.SelectedTileType = (TileType)((player.SelectedTileType + 1) % tileCount);
+        if (player.SelectedTileType <= TypeAir) player.SelectedTileType = TypeGrass;
     }
 }

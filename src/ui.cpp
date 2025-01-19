@@ -1,5 +1,5 @@
 #include "../include/Sandboxia/ui.h"
-
+#include "../include/mod_api.h"
 using namespace ImGui;
 
 bool isConsoleOpen = false;
@@ -59,19 +59,28 @@ void DebugUI(GLFWwindow* window, Player &player, World &world, Renderer &rendere
     Text("Version: %s", VERSION);
     Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / GetIO().Framerate, GetIO().Framerate); // Display FPS
     Text("Player position: (%.2f, %.2f)", player.posX, player.posY);
+    Text("Loaded mods:");
+    for (const auto& mod : GetLoadedMods()) {
+        Text("%s", mod.c_str());
+    }
     End();
 }
 
 void MenuUI(GLFWwindow* window ,World &world) {
     static char world_name[32] = "world";
-    SetNextWindowSize(ImVec2(200, 200), ImGuiCond_FirstUseEver);
+    static int world_seed = world.seed;
+    SetNextWindowSize(ImVec2(200, 300), ImGuiCond_FirstUseEver);
     Begin("Menu");
     Text("World name: ");
     InputText("##world_name", world_name, IM_ARRAYSIZE(world_name));
+    Text("World seed: ");
+    InputInt("##world_seed", &world_seed);
     if (Button("Load")) {
         loadWorld(world_name, &world);
     } else if (Button("Save")) {
         saveWorld(world_name, &world);
+    }else if (Button("New world")) {
+        generateWorld(world, world_seed);
     } else if (Button("Exit")) {
         glfwSetWindowShouldClose(window, true);
     }

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "../include/main.h"
+#include "../include/mod_api.h"
 #include "../include/Sandboxia/renderer.h"
 #include "../include/Sandboxia/player.h"
 #include "../include/Sandboxia/ui.h"
@@ -29,6 +30,7 @@ int SCREEN_HEIGHT = 600;
 bool VSYNC = true;
 bool COLLISION = true;
 bool DEBUG = false;
+bool MODS_ENABLED = true;
 
 GLFWwindow* window;
 
@@ -46,14 +48,12 @@ int initGame(){
     player.posX = 1.0f;
     player.posY = WORLD_HEIGHT - 70.0f;
     player.PlayerSpeed = 10.0f;
-    player.playerTile.type = T_Player;
-    player.playerTile.isSolid = false;
+    player.playerTile = DefaultTiles[TypePlayer];
 
     player.SelectorX = 0.0f;
     player.SelectorY = 0.0f;
     player.SelectedTileType = T_Grass;
-    player.SelectorTile.type = T_Selector;
-    player.SelectorTile.isSolid = false;
+    player.SelectorTile = DefaultTiles[TypeSelector];
 
     if (!glfwInit()) {
         log("[ERROR] Failed to initialize GLFW");
@@ -85,6 +85,7 @@ int initGame(){
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     glfwSetCursorPosCallback(window, cursorPosCallback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetScrollCallback(window, scrollCallback);
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     log("[INFO] Renderer device: " + string((const char*)glGetString(GL_RENDERER)));
 
@@ -93,11 +94,15 @@ int initGame(){
 
     renderer.init();
 
-    generateWorld(world);
+    generateWorld(world, -1);
 
     glfwSwapInterval(VSYNC); // Enable/disable vsync
 
     InitUI(window);
+
+    // Must load mods after other initialization.
+    if (!MODS_ENABLED) return 0;
+    LoadMods();
     return 0;
 }
 
@@ -168,7 +173,9 @@ int main(int argc, char *argv[]) {
         } else if (arg == "-W" && i + 1 < argc) { // world
             char *worldPath = argv[++i];
             loadWorld(worldPath, &world);
-        }
+        } else if (arg == "-disableMods") { // Disable mods
+            MODS_ENABLED = false;
+        } 
     }
 
     initGame();
@@ -180,8 +187,10 @@ int main(int argc, char *argv[]) {
         currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
+ 
+        if (MODS_ENABLED) UpdateMods(deltaTime); 
 
-        const auto& io = ImGui::GetIO();
+        const auto& io = GetIO();
 
         if (!io.WantCaptureMouse && !io.WantCaptureKeyboard) { // If is typing or using UI prevent player movement
             InputHandler(window, player, camera, world, deltaTime);
@@ -204,6 +213,11 @@ int main(int argc, char *argv[]) {
     glfwDestroyWindow(window);
     log("[INFO] Program shutting down");
     glfwTerminate();
+    // Deallocate memory
+    for (int i = 0; i < world.width; i++) {
+        delete[] world.tiles[i];
+    }
+    delete[] world.tiles;
     logFile.close();
     return 0;
 }

@@ -8,8 +8,11 @@
 #define SCALER 5 // Scaler for tile size
 
 // WORLD SIZE
-#define WORLD_WIDTH 128
-#define WORLD_HEIGHT 128
+//#define WORLD_WIDTH 128
+//#define WORLD_HEIGHT 128
+
+extern int WORLD_WIDTH;
+extern int WORLD_HEIGHT;
 
 typedef struct { // Tile structure
     int type;
@@ -22,11 +25,43 @@ typedef struct {
     char name[32]; // World name
     int seed; // World seed
     int width, height;
-    Tile tiles[WORLD_WIDTH][WORLD_HEIGHT];
+    Tile** tiles;
 } World;
 
-void generateWorld(World& world);
+enum TileType {
+    TypePlayer = 0,
+    TypeSelector,
+    TypeAir, //
+    TypeGrass,
+    TypeStone,
+    TypeDirt,
+    TypeSand,
+
+};
+
+extern int tileCount; // Keeps track of tile count
+
+// Max tile count: 256
+extern Tile DefaultTiles[0xFF];
+
+/* Default tile values. 
+    !Texture loading order is important!
+    Keep it same as below.
+
+    0: Player
+    1: Selector
+    2: Air
+    3: Grass
+    4: Stone
+    5: Dirt
+    6: Sand
+
+*/
+
+void generateWorld(World& world, int seed);
 void saveWorld(const char* filePath, const World* world);
 void loadWorld(const char* filePath, World* world);
+
+extern World world;
 
 #endif

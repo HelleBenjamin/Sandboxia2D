@@ -9,5 +9,6 @@
 
 void InputHandler(GLFWwindow* window, Player& player,Camera& camera, World& world, float deltaTime);
 void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& world, float deltaTime);
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 #endif

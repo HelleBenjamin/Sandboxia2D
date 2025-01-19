@@ -4,6 +4,7 @@
 #include "../include/glm/gtc/matrix_transform.hpp"
 #include "../include/glm/gtc/type_ptr.hpp"
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -17,7 +18,6 @@ using namespace glm;
     Modern and fast compared to the legacy renderer.
     Use this as default.
 */
-
 
 // Vertex and fragment shaders
 const char* vertexShaderSource = R"glsl(
@@ -140,13 +140,14 @@ void Renderer::init() {
     
 }
 
-GLuint Renderer::loadTexture(const char* filepath) {
+GLuint loadTexture(const char* filepath) {
+    if (!filepath) log("[ERROR] Texture path is null");
     int width, height, nrChannels;
     unsigned char* data = stbi_load(filepath, &width, &height, &nrChannels, 0);
 
     if (!data) {
         log("[ERROR] Failed to load texture: " + string(filepath));
-        return 0;
+        exit(2);
     }
 
     GLuint textureID;
@@ -164,26 +165,28 @@ GLuint Renderer::loadTexture(const char* filepath) {
     glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(data);
-    log("[RENDERER] Loaded texture: '" + string(filepath) + "' with ID: " + to_string(textureID));
+    log("[INFO] Loaded texture: '" + string(filepath) + "' with ID: " + to_string(textureID));
     return textureID;
 }
 
-void Renderer::unloadTexture(GLuint textureID) {
+void unloadTexture(GLuint textureID) {
     glDeleteTextures(1, &textureID);
-    log("[RENDERER] Unloaded texture with ID: " + to_string(textureID));
+    log("[INFO] Unloaded texture with ID: " + to_string(textureID));
 }
 
 void Renderer::loadTextures(){
-    const char* filenames[TEXTURE_COUNT] = {"assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/player.png", "assets/selection.png", "assets/sand.png"};
-    glGenTextures(TEXTURE_COUNT, textures);
+    const char* filenames[] = {"assets/player.png", "assets/selector.png", "assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/sand.png"}; // The order must be the same as defined in world.h
 
-    for (int i = 0; i < TEXTURE_COUNT; i++) {
-        textures[i] = loadTexture(filenames[i]);
+    glGenTextures(tileCount, textures.data());
+
+    for (int i = 0; i < tileCount; i++) {
+        textures.push_back(loadTexture(filenames[i]));
+        //textures[i] = loadTexture(filenames[i]);
     }
 }
 
 void Renderer::freeTextures(){
-    for (int i = 0; i < TEXTURE_COUNT; i++) {
+    for (int i = 0; i < textures.size(); i++) {
         unloadTexture(textures[i]);
     }
 }

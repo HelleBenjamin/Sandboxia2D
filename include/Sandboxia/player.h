@@ -8,6 +8,8 @@
 extern const float GRAVITY;
 extern float const JUMP_POWER;
 
+
+
 class Player{
 public:
     float posX, posY;
@@ -36,5 +38,7 @@ public:
     void updateCamera(Camera& camera, Player player);
 };
 
+extern Player player;
+extern Camera camera;
 
 #endif

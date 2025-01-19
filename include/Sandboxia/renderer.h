@@ -5,23 +5,23 @@
 #include "../main.h"
 #include "player.h"
 #include "world.h"
+#include <vector>
 
 /* Modern renderer */
 
-#define TEXTURE_COUNT 7
-
 enum TextureType {
-    T_Air = 0,
-    T_Grass = 1,
-    T_Stone = 2,
-    T_Dirt = 3,
-    T_Player = 4,
-    T_Selector = 5,
+    T_Player = 0,
+    T_Selector = 1,
+    T_Air = 2,
+    T_Grass = 3,
+    T_Stone = 4,
+    T_Dirt = 5,
     T_Sand = 6
 };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
+GLuint loadTexture(const char* filepath);
+void unloadTexture(GLuint textureID);
 
 class Renderer {
 public:
@@ -32,13 +32,10 @@ public:
     void clearScreen();
     void drawTile(Tile tile, int x, int y);
 
-    GLuint loadTexture(const char* filepath);
-    void unloadTexture(GLuint textureID);
-
     unsigned int compileShader(GLenum type, const char* source);
     unsigned int createShaderProgram();
 
-    GLuint textures[TEXTURE_COUNT] = {0};
+    std::vector<GLuint> textures;
 
     void RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window);
     void updateViewport(int width, int height);
@@ -49,5 +46,6 @@ private:
 
 };
 
+extern Renderer renderer;
 
 #endif
