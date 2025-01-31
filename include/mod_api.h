@@ -41,7 +41,7 @@ extern "C" {
     typedef Tile (*GetTileFunc)(int x, int y);
     typedef int (*GetCurrTileTypeFunc)();
     typedef int (*GetTileTypeCountFunc)();
-
+    typedef int (*GetWorldSeedFunc)();
 
     typedef int (*GetAPIVersionFunc)();
     typedef int (*GetGameVersionFunc)();
@@ -58,6 +58,7 @@ extern "C" {
         GetTileFunc GetTile;
         GetCurrTileTypeFunc GetCurrTileType;
         GetTileTypeCountFunc GetTileTypeCount;
+        GetWorldSeedFunc GetWorldSeed;
 
         GetAPIVersionFunc GetAPIVersion;
         GetGameVersionFunc GetGameVersion;

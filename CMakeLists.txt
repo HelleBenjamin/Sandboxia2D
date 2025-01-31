@@ -42,6 +42,6 @@ elseif(WIN32)
     target_link_libraries(Sandboxia PRIVATE win32 gdi32 opengl32 glfw)
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0") # Use -O2 or -O3 for better performance, may increase compile time, default is -O1, for debug use -O0
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1") # Use -O2 or -O3 for better performance, may increase compile time, default is -O1, for debug use -O0
 
 set_target_properties(Sandboxia PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

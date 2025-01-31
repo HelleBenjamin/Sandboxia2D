@@ -2,6 +2,10 @@
 #include "../include/main.h"
 #include <iostream>
 
+using namespace std;
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "../include/stb_image.h"
 
 /* 
     OpenGL 2.1 Compatibility based renderer
@@ -14,7 +18,7 @@ void Renderer::init() {
     loadTextures(); 
 }
 
-GLuint Renderer::loadTexture(const char* filepath) {
+GLuint loadTexture(const char* filepath) {
     int width, height, nrChannels;
     unsigned char* data = stbi_load(filepath, &width, &height, &nrChannels, 0);
 
@@ -43,31 +47,29 @@ GLuint Renderer::loadTexture(const char* filepath) {
     return textureID;
 }
 
-void Renderer::unloadTexture(GLuint textureID) {
+void unloadTexture(GLuint textureID) {
     glDeleteTextures(1, &textureID);
     log("[RENDERER] Unloaded texture with ID: " + to_string(textureID));
 }
 
 void Renderer::loadTextures(){
-    const char* filenames[TEXTURE_COUNT] = {"assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/player.png", "assets/selection.png", "assets/sand.png"};
-    glGenTextures(TEXTURE_COUNT, textures);
+    const char* filenames[] = {"assets/player.png", "assets/selector.png", "assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/sand.png"}; // The order must be the same as defined in world.h
 
-    for (int i = 0; i < TEXTURE_COUNT; i++) {
-        textures[i] = loadTexture(filenames[i]);
+    glGenTextures(tileCount, textures.data());
+
+    for (int i = 0; i < tileCount; i++) {
+        textures.push_back(loadTexture(filenames[i]));
+        //textures[i] = loadTexture(filenames[i]);
     }
 }
 
 void Renderer::freeTextures(){
-    for (int i = 0; i < TEXTURE_COUNT; i++) {
+    for (int i = 0; i < textures.size(); i++) {
         unloadTexture(textures[i]);
     }
 }
 
 void Renderer::exit() {
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-    glDeleteProgram(shaderProgram);
     freeTextures();
 }
 
@@ -77,7 +79,6 @@ void Renderer::clearScreen() {
 }
 
 void Renderer::drawTile(Tile tile, int x, int y) {
-    if (!tile.isVisible) return; // Skip invisible tiles for performance
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND); // Enable transparency
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

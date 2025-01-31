@@ -62,6 +62,10 @@ int GetTileTypeCount() {
     return tileCount;
 }
 
+int GetWorldSeed() {
+    return world.seed;
+}
+
 
 // API Info
 int GetAPIVersion() {
@@ -83,7 +87,7 @@ struct Mod {
 };
 
 vector<Mod> mods; // All mods are stored here
-ModAPI api = { &GetPlayerPos, &SetPlayerPos, &AddNewTile, LoadTexture, &FreeTexture, &SetTile, &GetTile, &GetCurrTileType, &GetTileTypeCount, &GetAPIVersion, &GetGameVersion, &DebugLog };
+ModAPI api = { &GetPlayerPos, &SetPlayerPos, &AddNewTile, LoadTexture, &FreeTexture, &SetTile, &GetTile, &GetCurrTileType, &GetTileTypeCount, &GetWorldSeed, &GetAPIVersion, &GetGameVersion, &DebugLog };
 vector<string> loadedMods;
 
 void LoadMods() {

@@ -58,6 +58,7 @@ void DebugUI(GLFWwindow* window, Player &player, World &world, Renderer &rendere
     Begin("Debug");
     Text("Version: %s", VERSION);
     Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / GetIO().Framerate, GetIO().Framerate); // Display FPS
+    Text("Average FPS: %.2f", 1.0f / GetIO().Framerate);
     Text("Player position: (%.2f, %.2f)", player.posX, player.posY);
     Text("Loaded mods:");
     for (const auto& mod : GetLoadedMods()) {
