@@ -100,6 +100,10 @@ void Renderer::drawTile(Tile tile, int x, int y) {
     glDisable(GL_BLEND);
 }
 
+void Renderer::updateViewport(int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
 void Renderer::RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window) {
     //glClear(GL_COLOR_BUFFER_BIT);
 
