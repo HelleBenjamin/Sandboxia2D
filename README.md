@@ -64,6 +64,7 @@ Debug keys:
 - [GLAD](https://github.com/Dav1dde/glad)
 - [stb_image](https://github.com/nothings/stb)
 - [GLM](https://github.com/g-truc/glm)
+- [stb_perlin](https://github.com/nothings/stb)
 
 
 ## License

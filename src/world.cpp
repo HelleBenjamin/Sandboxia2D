@@ -3,7 +3,12 @@
 #include <cmath>
 #include <iostream>
 
-int WORLD_WIDTH = 128; // Default world size
+using namespace std;
+
+#define STB_PERLIN_IMPLEMENTATION
+#include "../include/stb_perlin.h"
+
+int WORLD_WIDTH = 256; // Default world size
 int WORLD_HEIGHT = 128;
 
 int tileCount = 7; // To get the placeable tiles, subtract 2
@@ -37,32 +42,34 @@ void generateWorld(World& world, int seed) {
         world.tiles[x] = new Tile[world.height];
     }
 
-
     int terrainHeight[world.width];
+
+    // Perlin noise parameters
+    float scale = 0.1f; // Controls smoothness (lower = smoother, higher = rougher)
+    float amplitude = 10.0f; // Controls terrain height variation
+
     for (int x = 0; x < world.width; ++x) {
-        double noise = sin((double)x / 16.0 + world.seed) * 8.0 + cos((double)x / 32.0 + world.seed) * 4.0; // Combine waves for variation
-        terrainHeight[x] = (world.height / 2) + static_cast<int>(noise);
+        float noise = stb_perlin_noise3(x * scale, world.seed * 0.1f, 0.0f, 0, 0, 0);
+
+        // Normalize Perlin noise to be between -1 and 1, then scale it
+        int heightOffset = static_cast<int>(noise * amplitude);
+
+        // Base height is in the middle of the world
+        terrainHeight[x] = (world.height / 2) + heightOffset;
     }
 
+    // Generate terrain based on height map
     for (int x = 0; x < world.width; ++x) {
         for (int y = 0; y < world.height; ++y) {
             int terrainY = world.height - 1 - y;
             if (terrainY > terrainHeight[x]) {
                 world.tiles[x][y] = DefaultTiles[TypeAir];
-                //world.tiles[x][y].type = T_Air; // Air
-                //world.tiles[x][y].isSolid = false;
             } else if (terrainY == terrainHeight[x]) {
                 world.tiles[x][y] = DefaultTiles[TypeGrass];
-                //world.tiles[x][y].type = T_Grass; // Grass
-                //world.tiles[x][y].isSolid = true;
             } else if (terrainY > terrainHeight[x] - 4) {
                 world.tiles[x][y] = DefaultTiles[TypeDirt];
-                //world.tiles[x][y].type = T_Dirt; // Dirt
-                //world.tiles[x][y].isSolid = true;
             } else {
                 world.tiles[x][y] = DefaultTiles[TypeStone];
-                //world.tiles[x][y].type = T_Stone; // Stone
-                //world.tiles[x][y].isSolid = true;
             }
         }
     }
