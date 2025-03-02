@@ -142,9 +142,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 int main(int argc, char *argv[]) {
-
-    world.width = WORLD_WIDTH;
+    world.width = WORLD_WIDTH; // Set default world size
     world.height = WORLD_HEIGHT;
+
     strcpy(world.name, "Test world");
     string args;
     for (int i = 0; i < argc; i++) {
@@ -155,6 +155,8 @@ int main(int argc, char *argv[]) {
     }
     log("--- Sandboxia2D " + string(VERSION) + " ---");
     log("[INFO] Launching with arguments: " + args);
+
+    // Parse arguments
     for (int i = 1; i < argc; i++) {
         string arg = argv[i];
         if (arg == "-w" && i + 1 < argc) { // w for width
@@ -178,6 +180,7 @@ int main(int argc, char *argv[]) {
         } 
     }
 
+    // Initialize the game
     initGame();
 
     float lastFrame, currentFrame, deltaTime = 0.0f;
@@ -208,6 +211,7 @@ int main(int argc, char *argv[]) {
         glfwPollEvents();
     }
 
+    // Shutdown
     ExitUI();
     renderer.exit();
     glfwDestroyWindow(window);

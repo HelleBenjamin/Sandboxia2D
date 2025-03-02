@@ -8,8 +8,6 @@
 extern const float GRAVITY;
 extern float const JUMP_POWER;
 
-
-
 class Player{
 public:
     float posX, posY;

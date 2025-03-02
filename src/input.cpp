@@ -53,6 +53,8 @@ void InputHandler(GLFWwindow* window, Player& player, Camera& camera, World& wor
         player.SelectedTileType = TypeDirt;
     } else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) { // Sand
         player.SelectedTileType = TypeSand;
+    } else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) { // Wood
+        player.SelectedTileType = TypeWood;
     }
 
     // Modded tiles

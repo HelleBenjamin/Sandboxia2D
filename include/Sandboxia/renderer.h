@@ -16,7 +16,8 @@ enum TextureType {
     T_Grass = 3,
     T_Stone = 4,
     T_Dirt = 5,
-    T_Sand = 6
+    T_Sand = 6,
+    T_Wood = 7
 };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);

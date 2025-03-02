@@ -15,28 +15,28 @@ extern int WORLD_WIDTH;
 extern int WORLD_HEIGHT;
 
 typedef struct { // Tile structure
-    int type;
-    bool tileState;
-    bool isSolid;
-    int tileID;
+    int type;       // Type
+    bool tileState; // Tile state, eg. is lit
+    bool isSolid;   // Is solid
+    int tileID;     // Tile ID
 } Tile;
 
 typedef struct {
-    char name[32]; // World name
-    int seed; // World seed
-    int width, height;
-    Tile** tiles;
+    char name[32];      // World name
+    int seed;           // World seed
+    int width, height;  // World width and height
+    Tile** tiles;       // Matrix to store tiles
 } World;
 
 enum TileType {
     TypePlayer = 0,
     TypeSelector,
-    TypeAir, //
+    TypeAir,
     TypeGrass,
     TypeStone,
     TypeDirt,
     TypeSand,
-
+    TypeWood
 };
 
 extern int tileCount; // Keeps track of tile count
@@ -55,7 +55,7 @@ extern Tile DefaultTiles[0xFF];
     4: Stone
     5: Dirt
     6: Sand
-
+    7: Wood
 */
 
 void generateWorld(World& world, int seed);

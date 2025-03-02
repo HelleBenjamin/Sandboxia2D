@@ -11,7 +11,7 @@ using namespace std;
 int WORLD_WIDTH = 256; // Default world size
 int WORLD_HEIGHT = 128;
 
-int tileCount = 7; // To get the placeable tiles, subtract 2
+int tileCount = 8; // To get the placeable tiles, subtract 2
 
 Tile DefaultTiles[0xFF] = { // Default values of tiles
 /*  textureID, State, isSolid, tileID */
@@ -22,10 +22,11 @@ Tile DefaultTiles[0xFF] = { // Default values of tiles
     {T_Stone, 0, 1, 0},     //Stone
     {T_Dirt, 0, 1, 0},      //Dirt
     {T_Sand, 0, 1, 0},      //Sand
+    {T_Wood, 0, 1, 0}       //Wood
 };
 
 void generateWorld(World& world, int seed) {
-    if (seed == -1) {
+    if (seed == -1) { // If seed is -1, generate a random seed
         srand(time(NULL));
         world.seed = rand();
     } else {
@@ -50,11 +51,7 @@ void generateWorld(World& world, int seed) {
 
     for (int x = 0; x < world.width; ++x) {
         float noise = stb_perlin_noise3(x * scale, world.seed * 0.1f, 0.0f, 0, 0, 0);
-
-        // Normalize Perlin noise to be between -1 and 1, then scale it
         int heightOffset = static_cast<int>(noise * amplitude);
-
-        // Base height is in the middle of the world
         terrainHeight[x] = (world.height / 2) + heightOffset;
     }
 
@@ -77,7 +74,7 @@ void generateWorld(World& world, int seed) {
 
 void loadWorld(const char* filePath, World* world) {
     FILE* file = fopen(filePath, "rb");
-    if (!file) {
+    if (!file) { // Throw error if world file is not found
         log("[ERROR] Failed to open file for loading");
         return;
     }
