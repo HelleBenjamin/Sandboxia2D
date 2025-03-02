@@ -35,7 +35,11 @@ set(LIBS_FILES
 add_executable(Sandboxia ${SRC_FILES} ${LIBS_FILES})
 
 if(UNIX)
-    target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib)
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+        target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/linux/aarch64)
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+        target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/linux/x86_64)
+    endif()
     target_link_libraries(Sandboxia PRIVATE GL glfw3)
 elseif(WIN32)
     target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib)

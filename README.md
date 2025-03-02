@@ -12,6 +12,10 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - Console
 - Support for mods!
 
+# Supported platforms
+- Linux: x86_64, aarch64
+- Windows: x86_64 (experimental)
+
 ## How to play
 
 - W, A, S, D to move
