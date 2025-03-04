@@ -23,6 +23,9 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - Right mouse button to place blocks
 - T to open console
 
+## Pre-requisites
+- `mesa-common-dev` (for OpenGL)
+
 ## Building
 - Currently only Linux is supported(Windows is still experimental)
 - You can use WSL to run the game on Windows.
