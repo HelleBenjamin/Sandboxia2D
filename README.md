@@ -40,6 +40,9 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
     1. Install MSYS2
     2. Run `pacman -S mingw-w64-x86_64-gcc` to install the GCC
     3. Run `pacman -S mingw-w64-x86_64-cmake` to install CMake
+    4. Create the build directory: `mkdir build`
+    5. Generate the Makefile: `cmake -B build`
+    6. Compile the game: `cmake --build build -j(number of threads)`
 
 ## To build a simple mod
 - Mod building instructions:

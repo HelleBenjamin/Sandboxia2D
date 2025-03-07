@@ -65,7 +65,7 @@ int initGame(){
     player.SelectorTile = DefaultTiles[TypeSelector];
 
     if (!glfwInit()) {
-        log("[ERROR] Failed to initialize GLFW");
+        log("[ERROR] Failed to initialize GLFW with error code: " + to_string(glfwGetError(NULL)));
         return -1;
     }
 
@@ -78,7 +78,7 @@ int initGame(){
 
     window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Sandboxia2D", NULL, NULL);
     if (!window) {
-        log("[ERROR] Failed to create window");
+        log("[ERROR] Failed to create window with error code: " + to_string(glfwGetError(NULL)));
         glfwTerminate();
         return -1;
     }

@@ -52,10 +52,10 @@ elseif(WIN32)
   elseif(MINGW)
     message(STATUS "MinGW detected")
   endif()
-  target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/win32)
-  target_link_libraries(Sandboxia PRIVATE win32 gdi32 opengl32 glfw)
+  target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/win64)
+  target_link_libraries(Sandboxia PRIVATE gdi32 opengl32 glfw)
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1") # Use -O2 or -O3 for better performance, may increase compile time, default is -O1, for debug use -O0
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static -O1") # Use -O2 or -O3 for better performance, may increase compile time, default is -O1, for debug use -O0
 
 set_target_properties(Sandboxia PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
