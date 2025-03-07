@@ -24,16 +24,22 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - T to open console
 
 ## Pre-requisites
+### Linux
 - `mesa-common-dev` (for OpenGL)
 
 ## Building
-- Currently only Linux is supported(Windows is still experimental)
-- You can use WSL to run the game on Windows.
+
+### Linux
 - Building instructions:
     1. Run `mkdir build`  
     2. Run `cmake -B build` This will generate the Makefile
     3. Run `cmake --build build -j(number of threads)` to build the game.
 - Run `./build/Sandboxia` to play the game.
+### Windows
+- MSYS2 is strongly recommended for Windows users.
+    1. Install MSYS2
+    2. Run `pacman -S mingw-w64-x86_64-gcc` to install the GCC
+    3. Run `pacman -S mingw-w64-x86_64-cmake` to install CMake
 
 ## To build a simple mod
 - Mod building instructions:
@@ -53,7 +59,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 
 #### Example
 
-`./Sandboxia -v 1 -d`
+`./build/Sandboxia -v 1 -d`
 
 ### For debug
 
