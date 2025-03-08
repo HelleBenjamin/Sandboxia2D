@@ -34,7 +34,11 @@ set(LIBS_FILES
 
 add_executable(Sandboxia ${SRC_FILES} ${LIBS_FILES})
 
-if(UNIX)
+if(MSYS)
+  message(STATUS "MSYS detected")
+  target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/win64)
+  target_link_libraries(Sandboxia PRIVATE gdi32 opengl32 glfw3)
+elseif(UNIX)
   message(STATUS "Unix detected")
   if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
     message(STATUS "ARM64 Processor detected")
