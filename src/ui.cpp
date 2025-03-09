@@ -5,18 +5,18 @@ using namespace ImGui;
 bool isConsoleOpen = false;
 bool isMenuOpen = false;
 
-void InitUI(GLFWwindow* window) {
+void InitUI(SDL_Window* window) {
     IMGUI_CHECKVERSION();
     CreateContext();
     ImGuiIO& io = GetIO(); (void)io;
     StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplSDL3_InitForOpenGL(window, nullptr);
     ImGui_ImplOpenGL3_Init("#version 130");
 }
 
-void HandleUI(GLFWwindow* window, World &world, Player &player, Renderer &renderer) {
+void HandleUI(SDL_Window* window, World &world, Player &player, Renderer &renderer) {
     ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
     NewFrame();
 
     if (isConsoleOpen) ConsoleUI();
@@ -53,7 +53,7 @@ void ConsoleUI() {
     End();
 }
 
-void DebugUI(GLFWwindow* window, Player &player, World &world, Renderer &renderer) {
+void DebugUI(SDL_Window* window, Player &player, World &world, Renderer &renderer) {
     SetNextWindowSize(ImVec2(400, 100), ImGuiCond_FirstUseEver);
     Begin("Debug");
     Text("Version: %s", VERSION);
@@ -67,7 +67,7 @@ void DebugUI(GLFWwindow* window, Player &player, World &world, Renderer &rendere
     End();
 }
 
-void MenuUI(GLFWwindow* window ,World &world) {
+void MenuUI(SDL_Window* window ,World &world) {
     static char world_name[32] = "world";
     static int world_seed = world.seed;
     SetNextWindowSize(ImVec2(200, 300), ImGuiCond_FirstUseEver);
@@ -83,13 +83,13 @@ void MenuUI(GLFWwindow* window ,World &world) {
     }else if (Button("New world")) {
         generateWorld(world, world_seed);
     } else if (Button("Exit")) {
-        glfwSetWindowShouldClose(window, true);
+        SHOULD_EXIT = true;
     }
     End();
 }
 
 void ExitUI() {
     ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
     DestroyContext();
 }

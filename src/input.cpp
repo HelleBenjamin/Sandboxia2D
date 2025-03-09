@@ -1,90 +1,93 @@
 #include "../include/Sandboxia/input.h"
 
 // Keyboard and UI input
-void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& world, float deltaTime) {
+void InputHandlerUI(SDL_Window* window, SDL_Event* event, Player& player, Camera& camera, World& world, float deltaTime) {
     static bool pressed = false; // Prevent spamming the input
     static auto& io = ImGui::GetIO();
     // UI and other input
     if (!pressed && !io.WantCaptureMouse) {
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        SDL_assert(event->type == SDL_EVENT_KEY_DOWN);
+        if (event->key.scancode == SDL_SCANCODE_ESCAPE) {
             isMenuOpen = !isMenuOpen;
             pressed = true;
-        } else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) { 
+        } else if (event->key.scancode == SDL_SCANCODE_T) { 
             isConsoleOpen = !isConsoleOpen;
             pressed = true;
-        } else if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
+        } else if (event->key.scancode == SDL_SCANCODE_F1) {
             saveWorld("world", &world);
             pressed = true;
         } 
         
         // Debug only
-        else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && DEBUG) {
+        else if (event->key.scancode == SDL_SCANCODE_P && DEBUG) {
             log("[INFO] Player position: (" + std::to_string(player.posX) + ", " + std::to_string(player.posY) + ")");
             pressed = true;
-        } else if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && DEBUG) {
+        } else if (event->key.scancode == SDL_SCANCODE_O && DEBUG) {
             log("[INFO] Selector position: (" + std::to_string((player.SelectorX / TILE_SIZE / SCALER) + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)) +  ", " + std::to_string((player.SelectorY / TILE_SIZE / SCALER) + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)) + ")");
             pressed = true;
-        } else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && DEBUG) {
+        } else if (event->key.scancode == SDL_SCANCODE_F && DEBUG) {
             log("[INFO] Current FPS: " + std::to_string(1.0f / deltaTime));
             pressed = true;
         }
 
-    } else if (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && 
-               glfwGetKey(window, GLFW_KEY_T) != GLFW_PRESS && 
-               glfwGetKey(window, GLFW_KEY_F1) != GLFW_PRESS && 
-               glfwGetKey(window, GLFW_KEY_P) != GLFW_PRESS && 
-               glfwGetKey(window, GLFW_KEY_O) != GLFW_PRESS && 
-               glfwGetKey(window, GLFW_KEY_F) != GLFW_PRESS) {
+    } else {
         pressed = false;
     }
 }
 
 // Player movement
-void InputHandler(GLFWwindow* window, Player& player, Camera& camera, World& world, float deltaTime) {
+void InputHandler(SDL_Window* window, SDL_Event* event,Player& player, Camera& camera, World& world, float deltaTime) {
     int SelX = static_cast<int>((player.SelectorX / TILE_SIZE / SCALER)  + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)); // Calculate x + offset
     int SelY = static_cast<int>((player.SelectorY / TILE_SIZE / SCALER)  + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)); // Calculate y + offset
-
+    SDL_assert(event->type == SDL_EVENT_KEY_DOWN);
     // Tile selection & player movement, reserved tiles 0-6 (may change when new tiles are added)
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) { // Grass
+    if (event->key.scancode == SDL_SCANCODE_1) { // Grass
         player.SelectedTileType = TypeGrass;
-    } else if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS) { // Stone
+    } else if (event->key.scancode == SDL_SCANCODE_2) { // Stone
         player.SelectedTileType = TypeStone;
-    } else if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) { // Dirt
+    } else if (event->key.scancode == SDL_SCANCODE_3) { // Dirt
         player.SelectedTileType = TypeDirt;
-    } else if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) { // Sand
+    } else if (event->key.scancode == SDL_SCANCODE_4) { // Sand
         player.SelectedTileType = TypeSand;
-    } else if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS) { // Wood
+    } else if (event->key.scancode == SDL_SCANCODE_5) { // Wood
         player.SelectedTileType = TypeWood;
     }
 
     // Modded tiles
-    else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) {
+    else if (event->key.scancode == SDL_SCANCODE_6) {
         player.SelectedTileType = 7;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) player.move(0, -1, deltaTime, world);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) player.move(0, 1, deltaTime, world);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) player.move(-1, 0, deltaTime, world);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player.move(1, 0, deltaTime, world);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) player.jump(player);
+    if (event->key.scancode == SDL_SCANCODE_W) player.move(0, -1, deltaTime, world);
+    if (event->key.scancode == SDL_SCANCODE_S) player.move(0, 1, deltaTime, world);
+    if (event->key.scancode == SDL_SCANCODE_A) player.move(-1, 0, deltaTime, world);
+    if (event->key.scancode == SDL_SCANCODE_D) player.move(1, 0, deltaTime, world);
+    if (event->key.scancode == SDL_SCANCODE_SPACE) player.jump(player);
 
+
+}
+
+void MouseEvent(SDL_Window* window, SDL_Event* event,Player& player, Camera& camera, World& world, float deltaTime) {
+    int SelX = static_cast<int>((player.SelectorX / TILE_SIZE / SCALER)  + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)); // Calculate x + offset
+    int SelY = static_cast<int>((player.SelectorY / TILE_SIZE / SCALER)  + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)); // Calculate y + offset
     // Place and destroy
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) { // destroy tile
+    SDL_assert(event->type == SDL_EVENT_MOUSE_BUTTON_DOWN);
+    if (event->button.button == SDL_BUTTON_LEFT) { // destroy tile
         if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log("[ERROR] Tried to destroy tile out of bounds at " + std::to_string(SelX) + ", " + std::to_string(SelY));
         else{
             world.tiles[SelX][SelY].type = T_Air;
             world.tiles[SelX][SelY].isSolid = false;
         };
-    } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) { // place tile
+    } else if (event->button.button == SDL_BUTTON_RIGHT) { // place tile
         if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log("[ERROR] Tried to place tile out of bounds at " + std::to_string(SelX) + ", " + std::to_string(SelY));
         else if (world.tiles[SelX][SelY].type == T_Air){ // Only place if tile is air
             world.tiles[SelX][SelY].type = player.SelectedTileType;
             world.tiles[SelX][SelY].isSolid = true;
         };
-    }
+    }    
 }
 
-void scrollCallback(GLFWwindow* window, double xoffset, double yoffset){
+/*void scrollCallback(GLFWwindow* window, double xoffset, double yoffset){
     if (yoffset > 0) {
         player.SelectedTileType = (TileType)((player.SelectedTileType - 1 + tileCount) % tileCount);
         if (player.SelectedTileType <= TypeAir) player.SelectedTileType = TypeGrass;
@@ -92,4 +95,4 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset){
         player.SelectedTileType = (TileType)((player.SelectedTileType + 1) % tileCount);
         if (player.SelectedTileType <= TypeAir) player.SelectedTileType = TypeGrass;
     }
-}
+}*/

@@ -32,18 +32,18 @@ void SetPlayerPos(vec2 pos) {
     player.posY = pos.y;
 }
 
-void AddNewTile(GLuint texture, int type, bool isSolid) {
+void AddNewTile(SDL_Texture* texture, int type, bool isSolid) {
     DefaultTiles[type] = {type, 0, isSolid, 0};
     tileCount++;
     renderer.textures.push_back(texture);
 }
 
-GLuint LoadTexture(const char* filepath) {
-    return loadTexture(filepath);
+SDL_Texture* LoadTexture(const char* filepath) {
+    return renderer.loadTexture(filepath);
 }
 
-void FreeTexture(GLuint texture) {
-    unloadTexture(texture);
+void FreeTexture(SDL_Texture* texture) {
+    renderer.unloadTexture(texture);
 }
 
 void SetTile(int x, int y, int type) {

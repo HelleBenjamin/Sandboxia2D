@@ -7,8 +7,8 @@
 #include "world.h"
 #include "ui.h"
 
-void InputHandler(GLFWwindow* window, Player& player,Camera& camera, World& world, float deltaTime);
-void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& world, float deltaTime);
-void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-
+void InputHandler(SDL_Window* window, SDL_Event* event, Player& player,Camera& camera, World& world, float deltaTime);
+void InputHandlerUI(SDL_Window* window, SDL_Event* event, Player& player, Camera& camera, World& world, float deltaTime);
+void scrollCallback(SDL_Window* window, double xoffset, double yoffset);
+void MouseEvent(SDL_Window* window, SDL_Event* event,Player& player, Camera& camera, World& world, float deltaTime);
 #endif

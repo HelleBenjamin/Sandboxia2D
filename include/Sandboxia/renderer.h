@@ -6,6 +6,7 @@
 #include "player.h"
 #include "world.h"
 #include <vector>
+#include <unordered_map>
 
 /* Modern renderer */
 
@@ -20,25 +21,21 @@ enum TextureType {
     T_Wood = 7
 };
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-GLuint loadTexture(const char* filepath);
-void unloadTexture(GLuint textureID);
-
 class Renderer {
 public:
-    void init();
-    void exit();
+    SDL_Renderer* renderer;
+    SDL_Texture* loadTexture(const char* filepath);
+    void unloadTexture(SDL_Texture* textureID);
+    void initr(SDL_Window* window);
+    void exitr();
     void loadTextures();
     void freeTextures();
     void clearScreen();
     void drawTile(Tile tile, int x, int y);
 
-    unsigned int compileShader(GLenum type, const char* source);
-    unsigned int createShaderProgram();
+    std::vector<SDL_Texture*> textures;
 
-    std::vector<GLuint> textures;
-
-    void RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window);
+    void RenderViewport(Camera& camera, Player& player, World& world, SDL_Window* window);
     void updateViewport(int width, int height);
 
 private:

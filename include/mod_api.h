@@ -8,6 +8,9 @@
 #include "../include/Sandboxia/ui.h"
 #include "../include/Sandboxia/input.h"
 
+#include "../include/SDL3_image/SDL_image.h"
+#include "../include/SDL3/SDL.h"
+
 #define API_VERSION_STR "0.1"
 #define API_VERSION_NUM 01
 
@@ -34,9 +37,9 @@ extern "C" {
     // Define functions
     typedef vec2 (*GetPlayerPosFunc)();
     typedef void (*SetPlayerPosFunc)(vec2 pos);
-    typedef void (*AddNewTileFunc)(GLuint texture, int type, bool isSolid);
-    typedef GLuint (*LoadTextureFunc)(const char* path);
-    typedef void (*FreeTextureFunc)(GLuint texture);
+    typedef void (*AddNewTileFunc)(SDL_Texture* texture, int type, bool isSolid);
+    typedef SDL_Texture* (*LoadTextureFunc)(const char* path);
+    typedef void (*FreeTextureFunc)(SDL_Texture* texture);
     typedef void (*SetTileFunc)(int x, int y, int type);
     typedef Tile (*GetTileFunc)(int x, int y);
     typedef int (*GetCurrTileTypeFunc)();

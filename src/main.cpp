@@ -31,8 +31,10 @@ bool VSYNC = true;
 bool COLLISION = true;
 bool DEBUG = false;
 bool MODS_ENABLED = true;
+bool SHOULD_EXIT = false;
 
-GLFWwindow* window;
+SDL_Window* window = NULL;
+SDL_Event event;
 
 Renderer renderer;
 Player player;
@@ -50,55 +52,45 @@ int initGame(){
     player.PlayerSpeed = 10.0f;
     player.playerTile = DefaultTiles[TypePlayer];
 
-    player.SelectorX = 0.0f;
-    player.SelectorY = 0.0f;
+    player.SelectorX = 1.0f;
+    player.SelectorY = 1.0f;
     player.SelectedTileType = T_Grass;
     player.SelectorTile = DefaultTiles[TypeSelector];
 
-    if (!glfwInit()) {
-        log("[ERROR] Failed to initialize GLFW");
-        return -1;
-    }
-
-    // If using legacy renderer(2.1), change major to 2 and minor to 1
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     log("[INFO] Window size: " + to_string(SCREEN_WIDTH) + 'x' + to_string(SCREEN_HEIGHT));
 
-    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Sandboxia2D", NULL, NULL);
-    if (!window) {
-        log("[ERROR] Failed to create window");
-        glfwTerminate();
+    if(!SDL_Init(SDL_INIT_VIDEO)) {
+        log("[ERROR] SDL Video init failed");
+        log("[ERROR] SDL error: " + string(SDL_GetError()));
         return -1;
     }
+    if (!SDL_Init(SDL_INIT_EVENTS)) {
+        log("[ERROR] SDL Event init failed");
+        log("[ERROR] SDL error: " + string(SDL_GetError()));
+        return -1;  
+    }
 
-    glfwMakeContextCurrent(window);
+    window = SDL_CreateWindow("Sandboxia2D", SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL | SDL_WINDOW_INPUT_FOCUS);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        log("[ERROR] Failed to initialize GLAD");
+    if (!window) {
+        log("[ERROR] Failed to create window");
+        log("[ERROR] SDL error: " + string(SDL_GetError()));
+        SDL_Quit();
         return -1;
-    }  
+    }
+ 
+    //log("[INFO] Renderer device: " + string((const char*)glGetString(GL_RENDERER)));
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-    glfwSetCursorPosCallback(window, cursorPosCallback);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetScrollCallback(window, scrollCallback);
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    log("[INFO] Renderer device: " + string((const char*)glGetString(GL_RENDERER)));
-
-    glClearColor(0.222f, 0.608f, 0.924f, 1.0f); // Background color
-    glfwSwapBuffers(window);
-
-    renderer.init();
+    renderer.initr(window);
 
     generateWorld(world, -1);
 
-    glfwSwapInterval(VSYNC); // Enable/disable vsync
+    SDL_SetRenderVSync(renderer.renderer, VSYNC); // Enable/disable vsync
 
     InitUI(window);
+
+    log("[INFO] Initialized game");
 
     // Must load mods after other initialization.
     if (!MODS_ENABLED) return 0;
@@ -107,8 +99,8 @@ int initGame(){
 }
 
 void log(string msg) {
-    logFile << fixed << setprecision(2) << "[" << glfwGetTime() << "] " << msg << endl;
-    cout << fixed << setprecision(2) << " [" << glfwGetTime()  << "] " << msg << endl;
+    logFile << "[" << SDL_GetTicks() << "] " << msg << endl;
+    cout << " [" << SDL_GetTicks()  << "] " << msg << endl;
 }
 
 string handleConsoleCommand(std::string command) {
@@ -128,18 +120,10 @@ string handleConsoleCommand(std::string command) {
     return "Unknown command";
 }
 
-void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
+/*void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     player.SelectorX = xpos;
     player.SelectorY = ypos;
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    renderer.updateViewport(width, height);
-    camera.height = height;
-    camera.width = width;
-    SCREEN_WIDTH = width;
-    SCREEN_HEIGHT = height;
-}
+}*/
 
 int main(int argc, char *argv[]) {
     world.width = WORLD_WIDTH; // Set default world size
@@ -185,44 +169,53 @@ int main(int argc, char *argv[]) {
 
     float lastFrame, currentFrame, deltaTime = 0.0f;
 
-    while (!glfwWindowShouldClose(window)) { // Main game loop
-        glClear(GL_COLOR_BUFFER_BIT);
-        currentFrame = glfwGetTime();
+    while (!SHOULD_EXIT) { // Main game loop
+        currentFrame = SDL_GetTicks();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
- 
+
+        SDL_PollEvent(&event);
+
         if (MODS_ENABLED) UpdateMods(deltaTime); 
 
         const auto& io = GetIO();
 
-        if (!io.WantCaptureMouse && !io.WantCaptureKeyboard) { // If is typing or using UI prevent player movement
-            InputHandler(window, player, camera, world, deltaTime);
+        if (event.type == SDL_EVENT_QUIT) {
+            SHOULD_EXIT = true;
+        } else if (event.type == SDL_EVENT_KEY_DOWN) {
+            log("[INFO] Key pressed");
+            //if (!io.WantCaptureMouse && !io.WantCaptureKeyboard) { // If is typing or using UI prevent player movement
+                InputHandler(window, &event, player, camera, world, deltaTime);
+            //}
+            InputHandlerUI(window, &event, player, camera, world, deltaTime); // Always check for input for UI and other stuff
+        } else if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN) {
+            MouseEvent(window, &event, player, camera, world, deltaTime);
         }
+        float cursorX, cursorY;
+        SDL_GetMouseState(&cursorX, &cursorY);
+        player.SelectorX = cursorX;
+        player.SelectorY = cursorY;
 
         player.updatePlayer(player, world, deltaTime);
-
-        InputHandlerUI(window, player, camera, world, deltaTime); // Always check for input for UI and other stuff
 
         renderer.RenderViewport(camera, player, world, window);
 
         HandleUI(window, world, player, renderer);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
     }
 
     // Shutdown
     ExitUI();
-    renderer.exit();
-    glfwDestroyWindow(window);
+    renderer.exitr();
+    SDL_DestroyWindow(window);
     log("[INFO] Program shutting down");
-    glfwTerminate();
     // Deallocate memory
     for (int i = 0; i < world.width; i++) {
         delete[] world.tiles[i];
     }
     delete[] world.tiles;
     logFile.close();
+    SDL_Quit();
     return 0;
 }
 

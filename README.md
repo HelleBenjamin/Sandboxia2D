@@ -1,11 +1,15 @@
 # Sandboxia2D
 
-Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a simple sandbox game that is easy to run on older machines. The game is still in development. The render engine was upgraded to OpenGL 3.0. The 'Legacy' render engine is still included for backwards compatibility. Sandboxia2D comes with a simple API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still experimental.
+## SDL3 BRANCH
+
+Currently doesn't work properly. Need to fix.
+
+Sandboxia is a sandbox game written in C++ using SDL3. It is designed to be a simple sandbox game that is easy to run on low-end machines. The game is still in development. The renderer is fully replaced with new SDL3-based renderer. Sandboxia2D comes with a simple API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still experimental.
 
 ## Features
 - Bugs may be present
 - 2D World
-- OpenGL 3.0
+- SDL3-3.2.8
 - VSYNC
 - World saving/loading
 - Debug mode
@@ -67,11 +71,10 @@ Debug keys:
 
 ## Third-party libraries used
 - [ImGui](https://github.com/ocornut/imgui)
-- [GLFW](https://github.com/glfw/glfw)
-- [GLAD](https://github.com/Dav1dde/glad)
 - [stb_image](https://github.com/nothings/stb)
 - [GLM](https://github.com/g-truc/glm)
 - [stb_perlin](https://github.com/nothings/stb)
+- [SDL](https://github.com/libsdl-org/SDL)
 
 
 ## License
