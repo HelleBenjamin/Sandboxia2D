@@ -13,6 +13,10 @@ using namespace std;
     Outdated! Please use the new renderer. Use this if must.
 */
 
+GLFWwindow* getCurrentWindow() {
+    return glfwGetCurrentContext();
+}
+
 void Renderer::init() {
     log("[RENDERER] Using 'Legacy' as the render engine");
     loadTextures(); 

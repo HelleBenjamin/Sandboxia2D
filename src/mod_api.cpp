@@ -66,6 +66,21 @@ int GetWorldSeed() {
     return world.seed;
 }
 
+// Input/Output
+bool IsKeyDown(int key) {
+    GLFWwindow* window = getCurrentWindow();
+    if (window == NULL) return false;
+    if (glfwGetKey(window, key) == GLFW_KEY_DOWN) return true;
+    return false;
+}
+
+bool IsKeyPressed(int key) {
+    GLFWwindow* window = getCurrentWindow();
+    if (window == NULL) return false;
+    if (glfwGetKey(window, key) == GLFW_PRESS) return true;
+    return false;
+}
+
 
 // API Info
 int GetAPIVersion() {
@@ -87,7 +102,7 @@ struct Mod {
 };
 
 vector<Mod> mods; // All mods are stored here
-ModAPI api = { &GetPlayerPos, &SetPlayerPos, &AddNewTile, LoadTexture, &FreeTexture, &SetTile, &GetTile, &GetCurrTileType, &GetTileTypeCount, &GetWorldSeed, &GetAPIVersion, &GetGameVersion, &DebugLog };
+ModAPI api = { &GetPlayerPos, &SetPlayerPos, &AddNewTile, LoadTexture, &FreeTexture, &SetTile, &GetTile, &GetCurrTileType, &GetTileTypeCount, &GetWorldSeed, &IsKeyDown, &IsKeyPressed, &GetAPIVersion, &GetGameVersion, &DebugLog };
 vector<string> loadedMods;
 
 void LoadMods() {

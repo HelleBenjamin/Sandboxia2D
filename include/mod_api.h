@@ -43,6 +43,10 @@ extern "C" {
     typedef int (*GetTileTypeCountFunc)();
     typedef int (*GetWorldSeedFunc)();
 
+    // Input/Output
+    typedef bool (*IsKeyDownFunc)(int key);
+    typedef bool (*IsKeyPressedFunc)(int key);
+
     typedef int (*GetAPIVersionFunc)();
     typedef int (*GetGameVersionFunc)();
     typedef void (*DebugLogFunc)(std::string text);
@@ -59,6 +63,9 @@ extern "C" {
         GetCurrTileTypeFunc GetCurrTileType;
         GetTileTypeCountFunc GetTileTypeCount;
         GetWorldSeedFunc GetWorldSeed;
+
+        IsKeyDownFunc IsKeyDown;
+        IsKeyPressedFunc IsKeyPressed;
 
         GetAPIVersionFunc GetAPIVersion;
         GetGameVersionFunc GetGameVersion;

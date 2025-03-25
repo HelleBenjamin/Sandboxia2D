@@ -21,6 +21,7 @@ enum TextureType {
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 GLuint loadTexture(const char* filepath);
 void unloadTexture(GLuint textureID);
+GLFWwindow* getCurrentWindow();
 
 class Renderer {
 public:
@@ -38,10 +39,6 @@ public:
 
     void RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window);
     void updateViewport(int width, int height);
-
-private:
-    unsigned int VAO, VBO, EBO;
-    unsigned int shaderProgram;
 
 };
 

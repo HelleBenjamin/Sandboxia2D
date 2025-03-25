@@ -192,6 +192,8 @@ int main(int argc, char *argv[]) {
     // Initialize the game
     initGame();
 
+    log("[INFO] Game initialized");
+
     float lastFrame, currentFrame, deltaTime = 0.0f;
 
     while (!glfwWindowShouldClose(window)) { // Main game loop
