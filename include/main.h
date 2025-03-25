@@ -7,7 +7,7 @@
 #include "imgui/imgui_impl_opengl3.h"
 
 #include "glad/glad.h"
-#include <GLFW/glfw3.h>
+#include "GLFW/glfw3.h"
 #include <string>
 
 extern int SCREEN_WIDTH;

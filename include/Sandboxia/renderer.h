@@ -23,6 +23,7 @@ enum TextureType {
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 GLuint loadTexture(const char* filepath);
 void unloadTexture(GLuint textureID);
+GLFWwindow* getCurrentWindow();
 
 class Renderer {
 public:

@@ -1,6 +1,9 @@
 # Sandboxia2D
+![Logo](./assets/logo.png)
 
-Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a simple sandbox game that is easy to run on older machines. The game is still in development. The render engine was upgraded to OpenGL 3.0. The 'Legacy' render engine is still included for backwards compatibility. Sandboxia2D comes with a simple API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still experimental.
+## DEV BRANCH!
+
+Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a simple sandbox game that is easy to run on older machines. The game is still in development. Sandboxia2D comes with a simple API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still experimental.
 
 ## Features
 - Bugs may be present
@@ -24,16 +27,27 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - T to open console
 
 ## Pre-requisites
+### Linux
 - `mesa-common-dev` (for OpenGL)
+- `cmake`
+- `g++`
 
 ## Building
-- Currently only Linux is supported(Windows is still experimental)
-- You can use WSL to run the game on Windows.
+
+### Linux
 - Building instructions:
     1. Run `mkdir build`  
     2. Run `cmake -B build` This will generate the Makefile
     3. Run `cmake --build build -j(number of threads)` to build the game.
 - Run `./build/Sandboxia` to play the game.
+### Windows
+- MSYS2 is strongly recommended for Windows users.
+    1. Install MSYS2
+    2. Run `pacman -S mingw-w64-x86_64-gcc` to install the GCC
+    3. Run `pacman -S mingw-w64-x86_64-cmake` to install CMake
+    4. Create the build directory: `mkdir build`
+    5. Generate the Makefile: `cmake -B build`
+    6. Compile the game: `cmake --build build -j(number of threads)`
 
 ## To build a simple mod
 - Mod building instructions:
@@ -53,9 +67,10 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 
 #### Example
 
-`./Sandboxia -v 1 -d`
+`./build/Sandboxia -v 1 -d`
 
 ### For debug
+There is still legacy renderer included. Use that if you get OpenGL related errors.
 
 Debug keys:
 
@@ -63,6 +78,9 @@ Debug keys:
 - O to print the selector position
 - T to print the current tile data at the cursor
 - F to print the current FPS
+
+## Screenshots
+![Sandboxia](./assets/screenshot1.png)
 
 
 ## Third-party libraries used

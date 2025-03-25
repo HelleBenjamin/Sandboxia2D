@@ -1,3 +1,20 @@
+/*  
+ * Sandboxia2D - A sandbox game written in C++ using OpenGL.
+ * Copyright (c) 2024-2025 Benjamin Helle
+ *  
+ * This program is free software: you can redistribute it and/or modify  
+ * it under the terms of the GNU General Public License as published by  
+ * the Free Software Foundation, either version 3 of the License, or  
+ * (at your option) any later version.  
+ *  
+ * This program is distributed in the hope that it will be useful,  
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of  
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the  
+ * GNU General Public License for more details.  
+ *  
+ * You should have received a copy of the GNU General Public License  
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.  
+ */
 #include <iostream>
 #include "../include/main.h"
 #include "../include/mod_api.h"
@@ -8,14 +25,6 @@
 #include "../include/Sandboxia/world.h"
 #include <fstream>
 #include <iomanip>
-
-/*  Sandboxia2D by Benjamin Helle (C) 2024-2025
-
-    This is the main file for the Sandboxia2D project.
-    It contains the main function and the game loop.
-    Other functions are defined in other files.
-
-*/
 
 using namespace std;
 using namespace ImGui;
@@ -56,7 +65,7 @@ int initGame(){
     player.SelectorTile = DefaultTiles[TypeSelector];
 
     if (!glfwInit()) {
-        log("[ERROR] Failed to initialize GLFW");
+        log("[ERROR] Failed to initialize GLFW with error code: " + to_string(glfwGetError(NULL)));
         return -1;
     }
 
@@ -69,7 +78,7 @@ int initGame(){
 
     window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Sandboxia2D", NULL, NULL);
     if (!window) {
-        log("[ERROR] Failed to create window");
+        log("[ERROR] Failed to create window with error code: " + to_string(glfwGetError(NULL)));
         glfwTerminate();
         return -1;
     }
@@ -182,6 +191,8 @@ int main(int argc, char *argv[]) {
 
     // Initialize the game
     initGame();
+
+    log("[INFO] Game initialized");
 
     float lastFrame, currentFrame, deltaTime = 0.0f;
 

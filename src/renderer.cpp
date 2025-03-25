@@ -49,6 +49,10 @@ void main() {
 }
 )glsl";
 
+GLFWwindow* getCurrentWindow() {
+    return glfwGetCurrentContext();
+}
+
 unsigned int Renderer::compileShader(GLenum type, const char* source) {
     unsigned int shader = glCreateShader(type);
     glShaderSource(shader, 1, &source, nullptr);
