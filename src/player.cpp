@@ -3,8 +3,8 @@
 float const GRAVITY = 20.0f;
 float const JUMP_POWER = 2.0f;
 
-bool checkCollision(int x, int y, World& world) {
-    if (x < 0 || x >= world.width || y < 0 || y >= world.height) {
+static bool checkCollision(int x, int y, World& world, Player& player) {
+    if (x < 0 || x >= world.width || y < 0 || y >= world.height || player.posX < 0) {
         return true; // Return 1 if out of bounds
     }
 
@@ -24,7 +24,7 @@ void Player::updatePlayer(Player &player, World& world, float deltaTime) {
     player.posX += player.velX * deltaTime;
     player.posY -= player.velY * deltaTime;
 
-    if (player.posY >= WORLD_HEIGHT || checkCollision(player.posX, player.posY+1, world)) {
+    if (player.posY >= WORLD_HEIGHT || checkCollision(player.posX, player.posY+1, world, player)) {
         player.velY = 0;
         player.onGround = true;
     } else {
@@ -43,7 +43,7 @@ void Camera::updateCamera(Camera& camera, Player player) { // Update camera to f
     camera.posY = player.posY / 2;
 }
 
-void Player::move(int dx, int dy, float deltaTime, World& world) {
+void Player::move(int dx, int dy, float deltaTime, World& world, Player& player) {
     float moveAmountX = dx * PlayerSpeed * deltaTime;
     float moveAmountY = dy * PlayerSpeed * deltaTime;
 
@@ -55,10 +55,10 @@ void Player::move(int dx, int dy, float deltaTime, World& world) {
         posY = newY;
         return;
     } 
-    if (!checkCollision(newX, posY, world)) {
+    if (!checkCollision(newX, posY, world, player)) {
         posX = newX;
     }
-    if (!checkCollision(posX, newY, world)) {
+    if (!checkCollision(posX, newY, world, player)) {
         posY = newY;
     }
 }

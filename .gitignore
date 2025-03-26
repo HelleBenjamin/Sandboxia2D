@@ -3,3 +3,6 @@ main
 world
 build
 imgui.ini
+.vs
+out
+Sandboxia.exe

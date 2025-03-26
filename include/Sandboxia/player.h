@@ -23,7 +23,7 @@ public:
     unsigned int SelectedTileType;
     Tile playerTile; // Used for rendering
 
-    void move(int dx, int dy, float deltaTime, World& world);
+    void move(int dx, int dy, float deltaTime, World& world, Player& player);
     void updatePlayer(Player &player, World& world, float deltaTime);
     void jump(Player &player);
 };
@@ -35,6 +35,8 @@ public:
 
     void updateCamera(Camera& camera, Player player);
 };
+
+static bool checkCollision(int x, int y, World& world, Player& player);
 
 extern Player player;
 extern Camera camera;

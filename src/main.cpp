@@ -39,7 +39,13 @@ int SCREEN_HEIGHT = 600;
 bool VSYNC = true;
 bool COLLISION = true;
 bool DEBUG = false;
-bool MODS_ENABLED = true;
+
+
+#if defined(_WIN32) || defined(_WIN64)
+bool MODS_ENABLED = false; // Disable mods on Windows due to being experimental
+#else
+bool MODS_ENABLED = true; // Enable mods on Linux(Full support)
+#endif
 
 GLFWwindow* window;
 
@@ -122,9 +128,7 @@ void log(string msg) {
 
 string handleConsoleCommand(std::string command) {
     log("[INFO] Executing command: " + command);
-    istringstream iss(command);
-    string cmd;
-    iss >> cmd;
+    string cmd = command;
     if (cmd == "/seed") {
         return "Current world seed: " + to_string(world.seed);
     } else if (cmd == "/debug") {
@@ -194,8 +198,7 @@ int main(int argc, char *argv[]) {
 
     log("[INFO] Game initialized");
 
-    float lastFrame, currentFrame, deltaTime = 0.0f;
-
+    float lastFrame{}, currentFrame, deltaTime = 0.0f;
     while (!glfwWindowShouldClose(window)) { // Main game loop
         glClear(GL_COLOR_BUFFER_BIT);
         currentFrame = glfwGetTime();
@@ -210,9 +213,9 @@ int main(int argc, char *argv[]) {
             InputHandler(window, player, camera, world, deltaTime);
         }
 
-        player.updatePlayer(player, world, deltaTime);
-
         InputHandlerUI(window, player, camera, world, deltaTime); // Always check for input for UI and other stuff
+
+        player.updatePlayer(player, world, deltaTime);
 
         renderer.RenderViewport(camera, player, world, window);
 

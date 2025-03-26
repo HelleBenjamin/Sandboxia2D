@@ -43,7 +43,11 @@ void generateWorld(World& world, int seed) {
         world.tiles[x] = new Tile[world.height];
     }
 
-    int terrainHeight[world.width];
+    const int width = world.width;
+
+    vector<int> terrainHeight;
+    terrainHeight.resize(width);
+    //int terrainHeight[width];
 
     // Perlin noise parameters
     float scale = 0.1f; // Controls smoothness (lower = smoother, higher = rougher)
@@ -74,7 +78,7 @@ void generateWorld(World& world, int seed) {
 
 void loadWorld(const char* filePath, World* world) {
     FILE* file = fopen(filePath, "rb");
-    if (!file) { // Throw error if world file is not found
+    if (!file) {
         log("[ERROR] Failed to open file for loading");
         return;
     }

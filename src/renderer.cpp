@@ -151,7 +151,7 @@ GLuint loadTexture(const char* filepath) {
 
     if (!data) {
         log("[ERROR] Failed to load texture: " + string(filepath));
-        exit(2);
+        return(2);
     }
 
     GLuint textureID;
@@ -181,11 +181,12 @@ void unloadTexture(GLuint textureID) {
 void Renderer::loadTextures(){
     const char* filenames[] = {"assets/player.png", "assets/selector.png", "assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/sand.png", "assets/wood.png"}; // The order must be the same as defined in world.h
 
+    textures.resize(tileCount);
     glGenTextures(tileCount, textures.data());
 
     for (int i = 0; i < tileCount; i++) {
-        textures.push_back(loadTexture(filenames[i]));
-        //textures[i] = loadTexture(filenames[i]);
+        //textures.push_back(loadTexture(filenames[i]));
+        textures[i] = loadTexture(filenames[i]);
     }
 }
 

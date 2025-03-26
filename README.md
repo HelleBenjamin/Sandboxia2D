@@ -16,8 +16,8 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - Support for mods!
 
 # Supported platforms
-- Linux: x86_64, aarch64
-- Windows: x86_64 (experimental)
+- Linux: x64, aarch64
+- Windows: x64, x86 (experimental)
 
 ## How to play
 
@@ -41,13 +41,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
     3. Run `cmake --build build -j(number of threads)` to build the game.
 - Run `./build/Sandboxia` to play the game.
 ### Windows
-- MSYS2 is strongly recommended for Windows users.
-    1. Install MSYS2
-    2. Run `pacman -S mingw-w64-x86_64-gcc` to install the GCC
-    3. Run `pacman -S mingw-w64-x86_64-cmake` to install CMake
-    4. Create the build directory: `mkdir build`
-    5. Generate the Makefile: `cmake -B build`
-    6. Compile the game: `cmake --build build -j(number of threads)`
+Windows support is still experimental. Currently only VS 2022 is supported. To build the game, press the green play button at the top in Visual Studio. You can select between Release and Debug.
 
 ## To build a simple mod
 - Mod building instructions:
@@ -82,6 +76,17 @@ Debug keys:
 ## Screenshots
 ![Sandboxia](./assets/screenshot1.png)
 
+## TODO
+- [ ] Release v1.0.0 version
+- [ ] Add audio
+- [ ] Add more blocks
+- [ ] Make better GUI
+- [ ] Add settings menu
+- [ ] Better documentation
+- [ ] Do optimizations
+- [ ] Make Windows fully functional
+- [x] Implement modding API
+- [x] Replace OpenGL 2.1 with 3.0 core
 
 ## Third-party libraries used
 - [ImGui](https://github.com/ocornut/imgui)
