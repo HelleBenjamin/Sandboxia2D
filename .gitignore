@@ -7,3 +7,6 @@ imgui.ini
 out
 Sandboxia.exe
 sandboxia2d-win64
+/mods/testmod.exp
+/mods/testmod.lib
+/mods/testmod.obj
