@@ -1,9 +1,8 @@
 # Sandboxia2D
 ![Logo](./assets/logo.png)
 
-## Stable branch
 
-Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a simple sandbox game that is easy to run on older machines. The game is still in development. Sandboxia2D comes with a simple API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still experimental.
+Sandboxia is a sandbox game written in C++ using OpenGL 3.0. It's designed to be a simple sandbox game that is easy to run on older machines. The game is still in development. Sandboxia2D comes with a simple API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still partially experimental.
 
 ## Features
 - Bugs may be present
@@ -32,6 +31,10 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 - `cmake`
 - `g++`
 
+### Windows
+- Visual Studio 2022
+- x86-based processor, arm64 isn't officially supported yet.
+
 ## Building
 
 ### Linux
@@ -44,11 +47,21 @@ Sandboxia is a sandbox game written in C++ using OpenGL. It is designed to be a 
 Windows support is still experimental. Currently only VS 2022 is supported. To build the game, press the green play button at the top in Visual Studio. You can select between Release and Debug.
 
 ## To build a simple mod
-- Mod building instructions:
+This is a simple tutorial on how to build a mod for Sandboxia2D. The `testmod` is included in the `mods` folder. You can use it as a template.
+### Linux
     1. Create a `.cpp` file in `mods` folder
     2. Include `mod_api.h` in the mod file
-    3. Compile with `g++ -shared -fPIC mod.cpp -o mod.so`. In windows replace `.so` with `.dll`.
-- Mods will be loaded automatically.
+    3. Compile with `g++ -shared -fPIC testmod.cpp -o testmod.so`.
+
+### Windows
+    1. Create a `.cpp` file in `mods` folder
+    2. Include `mod_api.h` in the mod file
+    3. Open Developer Command Prompt(use x64 Native Tools Command Prompt for 64-bit) and cd to the mods folder.
+    4. Run `cl /LD testmod.cpp /I"../include" /Fe:testmod.dll` to compile the mod. You can delete other files except the `.dll` file.
+
+Replace `testmod` with your mod name.
+If you get errors, make sure you compile to right architecture.
+Mods will be loaded automatically.
 
 ## Launch args
 

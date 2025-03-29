@@ -4,14 +4,14 @@
 
 #include "../include/mod_api.h"
 
-#ifdef _WIN32
+#ifdef _WIN32 // Windows
     #include <windows.h>
     #define LOAD_LIBRARY(lib) LoadLibrary(lib)
     #define GET_PROC_ADDRESS GetProcAddress
     #define CLOSE_LIBRARY FreeLibrary
     #define MOD_PATH "mods\\"
     #define LIBRARY_EXTENSION ".dll"
-#else
+#else // Linux
     #include <dlfcn.h>
     #define LOAD_LIBRARY(lib) dlopen(lib, RTLD_LAZY)
     #define GET_PROC_ADDRESS dlsym
@@ -109,54 +109,50 @@ vector<string> loadedMods;
 
 void LoadMods() {
     string modfp = MOD_PATH;
-	if (!fs::exists(modfp)) {
+
+	if (!fs::exists(modfp)) { // Check if mods folder exists, this prevents crashes
 		log("[ERROR] Mods folder not found");
 		MODS_ENABLED = false;
 		return;
 	}
+
     for (const auto& entry : fs::directory_iterator(modfp)) {
+        if (!entry.is_regular_file()) continue; // Skip directories
+        
         string modPath = entry.path().string();
+        string extension = entry.path().extension().string();
+
+		if (extension != LIBRARY_EXTENSION) continue; // Skip non mod files
 
         #ifdef _WIN32
             HMODULE handle = LOAD_LIBRARY(modPath.c_str());
         #else
             void* handle = LOAD_LIBRARY(modPath.c_str());
         #endif
-        
-        if (entry.path().extension() == LIBRARY_EXTENSION) {
-            #ifdef _WIN32
-                auto ModInitialize = (InitMod) GET_PROC_ADDRESS((HMODULE)handle, "ModInitialize");
-                auto ModUpdate = (UpdateMod) GET_PROC_ADDRESS((HMODULE)handle, "ModUpdate");
-            #else
-                auto ModInitialize = (InitMod) GET_PROC_ADDRESS(handle, "ModInitialize");
-                auto ModUpdate = (UpdateMod) GET_PROC_ADDRESS(handle, "ModUpdate");
-            #endif
 
-            if (!handle) {
-                log("[ERROR] Failed to load mod: " + modPath);
-                continue;
-            }
-
-            if (!ModInitialize || !ModUpdate) { 
-                log("[ERROR] Failed to load mod: " + modPath);
-                #ifdef _WIN32
-                    CLOSE_LIBRARY((HMODULE)handle);
-                #else
-                    CLOSE_LIBRARY(handle);
-                #endif
-                continue;
-            }
-
-            loadedMods.push_back(modPath);
-            mods.push_back({handle, ModInitialize, ModUpdate});
-            
-            ModInitialize(&api);
-            log("[INFO] Loaded mod: " + modPath);
+        if (!handle) {
+			log("[ERROR] Failed to load mod: " + modPath); // Can be caused by different architecture
+            continue;
         }
+
+        auto ModInitialize = (InitMod) GET_PROC_ADDRESS(handle, "ModInitialize");
+        auto ModUpdate = (UpdateMod) GET_PROC_ADDRESS(handle, "ModUpdate");
+
+		if (!ModInitialize || !ModUpdate) {  // Check if the mod has the required functions
+            log("[ERROR] Invalid mod: " + modPath);
+            CLOSE_LIBRARY(handle);
+            continue;
+        }
+
+        loadedMods.push_back(modPath);
+        mods.push_back({handle, ModInitialize, ModUpdate});
+
+        ModInitialize(&api);
+        log("[INFO] Loaded mod: " + modPath);
     }
 }
 
-void UpdateMods(float deltaTime) {
+void UpdateMods(float deltaTime) { // Update all mods
     for (auto& mod : mods) {
         mod.ModUpdate(deltaTime);
     }
