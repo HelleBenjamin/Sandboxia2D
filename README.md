@@ -60,7 +60,7 @@ This is a simple tutorial on how to build a mod for Sandboxia2D. The `testmod` i
     4. Run `cl /LD testmod.cpp /I"../include" /Fe:testmod.dll` to compile the mod. You can delete other files except the `.dll` file.
 
 Replace `testmod` with your mod name.
-If you get errors, make sure you compile to right architecture.
+If you get errors, make sure you compile to right architecture. And if the game is built with Release, make sure the mod is built with Release too.
 Mods will be loaded automatically.
 
 ## Launch args
