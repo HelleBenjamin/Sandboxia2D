@@ -9,12 +9,14 @@
     #define LOAD_LIBRARY(lib) LoadLibrary(lib)
     #define GET_PROC_ADDRESS GetProcAddress
     #define CLOSE_LIBRARY FreeLibrary
+    #define MOD_PATH "mods\\"
     #define LIBRARY_EXTENSION ".dll"
 #else
     #include <dlfcn.h>
     #define LOAD_LIBRARY(lib) dlopen(lib, RTLD_LAZY)
     #define GET_PROC_ADDRESS dlsym
     #define CLOSE_LIBRARY dlclose
+    #define MOD_PATH "mods/"
     #define LIBRARY_EXTENSION ".so"
 #endif
 
@@ -106,8 +108,12 @@ ModAPI api = { &GetPlayerPos, &SetPlayerPos, &AddNewTile, LoadTexture, &FreeText
 vector<string> loadedMods;
 
 void LoadMods() {
-    string modfp = "mods/";
-
+    string modfp = MOD_PATH;
+	if (!fs::exists(modfp)) {
+		log("[ERROR] Mods folder not found");
+		MODS_ENABLED = false;
+		return;
+	}
     for (const auto& entry : fs::directory_iterator(modfp)) {
         string modPath = entry.path().string();
 

@@ -42,7 +42,7 @@ bool DEBUG = false;
 
 
 #if defined(_WIN32) || defined(_WIN64)
-bool MODS_ENABLED = false; // Disable mods on Windows due to being experimental
+bool MODS_ENABLED = true; // Disable mods on Windows due to being experimental
 #else
 bool MODS_ENABLED = true; // Enable mods on Linux(Full support)
 #endif
