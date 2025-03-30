@@ -50,6 +50,9 @@ You can install these via your package manager.
 ### Windows
 Windows support is still experimental. Currently only VS 2022 is supported. To build the game, press the green play button at the top in Visual Studio. You can select between Release and Debug.
 
+#### Important!
+In windows you must have `OpenAL32.dll` and `libsndfile.dll` in the same folder as the executable. You can find these in the `libs` folder.
+
 ## To build a simple mod
 This is a simple tutorial on how to build a mod for Sandboxia2D. The `testmod` is included in the `mods` folder. You can use it as a template.
 ### Linux

@@ -50,7 +50,7 @@ elseif(WIN32)
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) # x86
         target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/win32)
     endif()
-    target_link_libraries(Sandboxia PRIVATE gdi32 opengl32 glfw3 openal sndfile)
+    target_link_libraries(Sandboxia PRIVATE gdi32 opengl32 glfw3 OpenAL32 sndfile)
 endif()
 
 # Set building flags
