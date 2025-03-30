@@ -179,7 +179,7 @@ void unloadTexture(GLuint textureID) {
 }
 
 void Renderer::loadTextures(){
-    const char* filenames[] = {"assets/player.png", "assets/selector.png", "assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/sand.png", "assets/wood.png"}; // The order must be the same as defined in world.h
+    const char* filenames[] = {"assets/player.png", "assets/player_left.png", "assets/player_right.png", "assets/selector.png", "assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/sand.png", "assets/wood.png"}; // The order must be the same as defined in world.h
 
     textures.resize(tileCount);
     glGenTextures(tileCount, textures.data());
@@ -258,7 +258,9 @@ void Renderer::RenderViewport(Camera& camera, Player& player, World& world, GLFW
     }
 
     // Render the player at the center of the screen
-    drawTile(player.playerTile, (camera.width / TILE_SIZE / SCALER / 2), camera.height / TILE_SIZE / SCALER / 2);
+	if (player.isMovingRight) drawTile(DefaultTiles[TypePlayer_Right], (camera.width / TILE_SIZE / SCALER / 2), camera.height / TILE_SIZE / SCALER / 2);
+	else if (player.isMovingLeft) drawTile(DefaultTiles[TypePlayer_Left], (camera.width / TILE_SIZE / SCALER / 2), camera.height / TILE_SIZE / SCALER / 2);
+	else drawTile(player.playerTile, (camera.width / TILE_SIZE / SCALER / 2), camera.height / TILE_SIZE / SCALER / 2); // Default player
 
     // Render the selector
     drawTile(player.SelectorTile, (player.SelectorX / TILE_SIZE / SCALER), (player.SelectorY / TILE_SIZE / SCALER));

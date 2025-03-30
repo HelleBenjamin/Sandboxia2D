@@ -11,11 +11,15 @@ using namespace std;
 int WORLD_WIDTH = 256; // Default world size
 int WORLD_HEIGHT = 128;
 
-int tileCount = 8; // To get the placeable tiles, subtract 2
+int tileCount = 10; // To get the placeable tiles, subtract 4 from this value
+int PlaceableTileCount = tileCount-4;
+int DefaultPlaceableTileCount = PlaceableTileCount;  
 
 Tile DefaultTiles[0xFF] = { // Default values of tiles
 /*  textureID, State, isSolid, tileID */
     {T_Player, 0, 0, 0},    //Player 
+	{T_Player_Left, 0, 0, 0},    //Player Left
+	{T_Player_Right, 0, 0, 0},    //Player Right
     {T_Selector, 0, 0, 0},  //Selector
     {T_Air, 0, 0, 0},       //Air
     {T_Grass, 0, 1, 0},     //Grass

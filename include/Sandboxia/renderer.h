@@ -11,13 +11,15 @@
 
 enum TextureType {
     T_Player = 0,
-    T_Selector = 1,
-    T_Air = 2,
-    T_Grass = 3,
-    T_Stone = 4,
-    T_Dirt = 5,
-    T_Sand = 6,
-    T_Wood = 7
+	T_Player_Left,
+	T_Player_Right,
+    T_Selector,
+    T_Air,
+    T_Grass,
+    T_Stone,
+    T_Dirt,
+    T_Sand,
+    T_Wood
 };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);

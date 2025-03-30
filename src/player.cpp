@@ -50,6 +50,22 @@ void Player::move(int dx, int dy, float deltaTime, World& world, Player& player)
     float newX = posX + moveAmountX;
     float newY = posY + moveAmountY;
 
+	if (dx > 0) { // Set player direction
+		player.isMovingRight = true;
+		player.isMovingLeft = false;
+		player.isIdle = false;
+	}
+	else if (dx < 0) {
+		player.isMovingLeft = true;
+		player.isMovingRight = false;
+		player.isIdle = false;
+	}
+	else {
+		player.isIdle = true;
+		player.isMovingRight = false;
+		player.isMovingLeft = false;
+	}
+
     if (!COLLISION) { // Skip if collision is disabled
         posX = newX;
         posY = newY;
