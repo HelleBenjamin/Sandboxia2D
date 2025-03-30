@@ -1,4 +1,5 @@
 #include "../include/Sandboxia/input.h"
+#include "../include/Sandboxia/audio.h"
 
 // Keyboard and UI input
 void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& world, float deltaTime) {
@@ -70,12 +71,18 @@ void InputHandler(GLFWwindow* window, Player& player, Camera& camera, World& wor
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player.move(1, 0, deltaTime, world, player);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) player.jump(player);
 
+    static bool DestroySoundPlayed = false;
+
     // Place and destroy
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) { // destroy tile
         if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log("[ERROR] Tried to destroy tile out of bounds at " + std::to_string(SelX) + ", " + std::to_string(SelY));
         else{
             world.tiles[SelX][SelY].type = T_Air;
             world.tiles[SelX][SelY].isSolid = false;
+            if (!DestroySoundPlayed) {
+                playSound(ATypeTileBreak);
+                DestroySoundPlayed = true;
+            }
         };
     } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) { // place tile
         if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log("[ERROR] Tried to place tile out of bounds at " + std::to_string(SelX) + ", " + std::to_string(SelY));
@@ -84,6 +91,8 @@ void InputHandler(GLFWwindow* window, Player& player, Camera& camera, World& wor
             world.tiles[SelX][SelY].isSolid = true;
         };
     }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) DestroySoundPlayed = false;
 }
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset){

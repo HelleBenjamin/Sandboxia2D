@@ -2,7 +2,7 @@
 ![Logo](./assets/logo.png)
 
 
-Sandboxia is a sandbox game written in C++ using OpenGL 3.0. It's designed to be a simple sandbox game that is easy to run on older machines. The game is still in development. Sandboxia2D comes with a simple API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still partially experimental.
+Sandboxia is a sandbox game written in C++ using OpenGL 3.0. It's designed to be a simple sandbox game that is easy to run on older machines. There aren't any goals in the game. The game is still in development. Sandboxia2D comes with a simple API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still partially experimental.
 
 ## Features
 - Bugs may be present
@@ -28,8 +28,12 @@ Sandboxia is a sandbox game written in C++ using OpenGL 3.0. It's designed to be
 ## Pre-requisites
 ### Linux
 - `mesa-common-dev` (for OpenGL)
+- `libopenal-dev` (for audio)
+- `libsndfile-dev` (for audio)
 - `cmake`
 - `g++`
+
+You can install these via your package manager.
 
 ### Windows
 - Visual Studio 2022
@@ -70,7 +74,8 @@ Mods will be loaded automatically.
 - `-v` to set the VSYNC, Default is 1
 - `-c` to set the collision, Default is 1
 - `-d` to set the debug, Default is 0
-- `-disableMods` to disable mods
+- `-noMods` to disable mods
+- `-noSounds` to disable sounds
 
 #### Example
 
@@ -91,7 +96,7 @@ Debug keys:
 
 ## TODO
 - [ ] Release v1.0.0 version
-- [ ] Add audio
+- [x] Add audio support
 - [ ] Add more blocks
 - [ ] Make better GUI
 - [ ] Add settings menu
@@ -108,7 +113,8 @@ Debug keys:
 - [stb_image](https://github.com/nothings/stb)
 - [GLM](https://github.com/g-truc/glm)
 - [stb_perlin](https://github.com/nothings/stb)
-
+- [OpenAL Soft](https://github.com/kcat/openal-soft)
+- [libsndfile](https://github.com/libsndfile/libsndfile)
 
 ## License
 Copyright (c) 2024-2025 Benjamin Helle

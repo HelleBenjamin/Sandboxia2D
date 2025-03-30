@@ -179,14 +179,18 @@ void unloadTexture(GLuint textureID) {
 }
 
 void Renderer::loadTextures(){
-    const char* filenames[] = {"assets/player.png", "assets/player_left.png", "assets/player_right.png", "assets/selector.png", "assets/air.png", "assets/grass.png", "assets/stone.png", "assets/dirt.png", "assets/sand.png", "assets/wood.png"}; // The order must be the same as defined in world.h
+    const char* path = "assets/textures/";
+    const char* filenames[] = {"player.png", "player_left.png", "player_right.png", "selector.png", "air.png", "grass.png", "stone.png", "dirt.png", "sand.png", "wood.png"}; // The order must be the same as defined in world.h
 
-    textures.resize(tileCount);
+    textures.resize(tileCount); // Allocate memory
     glGenTextures(tileCount, textures.data());
 
     for (int i = 0; i < tileCount; i++) {
         //textures.push_back(loadTexture(filenames[i]));
-        textures[i] = loadTexture(filenames[i]);
+        char* filepath = (char*)malloc(strlen(path) + strlen(filenames[i]) + 1);
+        strcpy(filepath, path);
+        strcat(filepath, filenames[i]);
+        textures[i] = loadTexture(filepath);
     }
 }
 

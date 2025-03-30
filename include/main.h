@@ -19,6 +19,7 @@ extern bool VSYNC;
 extern bool COLLISION;
 extern bool DEBUG;
 extern bool MODS_ENABLED;
+extern bool SOUNDS_ENABLED;
 
 #define VERSION "0.1.8-beta"
 #define SANDBOXIA_VERSION_NUM 18

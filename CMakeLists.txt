@@ -18,6 +18,7 @@ set(SRC_FILES
     src/input.cpp
     src/world.cpp
     src/mod_api.cpp
+    src/audio.cpp
 )
 
 # Third-party libraries
@@ -41,7 +42,7 @@ if(UNIX)
     elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64") # x64
         target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/linux/x86_64)
     endif() # Todo: add support for x86
-    target_link_libraries(Sandboxia PRIVATE GL glfw3)
+    target_link_libraries(Sandboxia PRIVATE GL glfw3 openal sndfile)
 elseif(WIN32)
     message("Windows Detected")
     if(CMAKE_SIZEOF_VOID_P EQUAL 8) # x64
@@ -49,7 +50,7 @@ elseif(WIN32)
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) # x86
         target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/win32)
     endif()
-    target_link_libraries(Sandboxia PRIVATE gdi32 opengl32 glfw3)
+    target_link_libraries(Sandboxia PRIVATE gdi32 opengl32 glfw3 openal sndfile)
 endif()
 
 # Set building flags

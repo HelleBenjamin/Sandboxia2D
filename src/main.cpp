@@ -23,6 +23,7 @@
 #include "../include/Sandboxia/ui.h"
 #include "../include/Sandboxia/input.h"
 #include "../include/Sandboxia/world.h"
+#include "../include/Sandboxia/audio.h"
 #include <fstream>
 #include <iomanip>
 
@@ -39,13 +40,8 @@ int SCREEN_HEIGHT = 600;
 bool VSYNC = true;
 bool COLLISION = true;
 bool DEBUG = false;
-
-
-#if defined(_WIN32) || defined(_WIN64)
-bool MODS_ENABLED = true; // Disable mods on Windows due to being experimental
-#else
-bool MODS_ENABLED = true; // Enable mods on Linux(Full support)
-#endif
+bool MODS_ENABLED = true;
+bool SOUNDS_ENABLED = true;
 
 GLFWwindow* window;
 
@@ -97,7 +93,7 @@ int initGame(){
         return -1;
     }  
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); // Do some opengl stuff
     glfwSetCursorPosCallback(window, cursorPosCallback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetScrollCallback(window, scrollCallback);
@@ -114,6 +110,11 @@ int initGame(){
     glfwSwapInterval(VSYNC); // Enable/disable vsync
 
     InitUI(window);
+
+    if (SOUNDS_ENABLED) { // Load sounds
+        InitOpenAL();
+        loadSounds();
+    }
 
     // Must load mods after other initialization.
     if (!MODS_ENABLED) return 0;
@@ -188,9 +189,11 @@ int main(int argc, char *argv[]) {
         } else if (arg == "-W" && i + 1 < argc) { // world
             char *worldPath = argv[++i];
             loadWorld(worldPath, &world);
-        } else if (arg == "-disableMods") { // Disable mods
+        } else if (arg == "-noMods") { // Disable mods
             MODS_ENABLED = false;
-        } 
+        } else if (arg == "-noSounds") { // Disable sounds
+            SOUNDS_ENABLED = false;
+        }
     }
 
     // Initialize the game
@@ -199,6 +202,7 @@ int main(int argc, char *argv[]) {
     log("[INFO] Game initialized");
 
     float lastFrame{}, currentFrame, deltaTime = 0.0f;
+
     while (!glfwWindowShouldClose(window)) { // Main game loop
         glClear(GL_COLOR_BUFFER_BIT);
         currentFrame = glfwGetTime();
@@ -229,6 +233,12 @@ int main(int argc, char *argv[]) {
     ExitUI();
     renderer.exit();
     glfwDestroyWindow(window);
+
+    if (SOUNDS_ENABLED) {
+        unloadSounds();
+        CloseOpenAL();
+    }
+
     log("[INFO] Program shutting down");
     glfwTerminate();
     // Deallocate memory
