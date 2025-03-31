@@ -11,7 +11,7 @@ using namespace std;
 int WORLD_WIDTH = 256; // Default world size
 int WORLD_HEIGHT = 128;
 
-int tileCount = 10; // To get the placeable tiles, subtract 4 from this value
+int tileCount = 11; // To get the placeable tiles, subtract 4 from this value
 int PlaceableTileCount = tileCount-4;
 int DefaultPlaceableTileCount = PlaceableTileCount;  
 
@@ -26,12 +26,21 @@ Tile DefaultTiles[0xFF] = { // Default values of tiles
     {T_Stone, 0, 1, 0},     //Stone
     {T_Dirt, 0, 1, 0},      //Dirt
     {T_Sand, 0, 1, 0},      //Sand
-    {T_Wood, 0, 1, 0}       //Wood
+    {T_Wood, 0, 1, 0},      //Wood
+    {T_Leaves, 0, 1, 0}
 };
+
+struct Tree { // Tree template
+    int tiles[3][5] = {
+        {TypeAir,TypeAir, TypeLeaves, TypeLeaves, TypeAir},
+        {TypeWood, TypeWood, TypeWood, TypeLeaves, TypeLeaves},
+        {TypeAir, TypeAir, TypeLeaves, TypeLeaves, TypeAir}
+    };
+};
+
 
 void generateWorld(World& world, int seed) {
     if (seed == -1) { // If seed is -1, generate a random seed
-        srand(time(NULL));
         world.seed = rand();
     } else {
         srand(seed);
@@ -71,6 +80,18 @@ void generateWorld(World& world, int seed) {
                 world.tiles[x][y] = DefaultTiles[TypeAir];
             } else if (terrainY == terrainHeight[x]) {
                 world.tiles[x][y] = DefaultTiles[TypeGrass];
+                int treeRand = rand() % 100;
+                if (treeRand < 6) { // Chance of a tree
+                    Tree tree;
+                    for (int i = 0; i < 3; i++) {
+                        for (int j = 0; j < 5; j++) {
+                            if (x + i >= 0 && x + i < world.width && y + j >= 0 && y + j < world.height) {
+                                if (tree.tiles[i][j] == TypeAir) continue; // Skip empty tiles
+                                world.tiles[x - i][y - j] = DefaultTiles[tree.tiles[i][j]];
+                            }
+                        }
+                    }
+                }
             } else if (terrainY > terrainHeight[x] - 4) {
                 world.tiles[x][y] = DefaultTiles[TypeDirt];
             } else {

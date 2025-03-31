@@ -51,12 +51,14 @@ Camera camera;
 World world;
 
 int initGame(){
+    srand(time(NULL));
+
     camera.posX = 0.0f;
     camera.posY = 0.0f;
     camera.width = SCREEN_WIDTH;
     camera.height = SCREEN_HEIGHT;
 
-    player.posX = 1.0f;
+    player.posX = (float)(rand() % (WORLD_WIDTH - 2) + 1);
     player.posY = WORLD_HEIGHT - 70.0f;
     player.PlayerSpeed = 10.0f;
     player.playerTile = DefaultTiles[TypePlayer];

@@ -19,7 +19,8 @@ enum TextureType {
     T_Stone,
     T_Dirt,
     T_Sand,
-    T_Wood
+    T_Wood,
+    T_Leaves
 };
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);

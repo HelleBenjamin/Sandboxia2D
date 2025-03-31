@@ -4,7 +4,7 @@ float const GRAVITY = 20.0f;
 float const JUMP_POWER = 2.0f;
 
 static bool checkCollision(int x, int y, World& world, Player& player) {
-    if (x < 0 || x >= world.width || y < 0 || y >= world.height || player.posX < 0) {
+    if (x < 0 || x >= world.width || y < 0 || y >= world.height) {
         return true; // Return 1 if out of bounds
     }
 

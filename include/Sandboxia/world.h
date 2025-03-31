@@ -38,7 +38,8 @@ enum TileType {
     TypeStone,
     TypeDirt,
     TypeSand,
-    TypeWood
+    TypeWood,
+    TypeLeaves,
 };
 
 extern int tileCount; // Keeps track of tile count
@@ -62,6 +63,7 @@ extern Tile DefaultTiles[0xFF];
     7: Dirt
     8: Sand
     9: Wood
+    10: Leaves
 */
 
 void generateWorld(World& world, int seed);

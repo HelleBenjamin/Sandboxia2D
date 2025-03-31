@@ -21,8 +21,8 @@ extern bool DEBUG;
 extern bool MODS_ENABLED;
 extern bool SOUNDS_ENABLED;
 
-#define VERSION "0.1.8-beta"
-#define SANDBOXIA_VERSION_NUM 18
+#define VERSION "0.1.9-beta"
+#define SANDBOXIA_VERSION_NUM 19
 
 std::string handleConsoleCommand(std::string command); // Returns the output of the command to the console
 

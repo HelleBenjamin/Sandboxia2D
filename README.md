@@ -119,6 +119,10 @@ Debug keys:
 - [OpenAL Soft](https://github.com/kcat/openal-soft)
 - [libsndfile](https://github.com/libsndfile/libsndfile)
 
+## Contributing
+If you have any suggestions, bug reports, or feature requests, please open an issue.
+
+
 ## License
 Copyright (c) 2024-2025 Benjamin Helle
 

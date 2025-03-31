@@ -7,16 +7,19 @@ void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& w
     static auto& io = ImGui::GetIO();
     // UI and other input
     if (!pressed && !io.WantCaptureMouse) {
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { // Toggle menu
             isMenuOpen = !isMenuOpen;
             pressed = true;
-        } else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) { 
+        } else if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) { // Toggle console
             isConsoleOpen = !isConsoleOpen;
             pressed = true;
-        } else if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
+        } else if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) { // Save world
             saveWorld("world", &world);
             pressed = true;
-        } 
+        } else if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) { // Toggle inventory
+            isInventoryOpen = !isInventoryOpen;
+            pressed = true;
+        }
         
         // Debug only
         else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && DEBUG) {
@@ -33,6 +36,7 @@ void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& w
     } else if (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && 
                glfwGetKey(window, GLFW_KEY_T) != GLFW_PRESS && 
                glfwGetKey(window, GLFW_KEY_F1) != GLFW_PRESS && 
+               glfwGetKey(window, GLFW_KEY_I) != GLFW_PRESS &&
                glfwGetKey(window, GLFW_KEY_P) != GLFW_PRESS && 
                glfwGetKey(window, GLFW_KEY_O) != GLFW_PRESS && 
                glfwGetKey(window, GLFW_KEY_F) != GLFW_PRESS) {

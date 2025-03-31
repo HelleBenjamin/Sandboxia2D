@@ -13,12 +13,14 @@
 
 extern bool isConsoleOpen;
 extern bool isMenuOpen;
+extern bool isInventoryOpen;
 
 void InitUI(GLFWwindow* window);
 void HandleUI(GLFWwindow* window, World &world, Player &player, Renderer &renderer);
 void ConsoleUI();
 void DebugUI(GLFWwindow* window, Player &player, World &world, Renderer &renderer);
 void MenuUI(GLFWwindow* window ,World &world);
+void InventoryUI(GLFWwindow* window, Player &player, World &world, Renderer &renderer);
 void ExitUI();
 
 

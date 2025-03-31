@@ -4,6 +4,7 @@ using namespace ImGui;
 
 bool isConsoleOpen = false;
 bool isMenuOpen = false;
+bool isInventoryOpen = false;
 
 void InitUI(GLFWwindow* window) {
     IMGUI_CHECKVERSION();
@@ -21,6 +22,7 @@ void HandleUI(GLFWwindow* window, World &world, Player &player, Renderer &render
 
     if (isConsoleOpen) ConsoleUI();
     if (isMenuOpen) MenuUI(window, world);
+    if (isInventoryOpen) InventoryUI(window, player, world, renderer);
 
     // Selected tile
     ImVec2 window_pos = GetIO().DisplaySize;
@@ -85,6 +87,23 @@ void MenuUI(GLFWwindow* window ,World &world) {
         generateWorld(world, world_seed);
     } else if (Button("Exit")) {
         glfwSetWindowShouldClose(window, true);
+    }
+    End();
+}
+
+void InventoryUI(GLFWwindow* window, Player &player, World &world, Renderer &renderer) {
+    SetNextWindowSize(ImVec2(300, 100), ImGuiCond_FirstUseEver);
+
+    // The inventory shows all available tiles
+    Begin("Inventory");
+    Text("Inventory");
+    int itemsPerRow = 5;
+    for (int i = 5; i < tileCount; i++) {
+        Image((ImTextureID)renderer.textures[i], ImVec2(32, 32));
+        if (IsItemHovered() && IsMouseClicked(0)) {
+            player.SelectedTileType = i;
+        }
+        SameLine();
     }
     End();
 }
