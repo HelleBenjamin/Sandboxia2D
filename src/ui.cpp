@@ -79,6 +79,7 @@ void MenuUI(GLFWwindow* window ,World &world) {
     if (Button("Load")) {
         loadWorld(world_name, &world);
     } else if (Button("Save")) {
+		strncpy(world.name, world_name, sizeof(world.name) - 1);
         saveWorld(world_name, &world);
     }else if (Button("New world")) {
         generateWorld(world, world_seed);

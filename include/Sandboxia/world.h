@@ -30,6 +30,8 @@ typedef struct {
 
 enum TileType {
     TypePlayer = 0,
+	TypePlayer_Left,
+	TypePlayer_Right,
     TypeSelector,
     TypeAir,
     TypeGrass,
@@ -40,6 +42,8 @@ enum TileType {
 };
 
 extern int tileCount; // Keeps track of tile count
+extern int PlaceableTileCount; // Keeps track of placeable tile count
+extern int DefaultPlaceableTileCount; // Default placeable tile count
 
 // Max tile count: 256
 extern Tile DefaultTiles[0xFF];
@@ -49,13 +53,15 @@ extern Tile DefaultTiles[0xFF];
     Keep it same as below.
 
     0: Player
-    1: Selector
-    2: Air
-    3: Grass
-    4: Stone
-    5: Dirt
-    6: Sand
-    7: Wood
+	1: Player Left
+	2: Player Right
+    3: Selector
+    4: Air
+    5: Grass
+    6: Stone
+    7: Dirt
+    8: Sand
+    9: Wood
 */
 
 void generateWorld(World& world, int seed);

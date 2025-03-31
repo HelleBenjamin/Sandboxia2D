@@ -19,9 +19,10 @@ extern bool VSYNC;
 extern bool COLLISION;
 extern bool DEBUG;
 extern bool MODS_ENABLED;
+extern bool SOUNDS_ENABLED;
 
-#define VERSION "0.1.7-beta"
-#define SANDBOXIA_VERSION_NUM 017
+#define VERSION "0.1.8-beta"
+#define SANDBOXIA_VERSION_NUM 18
 
 std::string handleConsoleCommand(std::string command); // Returns the output of the command to the console
 

@@ -16,6 +16,7 @@ public:
     float velX, velY; // velocity
     float accelX, accelY; // acceleration
     bool onGround;
+	bool isMovingRight, isMovingLeft, isIdle;
 
     float SelectorX, SelectorY;
     Tile SelectorTile;

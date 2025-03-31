@@ -1,4 +1,5 @@
 #include "../include/Sandboxia/input.h"
+#include "../include/Sandboxia/audio.h"
 
 // Keyboard and UI input
 void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& world, float deltaTime) {
@@ -58,9 +59,11 @@ void InputHandler(GLFWwindow* window, Player& player, Camera& camera, World& wor
     }
 
     // Modded tiles
-    else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) {
-        player.SelectedTileType = 7;
-    }
+    else if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS) player.SelectedTileType = DefaultPlaceableTileCount + 1;
+	else if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS) player.SelectedTileType = DefaultPlaceableTileCount + 2;
+	else if (glfwGetKey(window, GLFW_KEY_8) == GLFW_PRESS) player.SelectedTileType = DefaultPlaceableTileCount + 3;
+	else if (glfwGetKey(window, GLFW_KEY_9) == GLFW_PRESS) player.SelectedTileType = DefaultPlaceableTileCount + 4;
+	else if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS) player.SelectedTileType = DefaultPlaceableTileCount + 5;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) player.move(0, -1, deltaTime, world, player);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) player.move(0, 1, deltaTime, world, player);
@@ -68,20 +71,28 @@ void InputHandler(GLFWwindow* window, Player& player, Camera& camera, World& wor
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) player.move(1, 0, deltaTime, world, player);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) player.jump(player);
 
+    static bool DestroySoundPlayed = false;
+
     // Place and destroy
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) { // destroy tile
         if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log("[ERROR] Tried to destroy tile out of bounds at " + std::to_string(SelX) + ", " + std::to_string(SelY));
         else{
             world.tiles[SelX][SelY].type = T_Air;
             world.tiles[SelX][SelY].isSolid = false;
+            if (!DestroySoundPlayed) {
+                playSound(ATypeTileBreak);
+                DestroySoundPlayed = true;
+            }
         };
     } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) { // place tile
         if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log("[ERROR] Tried to place tile out of bounds at " + std::to_string(SelX) + ", " + std::to_string(SelY));
-        else if (world.tiles[SelX][SelY].type == T_Air){ // Only place if tile is air
+        else if (world.tiles[SelX][SelY].type == T_Air && player.SelectedTileType < tileCount){ // Only place if tile is air and valid
             world.tiles[SelX][SelY].type = player.SelectedTileType;
             world.tiles[SelX][SelY].isSolid = true;
         };
     }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) DestroySoundPlayed = false;
 }
 
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset){
