@@ -47,6 +47,9 @@ You can install these via your package manager.
     2. Run `cmake -B build` This will generate the Makefile
     3. Run `cmake --build build -j(number of threads)` to build the game.
 - Run `./build/Sandboxia` to play the game.
+
+If you get compile errors on arm64, try adding `-lpthread -ldl` to the linker flags in your `CMakeLists.txt`.
+
 ### Windows
 Windows support is still experimental. Currently only VS 2022 is supported. To build the game, press the green play button at the top in Visual Studio. You can select between Release and Debug.
 
