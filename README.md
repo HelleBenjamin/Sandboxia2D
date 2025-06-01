@@ -26,10 +26,16 @@ Sandboxia is a sandbox game written in C++ using OpenGL 3.0. It's designed to be
 - T to open console
 
 ## Pre-requisites
-### Linux
+### Debian
 - `mesa-common-dev` (for OpenGL)
 - `libopenal-dev` (for audio)
 - `libsndfile-dev` (for audio)
+### OpenSuse
+- `Mesa-libGL-devel` (for OpenGL)
+- `openal-soft-devel` (for audio)
+- `libsndfile-devel` (for audio)
+
+### All linux
 - `cmake`
 - `g++`
 
