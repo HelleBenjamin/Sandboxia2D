@@ -25,19 +25,21 @@ Sandboxia is a sandbox game written in C++ using OpenGL 3.0. It's designed to be
 - Right mouse button to place blocks
 - T to open console
 
-## Pre-requisites
-### Debian
-- `mesa-common-dev` (for OpenGL)
-- `libopenal-dev` (for audio)
-- `libsndfile-dev` (for audio)
-### OpenSuse
-- `Mesa-libGL-devel` (for OpenGL)
-- `openal-soft-devel` (for audio)
-- `libsndfile-devel` (for audio)
-
-### All linux
+## Pre-requisites for Linux
 - `cmake`
 - `g++`
+
+## Distro specific packages:
+### Debian
+- `mesa-common-dev` (for OpenGL)
+- `libglfw3-dev` (for GLFW)
+- `libopenal-dev` (for audio)
+- `libsndfile-dev` (for audio)
+### OpenSUSE
+- `Mesa-libGL-devel` (for OpenGL)
+- `glfw3-devel` and `glfw3` (for GLFW)
+- `openal-soft-devel` (for audio)
+- `libsndfile-devel` (for audio)
 
 You can install these via your package manager.
 
@@ -94,7 +96,7 @@ Mods will be loaded automatically.
 `./build/Sandboxia -v 1 -d`
 
 ### For debug
-There is still legacy renderer included. Use that if you get OpenGL related errors.
+The legacy renderer was removed in v0.1.9-beta.
 
 Debug keys:
 

@@ -37,12 +37,7 @@ add_executable(Sandboxia ${SRC_FILES} ${LIBS_FILES})
 
 if(UNIX)
     message("Linux Detected")
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64") # arm64
-        target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/linux/aarch64)
-    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64") # x64
-        target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/linux/x86_64)
-    endif() # Todo: add support for x86
-    target_link_libraries(Sandboxia PRIVATE GL glfw3 openal sndfile pthread dl)
+    target_link_libraries(Sandboxia PRIVATE GL glfw openal sndfile pthread dl)
 elseif(WIN32)
     message("Windows Detected")
     if(CMAKE_SIZEOF_VOID_P EQUAL 8) # x64

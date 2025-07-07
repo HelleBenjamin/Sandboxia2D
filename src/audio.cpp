@@ -87,22 +87,23 @@ void stopSound(int index) {
 }
 
 void loadSounds() {
-  const char* path = "assets/sounds/";
+  const char* path = "assets/sounds/"; // Path
   const char* filenames[] = {"tile_break.wav", "sand.wav", "grass.wav"};
 
+  // Loop the sound files
   for (int i = 0; i < sizeof(filenames) / sizeof(char*); i++) {
     char* filepath = (char*)malloc(strlen(path) + strlen(filenames[i]) + 1);
     strcpy(filepath, path);
     strcat(filepath, filenames[i]);
     Sound sound;
-    if (loadSound(filepath, sound)) {
+    if (loadSound(filepath, sound)) { // If successful, load the sound
       sounds.push_back(sound);
     }
   }
 }
 
 void unloadSounds() {
-  for (auto& sound : sounds) {
+  for (auto& sound : sounds) { // Loop
     alDeleteBuffers(1, &sound.buffer);
     alDeleteSources(1, &sound.source);
   }

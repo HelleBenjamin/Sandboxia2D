@@ -60,6 +60,7 @@ int initGame(){
 
     player.posX = (float)(rand() % (WORLD_WIDTH - 2) + 1);
     player.posY = WORLD_HEIGHT - 70.0f;
+    if (player.posY > WORLD_HEIGHT) player.posY = 70.0f;
     player.PlayerSpeed = 10.0f;
     player.playerTile = DefaultTiles[TypePlayer];
 
@@ -73,8 +74,7 @@ int initGame(){
         return -1;
     }
 
-    // If using legacy renderer(2.1), change major to 2 and minor to 1
-
+    // GLFW window hints
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
@@ -96,6 +96,8 @@ int initGame(){
     }  
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); // Do some opengl stuff
+
+    // Setup custom callbacks, these will handle input events
     glfwSetCursorPosCallback(window, cursorPosCallback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetScrollCallback(window, scrollCallback);
@@ -107,11 +109,11 @@ int initGame(){
 
     renderer.init();
 
-    generateWorld(world, -1);
+    generateWorld(world, -1); // Generate a new world
 
     glfwSwapInterval(VSYNC); // Enable/disable vsync
 
-    InitUI(window);
+    InitUI(window); // Init the UI
 
     if (SOUNDS_ENABLED) { // Load sounds
         InitOpenAL();
@@ -130,6 +132,7 @@ void log(string msg) {
 }
 
 string handleConsoleCommand(std::string command) {
+    // Handle console commands, there might be a better way to do this, but this works
     log("[INFO] Executing command: " + command);
     string cmd = command;
     if (cmd == "/seed") {
@@ -145,11 +148,13 @@ string handleConsoleCommand(std::string command) {
 }
 
 void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
+    // Get current cursor position
     player.SelectorX = xpos;
     player.SelectorY = ypos;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    // Update viewport and window size
     renderer.updateViewport(width, height);
     camera.height = height;
     camera.width = width;
@@ -211,9 +216,9 @@ int main(int argc, char *argv[]) {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
  
-        if (MODS_ENABLED) UpdateMods(deltaTime); 
+        if (MODS_ENABLED) UpdateMods(deltaTime); // Update all mods
 
-        const auto& io = GetIO();
+        const auto& io = GetIO(); // Get ImGui IO
 
         if (!io.WantCaptureMouse && !io.WantCaptureKeyboard) { // If is typing or using UI prevent player movement
             InputHandler(window, player, camera, world, deltaTime);
@@ -221,13 +226,13 @@ int main(int argc, char *argv[]) {
 
         InputHandlerUI(window, player, camera, world, deltaTime); // Always check for input for UI and other stuff
 
-        player.updatePlayer(player, world, deltaTime);
+        player.updatePlayer(player, world, deltaTime); // Update the player
 
-        renderer.RenderViewport(camera, player, world, window);
+        renderer.RenderViewport(camera, player, world, window); // Render the viewport
 
-        HandleUI(window, world, player, renderer);
+        HandleUI(window, world, player, renderer); // Handle UI, and render it
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(window); // Show the rendered window
         glfwPollEvents();
     }
 
@@ -251,4 +256,3 @@ int main(int argc, char *argv[]) {
     logFile.close();
     return 0;
 }
-
