@@ -58,7 +58,7 @@ void ConsoleUI() {
 void DebugUI(GLFWwindow* window, Player &player, World &world, Renderer &renderer) {
     SetNextWindowSize(ImVec2(400, 100), ImGuiCond_FirstUseEver);
     Begin("Debug");
-    Text("Version: %s", VERSION);
+    Text("Version: %s", VERSION_STR);
     Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / GetIO().Framerate, GetIO().Framerate); // Display FPS
     Text("Average FPS: %.1f", GetIO().Framerate);
     Text("Player position: (%.2f, %.2f)", player.posX, player.posY);

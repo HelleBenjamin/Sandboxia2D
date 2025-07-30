@@ -53,6 +53,7 @@ GLFWwindow* getCurrentWindow() {
     return glfwGetCurrentContext();
 }
 
+// Do some complicated opengl stuff that I don't understand :)
 unsigned int Renderer::compileShader(GLenum type, const char* source) {
     unsigned int shader = glCreateShader(type);
     glShaderSource(shader, 1, &source, nullptr);
@@ -63,17 +64,17 @@ unsigned int Renderer::compileShader(GLenum type, const char* source) {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-        log("[RENDERER] ERROR::SHADER::COMPILATION_FAILED\n" + std::string(infoLog));
+        log(LOG_ERR,"[RENDERER] ERROR::SHADER::COMPILATION_FAILED\n%s", infoLog);
     }
     return shader;
 }
 
 unsigned int Renderer::createShaderProgram() {
-    log("[RENDERER] Creating shader program");
-    log("[RENDERER] Compiling shaders");
+    log(LOG_INFO,"[RENDERER] Creating shader program");
+    log(LOG_INFO,"[RENDERER] Compiling shaders");
     unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
     unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
-    log("[RENDERER] Compiled shaders");
+    log(LOG_INFO,"[RENDERER] Compiled shaders");
 
     unsigned int shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
@@ -85,10 +86,10 @@ unsigned int Renderer::createShaderProgram() {
     glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
     if (!success) {
         glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        log("[RENDERER] ERROR::SHADER::PROGRAM::LINKING_FAILED\n" + std::string(infoLog));
+        log(LOG_ERR, "[RENDERER] ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s", infoLog);
     }
 
-    if(success) log("[RENDERER] Created shader program successfully");
+    if(success) log(LOG_INFO,"[RENDERER] Created shader program successfully");
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -97,7 +98,8 @@ unsigned int Renderer::createShaderProgram() {
 }
 
 void Renderer::init() {
-    log("[RENDERER] Using 'Modern' as the render engine");
+    // I do understand this :)
+    log(LOG_INFO,"[RENDERER] Using 'Modern' as the render engine");
     loadTextures();
 
     float vertices[] = { // Tile vertices
@@ -145,12 +147,12 @@ void Renderer::init() {
 }
 
 GLuint loadTexture(const char* filepath) {
-    if (!filepath) log("[ERROR] Texture path is null");
+    if (!filepath) log(LOG_ERR,"[RENDERER] Texture path is null");
     int width, height, nrChannels;
     unsigned char* data = stbi_load(filepath, &width, &height, &nrChannels, 0);
 
     if (!data) {
-        log("[ERROR] Failed to load texture: " + string(filepath));
+        log(LOG_ERR, "[RENDERER] Failed to load texture: %s", filepath);
         return(2);
     }
 
@@ -169,17 +171,17 @@ GLuint loadTexture(const char* filepath) {
     glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(data);
-    log("[INFO] Loaded texture: '" + string(filepath) + "' with ID: " + to_string(textureID));
+    log(LOG_INFO, "[RENDERER] Loaded texture '%s' with ID %d", filepath, textureID);
     return textureID;
 }
 
 void unloadTexture(GLuint textureID) {
     glDeleteTextures(1, &textureID);
-    log("[INFO] Unloaded texture with ID: " + to_string(textureID));
+    log(LOG_INFO, "[RENDERER] Unloaded texture with ID %d", textureID);
 }
 
 void Renderer::loadTextures(){
-    const char* path = "assets/textures/";
+    const char* path = "assets/textures/"; // Texture directory
     const char* filenames[] = {"player.png", "player_left.png", "player_right.png", "selector.png", "air.png", "grass.png", "stone.png", "dirt.png", "sand.png", "wood.png", "leaves.png"}; // The order must be the same as defined in world.h
 
     textures.resize(tileCount); // Allocate memory
@@ -208,7 +210,7 @@ void Renderer::exit() {
     freeTextures();
 }
 
-void Renderer::drawTile(Tile tile, int x, int y) {
+void Renderer::drawTile(Tile tile, int x, int y) { // Draw the tile to x,y position
     glEnable(GL_BLEND); // Enable transparency
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

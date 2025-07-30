@@ -21,25 +21,10 @@ void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& w
             pressed = true;
         }
         
-        // Debug only
-        else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS && DEBUG) {
-            log("[INFO] Player position: (" + std::to_string(player.posX) + ", " + std::to_string(player.posY) + ")");
-            pressed = true;
-        } else if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS && DEBUG) {
-            log("[INFO] Selector position: (" + std::to_string((player.SelectorX / TILE_SIZE / SCALER) + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)) +  ", " + std::to_string((player.SelectorY / TILE_SIZE / SCALER) + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)) + ")");
-            pressed = true;
-        } else if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && DEBUG) {
-            log("[INFO] Current FPS: " + std::to_string(1.0f / deltaTime));
-            pressed = true;
-        }
-
     } else if (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && 
                glfwGetKey(window, GLFW_KEY_T) != GLFW_PRESS && 
                glfwGetKey(window, GLFW_KEY_F1) != GLFW_PRESS && 
-               glfwGetKey(window, GLFW_KEY_I) != GLFW_PRESS &&
-               glfwGetKey(window, GLFW_KEY_P) != GLFW_PRESS && 
-               glfwGetKey(window, GLFW_KEY_O) != GLFW_PRESS && 
-               glfwGetKey(window, GLFW_KEY_F) != GLFW_PRESS) {
+               glfwGetKey(window, GLFW_KEY_I) != GLFW_PRESS) {
         pressed = false;
     }
 }
@@ -79,7 +64,7 @@ void InputHandler(GLFWwindow* window, Player& player, Camera& camera, World& wor
 
     // Place and destroy
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) { // destroy tile
-        if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log("[ERROR] Tried to destroy tile out of bounds at " + std::to_string(SelX) + ", " + std::to_string(SelY));
+        if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log(LOG_ERR, "Tried to destroy tile out of bounds at (%d, %d)", SelX, SelY);
         else{
             world.tiles[SelX][SelY].type = T_Air;
             world.tiles[SelX][SelY].isSolid = false;
@@ -89,7 +74,7 @@ void InputHandler(GLFWwindow* window, Player& player, Camera& camera, World& wor
             }
         };
     } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) { // place tile
-        if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log("[ERROR] Tried to place tile out of bounds at " + std::to_string(SelX) + ", " + std::to_string(SelY));
+        if (SelX < 0 || SelX >= world.width || SelY < 0 || SelY >= world.height) log(LOG_ERR, "Tried to place tile out of bounds at (%d, %d)", SelX, SelY);
         else if (world.tiles[SelX][SelY].type == T_Air && player.SelectedTileType < tileCount){ // Only place if tile is air and valid
             world.tiles[SelX][SelY].type = player.SelectedTileType;
             world.tiles[SelX][SelY].isSolid = true;

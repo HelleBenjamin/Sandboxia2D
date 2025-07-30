@@ -14,21 +14,21 @@ void InitOpenAL() {
   // Make sure that initialization was successful
 
   if (!device) {
-    log("[ERROR] Failed to open OpenAL device");
+    log(LOG_ERR,"Failed to open OpenAL device");
     return;
   }
 
   context = alcCreateContext(device, NULL);
 
   if (!context) {
-    log("[ERROR] Failed to create OpenAL context");
+    log(LOG_ERR,"Failed to create OpenAL context");
     alcCloseDevice(device);
     return;
   }
 
   alcMakeContextCurrent(context);
 
-  log("[INFO] OpenAL initialized");
+  log(LOG_INFO,"OpenAL initialized");
 }
 
 void CloseOpenAL() {
@@ -36,14 +36,14 @@ void CloseOpenAL() {
   alcDestroyContext(context);
   alcCloseDevice(device);
 
-  log("[INFO] OpenAL closed");
+  log(LOG_INFO,"OpenAL closed");
 }
 
 bool loadSound(const std::string& filename, Sound& sound) {
   SF_INFO sfInfo; // Open sound file
   SNDFILE* file = sf_open(filename.c_str(), SFM_READ, &sfInfo);
   if (!file) {
-    log("[ERROR] Failed to open sound file: " + filename);
+    log(LOG_ERR, "Failed to open sound file: %s", filename.c_str());
     return false;
   }
 
@@ -69,16 +69,16 @@ bool loadSound(const std::string& filename, Sound& sound) {
 void playSound(int index) {
   if (!SOUNDS_ENABLED) return;
   if (index < 0 || index >= sounds.size()) { // Prevent crash
-    log("[ERROR] Invalid sound index: " + std::to_string(index));
+    log(LOG_ERR,"Invalid sound index %d", index);
     return;
   }
-  alSourceStop(sounds[index].source);
+  alSourceStop(sounds[index].source); // Stop the current sound
   alSourcePlay(sounds[index].source);
 }
 
 void stopSound(int index) {
   if (index < 0 || index >= sounds.size()) { // Prevent crash
-    log("[ERROR] Invalid sound index: " + std::to_string(index));
+    log(LOG_ERR,"Invalid sound index %d", index);
     return;
   }
   ALuint source = sounds[index].source;
@@ -88,7 +88,7 @@ void stopSound(int index) {
 
 void loadSounds() {
   const char* path = "assets/sounds/"; // Path
-  const char* filenames[] = {"tile_break.wav", "sand.wav", "grass.wav"};
+  const char* filenames[] = {"tile_break.wav", "sand.wav", "grass.wav"}; // Don't modify the order
 
   // Loop the sound files
   for (int i = 0; i < sizeof(filenames) / sizeof(char*); i++) {

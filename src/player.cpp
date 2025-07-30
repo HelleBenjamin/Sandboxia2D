@@ -44,6 +44,8 @@ void Camera::updateCamera(Camera& camera, Player player) { // Update camera to f
 }
 
 void Player::move(int dx, int dy, float deltaTime, World& world, Player& player) {
+    // Here's some code that controls the player
+
     float moveAmountX = dx * PlayerSpeed * deltaTime;
     float moveAmountY = dy * PlayerSpeed * deltaTime;
 
@@ -71,7 +73,7 @@ void Player::move(int dx, int dy, float deltaTime, World& world, Player& player)
         posY = newY;
         return;
     } 
-    if (!checkCollision(newX, posY, world, player)) {
+    if (!checkCollision(newX, posY, world, player)) { // Basic collision checking, may not be the best but it works
         posX = newX;
     }
     if (!checkCollision(posX, newY, world, player)) {

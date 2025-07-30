@@ -14,6 +14,8 @@
 extern int WORLD_WIDTH;
 extern int WORLD_HEIGHT;
 
+#define WORLD_SIGNATURE 0xBEEF
+
 typedef struct { // Tile structure
     int type;       // Type
     bool tileState; // Tile state, eg. is lit
@@ -68,7 +70,7 @@ extern Tile DefaultTiles[0xFF];
 
 void generateWorld(World& world, int seed);
 void saveWorld(const char* filePath, const World* world);
-void loadWorld(const char* filePath, World* world);
+int loadWorld(const char* filePath, World* world);
 
 extern World world;
 

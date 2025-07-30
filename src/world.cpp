@@ -2,6 +2,7 @@
 #include "../include/Sandboxia/renderer.h"
 #include <cmath>
 #include <iostream>
+#include <new>
 
 using namespace std;
 
@@ -30,7 +31,7 @@ Tile DefaultTiles[0xFF] = { // Default values of tiles
     {T_Leaves, 0, 1, 0}
 };
 
-struct Tree { // Tree template
+struct Tree { // Tree template, should make a template file which contains all the structures
     int tiles[3][5] = {
         {TypeAir,TypeAir, TypeLeaves, TypeLeaves, TypeAir},
         {TypeWood, TypeWood, TypeWood, TypeLeaves, TypeLeaves},
@@ -39,7 +40,7 @@ struct Tree { // Tree template
 };
 
 
-void generateWorld(World& world, int seed) {
+void generateWorld(World& world, int seed) { // The best world generation ever :)
     if (seed == -1) { // If seed is -1, generate a random seed
         world.seed = rand();
     } else {
@@ -101,24 +102,33 @@ void generateWorld(World& world, int seed) {
     }
 }
 
-void loadWorld(const char* filePath, World* world) {
+int loadWorld(const char* filePath, World* world) {
     FILE* file = fopen(filePath, "rb");
     if (!file) {
-        log("[ERROR] Failed to open file for loading");
-        return;
+        log(LOG_ERR,"Failed to open world '%s'", filePath);
+        return 1;
     }
 
-	// Free the old world
-    for (int i = 0; i < world->width; i++) {
-        delete[] world->tiles[i];
+    // Free the old world
+    if (world->tiles) {
+        for (int i = 0; i < world->width; i++) {
+            delete[] world->tiles[i];
+        }
+
+        delete[] world->tiles;
     }
-    delete[] world->tiles;
 
+	World newWorld = {0}; // Temporary world to load the world from file
 
-	World newWorld; // Temporary world to load the world from file
+    int signature = 0;
+    fread(&signature, sizeof(int), 1, file); // Read the world signature
+    if (signature != WORLD_SIGNATURE) {
+        log(LOG_ERR,"Invalid world signature! Expected %04x, got %04x", WORLD_SIGNATURE, signature);
+        return 1;
+    }
 
 	// Read the world dimensions
-	fread(&newWorld.width, sizeof(int), 1, file);
+    fread(&newWorld.width, sizeof(int), 1, file);
     fread(&newWorld.height, sizeof(int), 1, file);
 
 	// Now read the world seed
@@ -134,26 +144,33 @@ void loadWorld(const char* filePath, World* world) {
 		fread(newWorld.tiles[x], sizeof(Tile), newWorld.height, file);
 	}
 
+    // Put the new world in place
 	*world = newWorld;
 
-    log("[INFO] Loaded world");
-    log("[INFO] World name: " + std::string(world->name));
-    log("[INFO] World size: " + std::to_string(world->width) + "x" + std::to_string(world->height));
-    log("[INFO] World seed: " + std::to_string(world->seed));
+    // Print new world stuff
+    log(LOG_INFO,"Loaded world '%s'", world->name);
+    log(LOG_INFO,"World size: %d x %d", world->width, world->height);
+    log(LOG_INFO,"World seed: %d", world->seed);
 
+    // Finish
     fclose(file);
 	WORLD_HEIGHT = world->height;
 	WORLD_WIDTH = world->width;
+
+    return 0;
 }
 
 void saveWorld(const char* filePath, const World* world) {
 
-    FILE* file = fopen(filePath, "wb"); 
+    FILE* file = fopen(filePath, "wb"); // Save as a raw binary
 
     if (!file) {
-        log("[ERROR] Failed to open file for saving");
+        log(LOG_ERR," Failed to open file for saving");
         return;
     }
+
+    int signature = WORLD_SIGNATURE; // Signature to check if the world is corrupted
+    fwrite(&signature, sizeof(int), 1, file);
 
 	// Write the world size first, this way we can allocate memory for the tiles before reading them
 	fwrite(&world->width, sizeof(int), 1, file);
@@ -172,7 +189,7 @@ void saveWorld(const char* filePath, const World* world) {
 
 	// This way the world loading/saving is less error-prone
 
-    log("[INFO] Saved world: " + std::string(world->name));
+    log(LOG_INFO,"Saved world '%s'", filePath);
 
     fclose(file);
 }

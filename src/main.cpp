@@ -26,6 +26,7 @@
 #include "../include/Sandboxia/audio.h"
 #include <fstream>
 #include <iomanip>
+#include <stdarg.h>
 
 using namespace std;
 using namespace ImGui;
@@ -42,6 +43,8 @@ bool COLLISION = true;
 bool DEBUG = false;
 bool MODS_ENABLED = true;
 bool SOUNDS_ENABLED = true;
+int LOG_LEVEL = 4; // Log all messages
+bool WORLD_LOADED = false;
 
 GLFWwindow* window;
 
@@ -70,7 +73,7 @@ int initGame(){
     player.SelectorTile = DefaultTiles[TypeSelector];
 
     if (!glfwInit()) {
-        log("[ERROR] Failed to initialize GLFW with error code: " + to_string(glfwGetError(NULL)));
+        log(LOG_ERR,"Failed to initialize GLFW with error code %d", glfwGetError(NULL));
         return -1;
     }
 
@@ -78,11 +81,11 @@ int initGame(){
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    log("[INFO] Window size: " + to_string(SCREEN_WIDTH) + 'x' + to_string(SCREEN_HEIGHT));
+    log(LOG_INFO,"Window size %dx%d", SCREEN_WIDTH, SCREEN_HEIGHT);
 
     window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Sandboxia2D", NULL, NULL);
     if (!window) {
-        log("[ERROR] Failed to create window with error code: " + to_string(glfwGetError(NULL)));
+        log(LOG_ERR,"Failed to create window with error code %d ", glfwGetError(NULL));
         glfwTerminate();
         return -1;
     }
@@ -91,7 +94,8 @@ int initGame(){
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        log("[ERROR] Failed to initialize GLAD");
+        log(LOG_ERR,"Failed to initialize GLAD");
+        glfwTerminate();
         return -1;
     }  
 
@@ -102,14 +106,14 @@ int initGame(){
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetScrollCallback(window, scrollCallback);
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    log("[INFO] Renderer device: " + string((const char*)glGetString(GL_RENDERER)));
+    log(LOG_INFO, "Renderer device: %s ", (const char*)glGetString(GL_RENDERER));
 
     glClearColor(0.222f, 0.608f, 0.924f, 1.0f); // Background color
     glfwSwapBuffers(window);
 
     renderer.init();
 
-    generateWorld(world, -1); // Generate a new world
+    if (!WORLD_LOADED) generateWorld(world, -1); // Generate a new world
 
     glfwSwapInterval(VSYNC); // Enable/disable vsync
 
@@ -126,20 +130,29 @@ int initGame(){
     return 0;
 }
 
-void log(string msg) {
-    logFile << fixed << setprecision(2) << "[" << glfwGetTime() << "] " << msg << endl;
-    cout << fixed << setprecision(2) << " [" << glfwGetTime()  << "] " << msg << endl;
+void log(int type, char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    char buffer[1024];
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_end(args);
+    string msg = buffer;
+    double time = glfwGetTime();
+    string types[] = {"[NULL] ","[ERROR] ", "[WARNING] ", "[INFO] ", "[DEBUG] "};
+    string log_type = types[type];
+    cout << fixed << setprecision(2) << " [" << time  << "] " << log_type << msg << endl;
+    if (type <= LOG_LEVEL) logFile << fixed << setprecision(2) << "[" << time << "] " << log_type << msg << endl;
 }
 
 string handleConsoleCommand(std::string command) {
     // Handle console commands, there might be a better way to do this, but this works
-    log("[INFO] Executing command: " + command);
+    log(LOG_INFO, "Executing command: ", command.c_str());
     string cmd = command;
     if (cmd == "/seed") {
         return "Current world seed: " + to_string(world.seed);
     } else if (cmd == "/debug") {
         DEBUG = !DEBUG;
-        log("[INFO] DEBUG set to " + to_string(DEBUG));
+        log(LOG_INFO,"DEBUG set to ", DEBUG);
         return "DEBUG set to " + to_string(DEBUG);
     } else if (sscanf(command.c_str(), "/tp %e %e", &player.posX, &player.posY) == 2) {
         return "Teleported to (" + to_string(player.posX) + ", " + to_string(player.posY) + ")";
@@ -174,8 +187,9 @@ int main(int argc, char *argv[]) {
             args += " ";
         }
     }
-    log("--- Sandboxia2D " + string(VERSION) + " ---");
-    log("[INFO] Launching with arguments: " + args);
+    
+    log(LOG_INFO,"---Sandboxia2D %s---", VERSION_STR);
+    log(LOG_INFO,"Launching with arguments: %s", args.c_str());
 
     // Parse arguments
     for (int i = 1; i < argc; i++) {
@@ -186,27 +200,30 @@ int main(int argc, char *argv[]) {
             SCREEN_HEIGHT = atoi(argv[++i]);
         } else if (arg == "-v" && i + 1 < argc) { // vsync
             VSYNC = (argc > i + 1) ? atoi(argv[++i]) : 1;
-            log("[INFO] VSYNC set to " + to_string(VSYNC));
+            log(LOG_INFO, "VSYNC set to %d", VSYNC);
         } else if (arg == "-c" && i + 1 < argc) { // collision
             COLLISION = (argc > i + 1) ? atoi(argv[++i]) : 1;
-            log("[INFO] COLLISION set to " + to_string(COLLISION));
-        } else if (arg == "-d") { // debug
+            log(LOG_INFO, "COLLISION set to %d", COLLISION);
+        } else if (arg == "-debug") { // debug
             DEBUG = 1;
-            log("[INFO] DEBUG set to " + to_string(DEBUG));
-        } else if (arg == "-W" && i + 1 < argc) { // world
+            log(LOG_INFO, "DEBUG set to %d", DEBUG);
+        } else if (arg == "-world" && i + 1 < argc) { // world
+            WORLD_LOADED = true;
             char *worldPath = argv[++i];
-            loadWorld(worldPath, &world);
+            if(loadWorld(worldPath, &world)) WORLD_LOADED = false; // If unsuccessful, create a new world
         } else if (arg == "-noMods") { // Disable mods
             MODS_ENABLED = false;
         } else if (arg == "-noSounds") { // Disable sounds
             SOUNDS_ENABLED = false;
+        } else if (arg == "-log" && i + 1 < argc) { // log level
+            LOG_LEVEL = atoi(argv[++i]);
         }
     }
 
     // Initialize the game
     initGame();
 
-    log("[INFO] Game initialized");
+    log(LOG_INFO,"Game initialized");
 
     float lastFrame{}, currentFrame, deltaTime = 0.0f;
 
@@ -246,7 +263,7 @@ int main(int argc, char *argv[]) {
         CloseOpenAL();
     }
 
-    log("[INFO] Program shutting down");
+    log(LOG_INFO,"Program shutting down");
     glfwTerminate();
     // Deallocate memory
     for (int i = 0; i < world.width; i++) {

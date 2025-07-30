@@ -20,9 +20,10 @@ extern bool COLLISION;
 extern bool DEBUG;
 extern bool MODS_ENABLED;
 extern bool SOUNDS_ENABLED;
+extern int LOG_LEVEL;
 
-#define VERSION "0.1.9-beta"
-#define SANDBOXIA_VERSION_NUM 19
+#define VERSION_STR "0.1.9-beta"
+#define VERSION_NUM 19
 
 std::string handleConsoleCommand(std::string command); // Returns the output of the command to the console
 
@@ -31,7 +32,13 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 int initGame();
 int main(int argc, char *argv[]);
-void log(std::string msg);
+void log(int type, char *fmt, ...);
 
+#define LOG_NULL  0
+#define LOG_ERR   1 
+#define LOG_WARN  2
+#define LOG_INFO  3
+#define LOG_DEBUG 4
+#define LOG_MOD   5
 
 #endif

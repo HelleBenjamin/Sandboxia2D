@@ -91,11 +91,11 @@ int GetAPIVersion() {
 }
 
 int GetGameVersion() {
-    return SANDBOXIA_VERSION_NUM;
+    return VERSION_NUM;
 }
 
 void DebugLog(string text) {
-    log(text);
+    log(LOG_MOD, "%s", text.c_str());
 }
 
 struct Mod {
@@ -112,7 +112,7 @@ void LoadMods() {
     string modfp = MOD_PATH;
 
 	if (!fs::exists(modfp)) { // Check if mods folder exists, this prevents crashes
-		log("[ERROR] Mods folder not found");
+		log(LOG_ERR,"Mods folder not found");
 		MODS_ENABLED = false;
 		return;
 	}
@@ -132,7 +132,7 @@ void LoadMods() {
         #endif
 
         if (!handle) {
-			log("[ERROR] Failed to load mod: " + modPath); // Can be caused by different architecture
+			log(LOG_ERR,"Failed to load mod: %s", modPath.c_str()); // Can be caused by different architecture
             continue;
         }
 
@@ -140,7 +140,7 @@ void LoadMods() {
         auto ModUpdate = (UpdateMod) GET_PROC_ADDRESS(handle, "ModUpdate");
 
 		if (!ModInitialize || !ModUpdate) {  // Check if the mod has the required functions
-            log("[ERROR] Invalid mod: " + modPath);
+            log(LOG_ERR,"Invalid mod: %s", modPath.c_str());
             CLOSE_LIBRARY(handle);
             continue;
         }
@@ -149,7 +149,7 @@ void LoadMods() {
         mods.push_back({handle, ModInitialize, ModUpdate});
 
         ModInitialize(&api);
-        log("[INFO] Loaded mod: " + modPath);
+        log(LOG_INFO,"Loaded mod: %s", modPath.c_str());
     }
 }
 
