@@ -15,7 +15,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL 3.0. It's designed to be
 - Support for mods!
 
 # Supported platforms
-- Linux: x64, aarch64
+- Linux: x64, x86, aarch64
 - Windows: x64, x86 (experimental)
 
 ## How to play
@@ -41,7 +41,7 @@ Sandboxia is a sandbox game written in C++ using OpenGL 3.0. It's designed to be
 - `openal-soft-devel` (for audio)
 - `libsndfile-devel` (for audio)
 
-You can install these via your package manager.
+You can install these via your package manager. Windows has the required packages already in `lib` folder.
 
 ### Windows
 - Visual Studio 2022
@@ -88,6 +88,7 @@ Mods will be loaded automatically.
 - `-v` to set the VSYNC, Default is 1
 - `-c` to set the collision, Default is 1
 - `-d` to set the debug, Default is 0
+- `-world` to set the world file
 - `-noMods` to disable mods
 - `-noSounds` to disable sounds
 
