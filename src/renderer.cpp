@@ -7,11 +7,10 @@
 #include <vector>
 
 using namespace std;
+using namespace glm;
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "../include/stb_image.h"
-
-using namespace glm;
 
 /* 
     OpenGL 3.0 Core based renderer
@@ -193,6 +192,7 @@ void Renderer::loadTextures(){
         strcpy(filepath, path);
         strcat(filepath, filenames[i]);
         textures[i] = loadTexture(filepath);
+        free(filepath);
     }
 }
 
@@ -231,6 +231,27 @@ void Renderer::drawTile(Tile tile, int x, int y) { // Draw the tile to x,y posit
     glDisable(GL_BLEND);
 }
 
+void Renderer::drawTilef(Tile tile, float x, float y) { // Draw the tile to x,y position
+    glEnable(GL_BLEND); // Enable transparency
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glBindTexture(GL_TEXTURE_2D, textures[tile.type]);
+
+    mat4 model = mat4(1.0f);
+    model = translate(model, vec3(x * TILE_SIZE * SCALER, y * TILE_SIZE * SCALER, 0.0f));
+    model = scale(model, vec3(TILE_SIZE * SCALER, TILE_SIZE * SCALER, 1.0f));
+
+    glUseProgram(shaderProgram);
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, value_ptr(model));
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_BLEND);
+}
+
 void Renderer::updateViewport(int width, int height) { // Update the viewport, fixes the streching bug
     glViewport(0, 0, width, height);
 
@@ -243,14 +264,44 @@ void Renderer::updateViewport(int width, int height) { // Update the viewport, f
 void Renderer::RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window) {
     //glClear(GL_COLOR_BUFFER_BIT);
 
-    camera.posX += (player.posX - camera.posX);
-    camera.posY += (player.posY - camera.posY);
+    // TODO: Fix a bug where the player is inside of a tile
+
+    // Deadzone and following camera. Way better than centered camera
+    float deadzoneWidth = static_cast<float>(camera.width) / TILE_SIZE / SCALER * 0.25f;
+    float deadzoneHeight = static_cast<float>(camera.height) / TILE_SIZE / SCALER * 0.25f;
+    float smoothness = 0.15f; // Smaller = more smooth, bigger = snapper
+    
+    // Calculate player position relative to camera center
+    float playerRelX = player.posX - camera.posX;
+    float playerRelY = player.posY - camera.posY;
+    
+    // Calculate target camera position based on deadzone
+    float targetX = camera.posX;
+    float targetY = camera.posY;
+    
+    // Horizontal deadzone check
+    if (playerRelX > deadzoneWidth) {
+        targetX = player.posX - deadzoneWidth;
+    } else if (playerRelX < -deadzoneWidth) {
+        targetX = player.posX + deadzoneWidth;
+    }
+    
+    // Vertical deadzone check
+    if (playerRelY > deadzoneHeight) {
+        targetY = player.posY - deadzoneHeight;
+    } else if (playerRelY < -deadzoneHeight) {
+        targetY = player.posY + deadzoneHeight;
+    }
+    
+    // Smoothly interpolate camera to target position
+    camera.posX += (targetX - camera.posX) * smoothness;
+    camera.posY += (targetY - camera.posY) * smoothness;
 
     // Calculate the visible tiles
-    float startX = (camera.posX - camera.width / TILE_SIZE / SCALER / 2);
-    float startY = (camera.posY - camera.height / TILE_SIZE / SCALER / 2);
-    float endX = startX + camera.width / TILE_SIZE / SCALER;
-    float endY = startY + camera.height / TILE_SIZE / SCALER;
+    float startX = (camera.posX - static_cast<float>(camera.width) / TILE_SIZE / SCALER / 2);
+    float startY = (camera.posY - static_cast<float>(camera.height) / TILE_SIZE / SCALER / 2);
+    float endX = startX + static_cast<float>(camera.width) / TILE_SIZE / SCALER;
+    float endY = startY + static_cast<float>(camera.height) / TILE_SIZE / SCALER;
 
     // Render visible tiles
     for (int x = startX; x < endX; ++x) {
@@ -263,10 +314,13 @@ void Renderer::RenderViewport(Camera& camera, Player& player, World& world, GLFW
         }
     }
 
-    // Render the player at the center of the screen
-	if (player.isMovingRight) drawTile(DefaultTiles[TypePlayer_Right], (camera.width / TILE_SIZE / SCALER / 2), camera.height / TILE_SIZE / SCALER / 2);
-	else if (player.isMovingLeft) drawTile(DefaultTiles[TypePlayer_Left], (camera.width / TILE_SIZE / SCALER / 2), camera.height / TILE_SIZE / SCALER / 2);
-	else drawTile(player.playerTile, (camera.width / TILE_SIZE / SCALER / 2), camera.height / TILE_SIZE / SCALER / 2); // Default player
+    // Render the player at their actual world position
+    float playerScreenX = player.posX - startX;
+    float playerScreenY = player.posY - startY;
+    
+	if (player.isMovingRight) drawTile(DefaultTiles[TypePlayer_Right], playerScreenX, playerScreenY);
+	else if (player.isMovingLeft) drawTile(DefaultTiles[TypePlayer_Left], playerScreenX, playerScreenY);
+	else drawTile(player.playerTile, playerScreenX, playerScreenY);
 
     // Render the selector
     drawTile(player.SelectorTile, (player.SelectorX / TILE_SIZE / SCALER), (player.SelectorY / TILE_SIZE / SCALER));

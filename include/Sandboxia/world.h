@@ -4,9 +4,6 @@
 
 #include "../main.h"
 
-#define TILE_SIZE 8 // 8x8 pixels per tile
-#define SCALER 5 // Scaler for tile size
-
 // WORLD SIZE
 //#define WORLD_WIDTH 128
 //#define WORLD_HEIGHT 128

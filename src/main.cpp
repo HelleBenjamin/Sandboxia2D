@@ -78,7 +78,7 @@ int initGame(){
     }
 
     // GLFW window hints
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // Opengl 3.0
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
     log(LOG_INFO,"Window size %dx%d", SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -106,7 +106,7 @@ int initGame(){
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetScrollCallback(window, scrollCallback);
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    log(LOG_INFO, "Renderer device: %s ", (const char*)glGetString(GL_RENDERER));
+    log(LOG_INFO, "Render device: %s ", (const char*)glGetString(GL_RENDERER));
 
     glClearColor(0.222f, 0.608f, 0.924f, 1.0f); // Background color
     glfwSwapBuffers(window);

@@ -9,6 +9,9 @@
 
 /* Modern renderer */
 
+#define TILE_SIZE 8 // 8x8 pixels per tile
+#define SCALER 5 // Scaler for tile size
+
 enum TextureType {
     T_Player = 0,
 	T_Player_Left,
@@ -36,6 +39,7 @@ public:
     void freeTextures();
     void clearScreen();
     void drawTile(Tile tile, int x, int y);
+    void drawTilef(Tile tile, float x, float y);
 
     unsigned int compileShader(GLenum type, const char* source);
     unsigned int createShaderProgram();

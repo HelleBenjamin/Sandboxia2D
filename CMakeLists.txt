@@ -50,10 +50,11 @@ endif()
 
 # Set building flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1") # Use -O2 or -O3 for better performance, may increase compile time, default is -O1, for debug use -O0 and -g
+# To get the best performance use -march=native, may not work on all platforms
 
 set_target_properties(Sandboxia PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-# Copies assets to build directory, necessary on Windows
+# Copies assets to build directory
 add_custom_command(TARGET Sandboxia POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:Sandboxia>/assets

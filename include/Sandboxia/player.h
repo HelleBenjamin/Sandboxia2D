@@ -31,7 +31,7 @@ public:
 
 class Camera{
 public:
-    int posX, posY;
+    float posX, posY;
     int width, height; // viewport
 
     void updateCamera(Camera& camera, Player player);
