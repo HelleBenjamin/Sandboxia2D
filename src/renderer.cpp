@@ -298,16 +298,17 @@ void Renderer::RenderViewport(Camera& camera, Player& player, World& world, GLFW
     camera.posY += (targetY - camera.posY) * smoothness;
 
     // Calculate the visible tiles
-    float startX = (camera.posX - static_cast<float>(camera.width) / TILE_SIZE / SCALER / 2);
-    float startY = (camera.posY - static_cast<float>(camera.height) / TILE_SIZE / SCALER / 2);
-    float endX = startX + static_cast<float>(camera.width) / TILE_SIZE / SCALER;
-    float endY = startY + static_cast<float>(camera.height) / TILE_SIZE / SCALER;
+    // Use rounding to fix clipping, maybe even use int instead of float?
+    float startX = floor(camera.posX - static_cast<float>(camera.width) / TILE_SIZE / SCALER / 2);
+    float startY = floor(camera.posY - static_cast<float>(camera.height) / TILE_SIZE / SCALER / 2);
+    float endX = ceil(startX + static_cast<float>(camera.width) / TILE_SIZE / SCALER);
+    float endY = ceil(startY + static_cast<float>(camera.height) / TILE_SIZE / SCALER);
 
     // Render visible tiles
     for (int x = startX; x < endX; ++x) {
         for (int y = startY; y < endY; ++y) {
-            int tileX = (int)x;
-            int tileY = (int)y;
+            int tileX = static_cast<int>(x); // Instead of (int)x
+            int tileY = static_cast<int>(y);
             if (tileX >= 0 && tileX < world.width && tileY >= 0 && tileY < world.height && world.tiles[tileX][tileY].type != T_Air) {
                 drawTile(world.tiles[tileX][tileY], x - startX, y - startY);
             }

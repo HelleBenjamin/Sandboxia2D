@@ -3,12 +3,14 @@
 float const GRAVITY = 20.0f;
 float const JUMP_POWER = 2.0f;
 
-static bool checkCollision(int x, int y, World& world, Player& player) {
-    if (x < 0 || x >= world.width || y < 0 || y >= world.height) {
+static bool checkCollision(float x, float y, World& world) {
+    int tileX = static_cast<int>(x);
+    int tileY = static_cast<int>(y);
+    if (tileX < 0 || tileX >= world.width || tileY < 0 || tileY >= world.height) {
         return true; // Return 1 if out of bounds
     }
 
-    return world.tiles[x][y].isSolid; // Return 1 if solid
+    return world.tiles[tileX][tileY].isSolid; // Return 1 if solid
 }
 
 void Player::updatePlayer(Player &player, World& world, float deltaTime) {
@@ -24,7 +26,7 @@ void Player::updatePlayer(Player &player, World& world, float deltaTime) {
     player.posX += player.velX * deltaTime;
     player.posY -= player.velY * deltaTime;
 
-    if (player.posY >= WORLD_HEIGHT || checkCollision(player.posX, player.posY+1, world, player)) {
+    if (player.posY >= WORLD_HEIGHT || checkCollision(player.posX, player.posY+1, world)) {
         player.velY = 0;
         player.onGround = true;
     } else {
@@ -73,10 +75,10 @@ void Player::move(int dx, int dy, float deltaTime, World& world, Player& player)
         posY = newY;
         return;
     } 
-    if (!checkCollision(newX, posY, world, player)) { // Basic collision checking, may not be the best but it works
+    if (!checkCollision(newX, posY, world)) { // Basic collision checking, may not be the best but it works
         posX = newX;
     }
-    if (!checkCollision(posX, newY, world, player)) {
+    if (!checkCollision(posX, newY, world)) {
         posY = newY;
     }
 }
