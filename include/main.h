@@ -32,7 +32,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 int initGame();
 int main(int argc, char *argv[]);
-void log(int type, char *fmt, ...);
+void log(int type, const char *fmt, ...);
 
 #define LOG_NULL  0
 #define LOG_ERR   1 

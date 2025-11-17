@@ -130,7 +130,7 @@ int initGame(){
     return 0;
 }
 
-void log(int type, char *fmt, ...) {
+void log(int type, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
     char buffer[1024];
