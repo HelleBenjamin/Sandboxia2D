@@ -141,54 +141,54 @@ void Renderer::updateCamera(Player& player) {
 }
 
 void Renderer::RenderViewport(Player& player, World& world) {
-        BeginDrawing();
-        ClearBackground(SKYBLUE);
-        
-        // Update camera before rendering
-        updateCamera(player);
-        
-        BeginMode2D(camera);
-        
-        // Calculate visible tiles in world coordinates
-        Vector2 topLeft = GetScreenToWorld2D({0, 0}, camera);
-        Vector2 bottomRight = GetScreenToWorld2D({(float)SCREEN_WIDTH, (float)SCREEN_HEIGHT}, camera);
-        
-        int startX = (int)floor(topLeft.x / (TILE_SIZE * SCALER));
-        int startY = (int)floor(topLeft.y / (TILE_SIZE * SCALER));
-        int endX = (int)ceil(bottomRight.x / (TILE_SIZE * SCALER));
-        int endY = (int)ceil(bottomRight.y / (TILE_SIZE * SCALER));
-        
-        // Render visible tiles
-        for (int x = startX; x < endX; ++x) {
-            for (int y = startY; y < endY; ++y) {
-                if (x >= 0 && x < world.width && 
-                    y >= 0 && y < world.height && 
-                    world.tiles[x][y].type != T_Air) {
-                    drawTileWorld(world.tiles[x][y], x, y);
-                }
+    BeginDrawing();
+    ClearBackground(SKYBLUE);
+    
+    // Update camera before rendering
+    updateCamera(player);
+    
+    BeginMode2D(camera);
+    
+    // Calculate visible tiles in world coordinates
+    Vector2 topLeft = GetScreenToWorld2D({0, 0}, camera);
+    Vector2 bottomRight = GetScreenToWorld2D({(float)SCREEN_WIDTH, (float)SCREEN_HEIGHT}, camera);
+    
+    int startX = (int)floor(topLeft.x / (TILE_SIZE * SCALER));
+    int startY = (int)floor(topLeft.y / (TILE_SIZE * SCALER));
+    int endX = (int)ceil(bottomRight.x / (TILE_SIZE * SCALER));
+    int endY = (int)ceil(bottomRight.y / (TILE_SIZE * SCALER));
+    
+    // Render visible tiles
+    for (int x = startX; x < endX; ++x) {
+        for (int y = startY; y < endY; ++y) {
+            if (x >= 0 && x < world.width && 
+                y >= 0 && y < world.height && 
+                world.tiles[x][y].type != T_Air) {
+                drawTileWorld(world.tiles[x][y], x, y);
             }
         }
-        
-        // Render the player in world coordinates
-        Tile playerDisplayTile;
-        if (player.isMovingRight) {
-            playerDisplayTile.type = TypePlayer_Right;
-        } else if (player.isMovingLeft) {
-            playerDisplayTile.type = TypePlayer_Left;
-        } else {
-            playerDisplayTile = player.playerTile;
-        }
-        
-        drawTileWorld(playerDisplayTile, player.posX, player.posY);
-        
-        // Render the selector
-        drawTileWorld(player.SelectorTile, 
-                      player.SelectorX / TILE_SIZE / SCALER, 
-                      player.SelectorY / TILE_SIZE / SCALER);
-        
-        EndMode2D();
-        
-        // Draw UI elements here (outside camera) if needed
-        
-        EndDrawing();
+    }
+    
+    // Render the player in world coordinates
+    Tile playerDisplayTile;
+    if (player.isMovingRight) {
+        playerDisplayTile.type = TypePlayer_Right;
+    } else if (player.isMovingLeft) {
+        playerDisplayTile.type = TypePlayer_Left;
+    } else {
+        playerDisplayTile = player.playerTile;
+    }
+    
+    drawTileWorld(playerDisplayTile, player.posX, player.posY);
+    
+    // Render the selector
+    drawTileWorld(player.SelectorTile, 
+                    player.SelectorX / TILE_SIZE / SCALER, 
+                    player.SelectorY / TILE_SIZE / SCALER);
+    
+    EndMode2D();
+    
+    // Draw UI elements here (outside camera) if needed
+    
+    EndDrawing();
 }

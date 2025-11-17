@@ -53,6 +53,8 @@ World world;
 int initGame(){
     srand(time(NULL));
 
+    memset(camera, 0, sizeof(camera));
+
     player.posX = (float)(rand() % (WORLD_WIDTH - 2) + 1);
     player.posY = WORLD_HEIGHT - 70.0f;
     if (player.posY > WORLD_HEIGHT) player.posY = 70.0f;
