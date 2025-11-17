@@ -39,12 +39,6 @@ void Player::jump(Player &player) {
     player.onGround = false;
 }
 
-
-void Camera::updateCamera(Camera& camera, Player player) { // Update camera to follow player
-    camera.posX = player.posX / 2;
-    camera.posY = player.posY / 2;
-}
-
 void Player::move(int dx, int dy, float deltaTime, World& world, Player& player) {
     // Here's some code that controls the player
 

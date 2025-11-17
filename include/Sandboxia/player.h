@@ -4,6 +4,7 @@
 
 #include "../main.h"
 #include "world.h"
+#include <raylib.h>
 
 extern const float GRAVITY;
 extern float const JUMP_POWER;
@@ -29,17 +30,9 @@ public:
     void jump(Player &player);
 };
 
-class Camera{
-public:
-    float posX, posY;
-    int width, height; // viewport
-
-    void updateCamera(Camera& camera, Player player);
-};
-
 static bool checkCollision(int x, int y, World& world, Player& player);
 
 extern Player player;
-extern Camera camera;
+extern Camera2D camera;
 
 #endif

@@ -5,6 +5,8 @@
 #include "../main.h"
 #include "player.h"
 #include "world.h"
+#include <raylib.h>
+#include <raymath.h>
 #include <vector>
 
 /* Modern renderer */
@@ -26,11 +28,6 @@ enum TextureType {
     T_Leaves
 };
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-GLuint loadTexture(const char* filepath);
-void unloadTexture(GLuint textureID);
-GLFWwindow* getCurrentWindow();
-
 class Renderer {
 public:
     void init();
@@ -41,13 +38,12 @@ public:
     void drawTile(Tile tile, int x, int y);
     void drawTilef(Tile tile, float x, float y);
 
-    unsigned int compileShader(GLenum type, const char* source);
-    unsigned int createShaderProgram();
+    void updateCamera(Player& player);
+    void drawTileWorld(Tile tile, float worldX, float worldY);
 
-    std::vector<GLuint> textures;
+    std::vector<Texture2D> textures;
 
-    void RenderViewport(Camera& camera, Player& player, World& world, GLFWwindow* window);
-    void updateViewport(int width, int height);
+    void RenderViewport(Player& player, World& world);
 
 private:
     unsigned int VAO, VBO, EBO;

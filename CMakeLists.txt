@@ -14,39 +14,16 @@ set(SRC_FILES
     src/main.cpp
     src/renderer.cpp
     src/player.cpp
-    src/ui.cpp
+#    src/ui.cpp
     src/input.cpp
     src/world.cpp
-    src/mod_api.cpp
-    src/audio.cpp
+#    src/mod_api.cpp
+#    src/audio.cpp
 )
 
-# Third-party libraries
-set(LIBS_FILES
-    src/glad/glad.c
-    src/imgui/imgui.cpp
-    src/imgui/imgui_impl_glfw.cpp
-    src/imgui/imgui_impl_opengl3.cpp
-    src/imgui/imgui_demo.cpp
-    src/imgui/imgui_draw.cpp
-    src/imgui/imgui_tables.cpp
-    src/imgui/imgui_widgets.cpp
-)
 
-add_executable(Sandboxia ${SRC_FILES} ${LIBS_FILES})
-
-if(UNIX)
-    message("Linux Detected")
-    target_link_libraries(Sandboxia PRIVATE GL glfw openal sndfile pthread dl)
-elseif(WIN32)
-    message("Windows Detected")
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8) # x64
-        target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/win64)
-    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4) # x86
-        target_link_directories(Sandboxia PRIVATE ${CMAKE_SOURCE_DIR}/lib/win32)
-    endif()
-    target_link_libraries(Sandboxia PRIVATE gdi32 opengl32 glfw3 OpenAL32 sndfile)
-endif()
+add_executable(Sandboxia ${SRC_FILES})
+target_link_libraries(Sandboxia PRIVATE raylib)
 
 # Set building flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1") # Use -O2 or -O3 for better performance, may increase compile time, default is -O1, for debug use -O0 and -g

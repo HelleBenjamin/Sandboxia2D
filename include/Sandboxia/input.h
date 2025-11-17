@@ -5,10 +5,8 @@
 #include "../main.h"
 #include "player.h"
 #include "world.h"
-#include "ui.h"
+#include "renderer.h"
 
-void InputHandler(GLFWwindow* window, Player& player,Camera& camera, World& world, float deltaTime);
-void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& world, float deltaTime);
-void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+void HandleInput(World &world, Player &player, Renderer &renderer, float deltaTime);
 
 #endif

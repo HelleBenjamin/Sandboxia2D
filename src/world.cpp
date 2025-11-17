@@ -105,7 +105,7 @@ void generateWorld(World& world, int seed) { // The best world generation ever :
 int loadWorld(const char* filePath, World* world) {
     FILE* file = fopen(filePath, "rb");
     if (!file) {
-        log(LOG_ERR,"Failed to open world '%s'", filePath);
+        log(SLOG_ERR,"Failed to open world '%s'", filePath);
         return 1;
     }
 
@@ -123,7 +123,7 @@ int loadWorld(const char* filePath, World* world) {
     int signature = 0;
     fread(&signature, sizeof(int), 1, file); // Read the world signature
     if (signature != WORLD_SIGNATURE) {
-        log(LOG_ERR,"Invalid world signature! Expected %04x, got %04x", WORLD_SIGNATURE, signature);
+        log(SLOG_ERR,"Invalid world signature! Expected %04x, got %04x", WORLD_SIGNATURE, signature);
         return 1;
     }
 
@@ -148,9 +148,9 @@ int loadWorld(const char* filePath, World* world) {
 	*world = newWorld;
 
     // Print new world stuff
-    log(LOG_INFO,"Loaded world '%s'", world->name);
-    log(LOG_INFO,"World size: %d x %d", world->width, world->height);
-    log(LOG_INFO,"World seed: %d", world->seed);
+    log(SLOG_INFO,"Loaded world '%s'", world->name);
+    log(SLOG_INFO,"World size: %d x %d", world->width, world->height);
+    log(SLOG_INFO,"World seed: %d", world->seed);
 
     // Finish
     fclose(file);
@@ -165,7 +165,7 @@ void saveWorld(const char* filePath, const World* world) {
     FILE* file = fopen(filePath, "wb"); // Save as a raw binary
 
     if (!file) {
-        log(LOG_ERR," Failed to open file for saving");
+        log(SLOG_ERR," Failed to open file for saving");
         return;
     }
 
@@ -189,7 +189,7 @@ void saveWorld(const char* filePath, const World* world) {
 
 	// This way the world loading/saving is less error-prone
 
-    log(LOG_INFO,"Saved world '%s'", filePath);
+    log(SLOG_INFO,"Saved world '%s'", filePath);
 
     fclose(file);
 }

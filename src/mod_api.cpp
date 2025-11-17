@@ -34,7 +34,7 @@ void SetPlayerPos(vec2 pos) {
     player.posY = pos.y;
 }
 
-void AddNewTile(GLuint texture, int type, bool isSolid) {
+void AddNewTile(Texture2D texture, int type, bool isSolid) {
     DefaultTiles[type] = {type, 0, isSolid, 0};
     tileCount++;
 	PlaceableTileCount++;

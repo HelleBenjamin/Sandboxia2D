@@ -1,8 +1,8 @@
 #include "../include/Sandboxia/input.h"
-#include "../include/Sandboxia/audio.h"
+#include <raylib.h>
 
 // Keyboard and UI input
-void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& world, float deltaTime) {
+/*void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& world, float deltaTime) {
     static bool pressed = false; // Prevent spamming the input
     static auto& io = ImGui::GetIO();
     // UI and other input
@@ -27,9 +27,22 @@ void InputHandlerUI(GLFWwindow* window, Player& player, Camera& camera, World& w
                glfwGetKey(window, GLFW_KEY_I) != GLFW_PRESS) {
         pressed = false;
     }
+}*/
+
+void HandleInput(World &world, Player &player, Renderer &renderer, float deltaTime) {
+    if (IsKeyDown(KEY_W)) player.move(0, -1, deltaTime, world, player);
+    if (IsKeyDown(KEY_S)) player.move(0, 1, deltaTime, world, player);
+    if (IsKeyDown(KEY_A)) player.move(-1, 0, deltaTime, world, player);
+    if (IsKeyDown(KEY_D)) player.move(1, 0, deltaTime, world, player);
+    if (IsKeyDown(KEY_SPACE)) player.jump(player);
+
+    Vector2 mousePos = GetMousePosition();
+    Vector2 worldPos = GetScreenToWorld2D(mousePos, camera);
+    player.SelectorX = worldPos.x;
+    player.SelectorY = worldPos.y;
 }
 
-// Player movement
+/*// Player movement
 void InputHandler(GLFWwindow* window, Player& player, Camera& camera, World& world, float deltaTime) {
     int SelX = static_cast<int>((player.SelectorX / TILE_SIZE / SCALER)  + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)); // Calculate x + offset
     int SelY = static_cast<int>((player.SelectorY / TILE_SIZE / SCALER)  + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)); // Calculate y + offset
@@ -92,4 +105,4 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset){
         player.SelectedTileType = (TileType)((player.SelectedTileType + 1) % tileCount);
         if (player.SelectedTileType <= TypeAir) player.SelectedTileType = TypeGrass;
     }
-}
+}*/

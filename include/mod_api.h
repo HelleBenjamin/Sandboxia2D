@@ -5,8 +5,8 @@
 #include "../include/Sandboxia/world.h"
 #include "../include/Sandboxia/player.h"
 #include "../include/Sandboxia/renderer.h"
-#include "../include/Sandboxia/ui.h"
 #include "../include/Sandboxia/input.h"
+#include <raylib.h>
 
 #define API_VERSION_STR "0.1"
 #define API_VERSION_NUM 01
@@ -34,9 +34,9 @@ extern "C" {
     // Define functions
     typedef vec2 (*GetPlayerPosFunc)();
     typedef void (*SetPlayerPosFunc)(vec2 pos);
-    typedef void (*AddNewTileFunc)(GLuint texture, int type, bool isSolid);
-    typedef GLuint (*LoadTextureFunc)(const char* path);
-    typedef void (*FreeTextureFunc)(GLuint texture);
+    typedef void (*AddNewTileFunc)(Texture2D texture, int type, bool isSolid);
+    typedef Texture2D (*LoadTextureFunc)(const char* path);
+    typedef void (*FreeTextureFunc)(Texture2D texture);
     typedef void (*SetTileFunc)(int x, int y, int type);
     typedef Tile (*GetTileFunc)(int x, int y);
     typedef int (*GetCurrTileTypeFunc)();

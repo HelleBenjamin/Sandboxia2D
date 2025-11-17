@@ -17,19 +17,18 @@
  */
 #include <iostream>
 #include "../include/main.h"
-#include "../include/mod_api.h"
 #include "../include/Sandboxia/renderer.h"
 #include "../include/Sandboxia/player.h"
-#include "../include/Sandboxia/ui.h"
 #include "../include/Sandboxia/input.h"
 #include "../include/Sandboxia/world.h"
-#include "../include/Sandboxia/audio.h"
 #include <fstream>
 #include <iomanip>
+#include <raylib.h>
+#include <cstring>
 #include <stdarg.h>
 
 using namespace std;
-using namespace ImGui;
+
 
 ofstream logFile("log.txt"); // Log file
 
@@ -46,20 +45,13 @@ bool SOUNDS_ENABLED = true;
 int LOG_LEVEL = 4; // Log all messages
 bool WORLD_LOADED = false;
 
-GLFWwindow* window;
-
 Renderer renderer;
 Player player;
-Camera camera;
+Camera2D camera;
 World world;
 
 int initGame(){
     srand(time(NULL));
-
-    camera.posX = 0.0f;
-    camera.posY = 0.0f;
-    camera.width = SCREEN_WIDTH;
-    camera.height = SCREEN_HEIGHT;
 
     player.posX = (float)(rand() % (WORLD_WIDTH - 2) + 1);
     player.posY = WORLD_HEIGHT - 70.0f;
@@ -72,61 +64,13 @@ int initGame(){
     player.SelectedTileType = T_Grass;
     player.SelectorTile = DefaultTiles[TypeSelector];
 
-    if (!glfwInit()) {
-        log(LOG_ERR,"Failed to initialize GLFW with error code %d", glfwGetError(NULL));
-        return -1;
-    }
-
-    // GLFW window hints
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // Opengl 3.0
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-    log(LOG_INFO,"Window size %dx%d", SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Sandboxia2D", NULL, NULL);
-    if (!window) {
-        log(LOG_ERR,"Failed to create window with error code %d ", glfwGetError(NULL));
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        log(LOG_ERR,"Failed to initialize GLAD");
-        glfwTerminate();
-        return -1;
-    }  
-
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN); // Do some opengl stuff
-
-    // Setup custom callbacks, these will handle input events
-    glfwSetCursorPosCallback(window, cursorPosCallback);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetScrollCallback(window, scrollCallback);
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    log(LOG_INFO, "Render device: %s ", (const char*)glGetString(GL_RENDERER));
-
-    glClearColor(0.222f, 0.608f, 0.924f, 1.0f); // Background color
-    glfwSwapBuffers(window);
-
     renderer.init();
 
     if (!WORLD_LOADED) generateWorld(world, -1); // Generate a new world
 
-    glfwSwapInterval(VSYNC); // Enable/disable vsync
-
-    InitUI(window); // Init the UI
-
-    if (SOUNDS_ENABLED) { // Load sounds
-        InitOpenAL();
-        loadSounds();
-    }
-
     // Must load mods after other initialization.
     if (!MODS_ENABLED) return 0;
-    LoadMods();
+    //LoadMods();
     return 0;
 }
 
@@ -137,7 +81,7 @@ void log(int type, const char *fmt, ...) {
     vsnprintf(buffer, sizeof(buffer), fmt, args);
     va_end(args);
     string msg = buffer;
-    double time = glfwGetTime();
+    double time = GetFrameTime();
     string types[] = {"[NULL] ","[ERROR] ", "[WARNING] ", "[INFO] ", "[DEBUG] "};
     string log_type = types[type];
     cout << fixed << setprecision(2) << " [" << time  << "] " << log_type << msg << endl;
@@ -146,13 +90,13 @@ void log(int type, const char *fmt, ...) {
 
 string handleConsoleCommand(std::string command) {
     // Handle console commands, there might be a better way to do this, but this works
-    log(LOG_INFO, "Executing command: ", command.c_str());
+    log(SLOG_INFO, "Executing command: ", command.c_str());
     string cmd = command;
     if (cmd == "/seed") {
         return "Current world seed: " + to_string(world.seed);
     } else if (cmd == "/debug") {
         DEBUG = !DEBUG;
-        log(LOG_INFO,"DEBUG set to ", DEBUG);
+        log(SLOG_INFO,"DEBUG set to ", DEBUG);
         return "DEBUG set to " + to_string(DEBUG);
     } else if (sscanf(command.c_str(), "/tp %e %e", &player.posX, &player.posY) == 2) {
         return "Teleported to (" + to_string(player.posX) + ", " + to_string(player.posY) + ")";
@@ -160,7 +104,7 @@ string handleConsoleCommand(std::string command) {
     return "Unknown command";
 }
 
-void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
+/*void cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
     // Get current cursor position
     player.SelectorX = xpos;
     player.SelectorY = ypos;
@@ -173,7 +117,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     camera.width = width;
     SCREEN_WIDTH = width;
     SCREEN_HEIGHT = height;
-}
+}*/
 
 int main(int argc, char *argv[]) {
     world.width = WORLD_WIDTH; // Set default world size
@@ -188,8 +132,8 @@ int main(int argc, char *argv[]) {
         }
     }
     
-    log(LOG_INFO,"---Sandboxia2D %s---", VERSION_STR);
-    log(LOG_INFO,"Launching with arguments: %s", args.c_str());
+    log(SLOG_INFO,"---Sandboxia2D %s---", VERSION_STR);
+    log(SLOG_INFO,"Launching with arguments: %s", args.c_str());
 
     // Parse arguments
     for (int i = 1; i < argc; i++) {
@@ -200,13 +144,13 @@ int main(int argc, char *argv[]) {
             SCREEN_HEIGHT = atoi(argv[++i]);
         } else if (arg == "-v" && i + 1 < argc) { // vsync
             VSYNC = (argc > i + 1) ? atoi(argv[++i]) : 1;
-            log(LOG_INFO, "VSYNC set to %d", VSYNC);
+            log(SLOG_INFO, "VSYNC set to %d", VSYNC);
         } else if (arg == "-c" && i + 1 < argc) { // collision
             COLLISION = (argc > i + 1) ? atoi(argv[++i]) : 1;
-            log(LOG_INFO, "COLLISION set to %d", COLLISION);
+            log(SLOG_INFO, "COLLISION set to %d", COLLISION);
         } else if (arg == "-debug") { // debug
             DEBUG = 1;
-            log(LOG_INFO, "DEBUG set to %d", DEBUG);
+            log(SLOG_INFO, "DEBUG set to %d", DEBUG);
         } else if (arg == "-world" && i + 1 < argc) { // world
             WORLD_LOADED = true;
             char *worldPath = argv[++i];
@@ -223,48 +167,28 @@ int main(int argc, char *argv[]) {
     // Initialize the game
     initGame();
 
-    log(LOG_INFO,"Game initialized");
+    log(SLOG_INFO,"Game initialized");
 
     float lastFrame{}, currentFrame, deltaTime = 0.0f;
 
-    while (!glfwWindowShouldClose(window)) { // Main game loop
-        glClear(GL_COLOR_BUFFER_BIT);
-        currentFrame = glfwGetTime();
+    while (!WindowShouldClose()) { // Main game loop
+        currentFrame = GetFrameTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
  
-        if (MODS_ENABLED) UpdateMods(deltaTime); // Update all mods
-
-        const auto& io = GetIO(); // Get ImGui IO
-
-        if (!io.WantCaptureMouse && !io.WantCaptureKeyboard) { // If is typing or using UI prevent player movement
-            InputHandler(window, player, camera, world, deltaTime);
-        }
-
-        InputHandlerUI(window, player, camera, world, deltaTime); // Always check for input for UI and other stuff
+        //if (MODS_ENABLED) UpdateMods(deltaTime); // Update all mods
 
         player.updatePlayer(player, world, deltaTime); // Update the player
 
-        renderer.RenderViewport(camera, player, world, window); // Render the viewport
+        renderer.RenderViewport(player, world); // Render the viewport
 
-        HandleUI(window, world, player, renderer); // Handle UI, and render it
-
-        glfwSwapBuffers(window); // Show the rendered window
-        glfwPollEvents();
     }
 
     // Shutdown
-    ExitUI();
     renderer.exit();
-    glfwDestroyWindow(window);
 
-    if (SOUNDS_ENABLED) {
-        unloadSounds();
-        CloseOpenAL();
-    }
+    log(SLOG_INFO,"Program shutting down");
 
-    log(LOG_INFO,"Program shutting down");
-    glfwTerminate();
     // Deallocate memory
     for (int i = 0; i < world.width; i++) {
         delete[] world.tiles[i];
