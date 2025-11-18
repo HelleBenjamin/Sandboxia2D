@@ -47,8 +47,10 @@ int main(int argc, char* argv[]) {
   World     world  = {0};
   Camera2D  camera = {0};
 
+  /* Make a constant?*/
   player.speed = 200.0f;
 
+  /* Initialize camera */
   camera.target = player.position;
   camera.offset = (Vector2){(float)SCREEN_WIDTH/2.0f, (float)SCREEN_HEIGHT/2.0f};
   camera.rotation = 0.0f;
@@ -56,6 +58,7 @@ int main(int argc, char* argv[]) {
 
   world.tiles = (Tile*)malloc(WORLD_WIDTH * WORLD_HEIGHT * sizeof(Tile));
 
+  /* Initialize renderer(eg. load textures)*/
   render_init();
 
   generateWorld(&world, -1);
@@ -65,7 +68,7 @@ int main(int argc, char* argv[]) {
     dt = GetFrameTime();
     handle_input(&player, &world, dt);
 
-    /* Creadit to raylib examples*/
+    /* Credit to the raylib examples*/
 
     static Vector2 bbox = { 0.2f, 0.2f };
 

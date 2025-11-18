@@ -2,21 +2,19 @@
 ![Logo](./assets/logo.png)
 
 
-Sandboxia is a sandbox game written in C++ using OpenGL 3.0. It's designed to be a simple sandbox game that is easy to run on older machines. There aren't any goals in the game. The game is still in development. Sandboxia2D comes with a simple API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still partially experimental.
+Sandboxia is a sandbox game written in C using Raylib. It was originally written in C++ and used OpenGL based renderer, but it became too messy to maintain.
+ It's designed to be a simple sandbox game that is easy to run on older machines. There aren't any goals in the game. The game is still in development. Sandboxia2D comes with a simple API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still partially experimental. 
 
-This branch uses raylib as the engine. I will start to rewrite the whole game in C using raylib.
-
-TODO: This readme
+Currently the game is being rewritten in C, so expect missing features and bugs.
 
 ## Features
 - Bugs may be present
 - 2D World
-- OpenGL 3.0
-- VSYNC
-- World saving/loading
-- Debug mode
-- Console
-- Support for mods!
+- VSYNC(WIP)
+- World saving/loading(WIP)
+- Debug mode(WIP)
+- Console(WIP)
+- Support for mods!(WIP)
 
 # Supported platforms
 - Linux: x64, x86, aarch64
@@ -25,16 +23,14 @@ TODO: This readme
 ## How to play
 
 - W, A, S, D to move
-- Left mouse button to destroy blocks
-- Right mouse button to place blocks
-- T to open console
+- Left mouse button to destroy blocks(WIP)
+- Right mouse button to place blocks(WIP)
+- T to open console(WIP)
 
 ## Pre-requisites for Linux
 - `cmake`
 - `g++`
-- `raylib`
-
-You can install these via your package manager. Windows has the required packages already in `lib` folder.
+- `raylib` (See https://github.com/raysan5/raylib/wiki)
 
 ### Windows
 - Visual Studio 2022
@@ -54,10 +50,7 @@ If you get compile errors on arm64, try adding `-lpthread -ldl` to the linker fl
 ### Windows
 Windows support is still experimental. Currently only VS 2022 is supported. To build the game, press the green play button at the top in Visual Studio. You can select between Release and Debug.
 
-#### Important!
-In windows you must have `OpenAL32.dll` and `libsndfile.dll` in the same folder as the executable. You can find these in the `libs` folder.
-
-## To build a simple mod
+## To build a simple mod(WIP)
 This is a simple tutorial on how to build a mod for Sandboxia2D. The `testmod` is included in the `mods` folder. You can use it as a template.
 ### Linux
     1. Create a `.cpp` file in `mods` folder
@@ -76,10 +69,12 @@ Mods will be loaded automatically.
 
 ## Launch args
 
-- `-w` to set the width of the window
-- `-h` to set the height of the window
-- `-v` to set the VSYNC, Default is 1
-- `-c` to set the collision, Default is 1
+- `--width=` to set the width of the window
+- `--height=` to set the height of the window
+- `--vsync=` to set the VSYNC, Default is 1
+- `--collision=` to set the collision, Default is 1
+
+These doesn't work yet:
 - `-d` to set the debug, Default is 0
 - `-world` to set the world file
 - `-noMods` to disable mods
@@ -87,12 +82,13 @@ Mods will be loaded automatically.
 
 #### Example
 
-`./build/Sandboxia -v 1 -d`
+`./build/Sandboxia --width=800 --height=600`
 
 ### For debug
 The legacy renderer was removed in v0.1.9-beta.
+The OpenGL renderer was removed in v0.2.0-beta.
 
-Debug keys:
+Debug keys(Doesn't work yet):
 
 - P to print the player position
 - O to print the selector position
@@ -113,16 +109,11 @@ Debug keys:
 - [ ] Make Windows fully functional
 - [x] Implement modding API
 - [x] Replace OpenGL 2.1 with 3.0 core
+- [ ] Rewrite the whole game in C using raylib
 
 ## Third-party libraries used
-- [ImGui](https://github.com/ocornut/imgui)
-- [GLFW](https://github.com/glfw/glfw)
-- [GLAD](https://github.com/Dav1dde/glad)
-- [stb_image](https://github.com/nothings/stb)
-- [GLM](https://github.com/g-truc/glm)
+- [raylib](https://github.com/raysan5/raylib)
 - [stb_perlin](https://github.com/nothings/stb)
-- [OpenAL Soft](https://github.com/kcat/openal-soft)
-- [libsndfile](https://github.com/libsndfile/libsndfile)
 
 ## Contributing
 If you have any suggestions, bug reports, or feature requests, please open an issue.
