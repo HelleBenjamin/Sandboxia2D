@@ -1,15 +1,15 @@
 #ifndef MOD_API_H
 #define MOD_API_H
 
-#include "../include/main.h"
-#include "../include/Sandboxia/world.h"
-#include "../include/Sandboxia/player.h"
-#include "../include/Sandboxia/renderer.h"
-#include "../include/Sandboxia/input.h"
+#include "main.h"
+#include "game.h"
+#include "render.h"
 #include <raylib.h>
 
 #define API_VERSION_STR "0.1"
 #define API_VERSION_NUM 01
+
+/* This doesn't work!*/
 
 /* Sandboxia2D Mod API v0.1
 
@@ -49,7 +49,7 @@ extern "C" {
 
     typedef int (*GetAPIVersionFunc)();
     typedef int (*GetGameVersionFunc)();
-    typedef void (*DebugLogFunc)(std::string text);
+    typedef void (*DebugLogFunc)(const char* text);
 
     // API structure
     struct ModAPI {

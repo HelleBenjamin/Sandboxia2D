@@ -11,22 +11,17 @@ include_directories(include)
 
 # Main files
 set(SRC_FILES
-    src/main.cpp
-    src/renderer.cpp
-    src/player.cpp
-#    src/ui.cpp
-    src/input.cpp
-    src/world.cpp
-#    src/mod_api.cpp
-#    src/audio.cpp
+    src/main.c
+    src/game.c
+    src/render.c
 )
 
 
 add_executable(Sandboxia ${SRC_FILES})
-target_link_libraries(Sandboxia PRIVATE raylib)
+target_link_libraries(Sandboxia PRIVATE raylib m)
 
 # Set building flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1") # Use -O2 or -O3 for better performance, may increase compile time, default is -O1, for debug use -O0 and -g
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g") # Use -O2 or -O3 for better performance, may increase compile time, default is -O1, for debug use -O0 and -g
 # To get the best performance use -march=native, may not work on all platforms
 
 set_target_properties(Sandboxia PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
