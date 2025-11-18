@@ -8,17 +8,48 @@
 #define STB_PERLIN_IMPLEMENTATION
 #include "../include/stb_perlin.h"
 
-bool check_collision(World *world, float x, float y) {
-  int tileX = (int)(x / TILE_SIZE / RENDER_SCALE) +1; /* Need to divide due to the scaling */
-  int tileY = (int)(y / TILE_SIZE / RENDER_SCALE) +1;
-  if ((tileX >= 0) && (tileX < WORLD_WIDTH) && (tileY >= 0) && (tileY < WORLD_HEIGHT)) {
-    return world->tiles[translate_index(tileX, tileY)].type != TypeAir;
+bool check_collision_box(World *world, float x, float y, float width, float height) {
+  /* This checks all the bounds of the box*/
+  float world_x = x / TILE_SIZE / RENDER_SCALE;
+  float world_y = y / TILE_SIZE / RENDER_SCALE;
+  float world_width = width / TILE_SIZE / RENDER_SCALE;
+  float world_height = height / TILE_SIZE / RENDER_SCALE;
+  
+  /* Four corners, faces?*/
+  int minX = (int)floorf(world_x);
+  int minY = (int)floorf(world_y);
+  int maxX = (int)floorf(world_x + world_width - 0.001f);
+  int maxY = (int)floorf(world_y + world_height - 0.001f);
+  
+  for (int tileX = minX; tileX <= maxX; tileX++) {
+    for (int tileY = minY; tileY <= maxY; tileY++) {
+      if (tileX < 0 || tileX >= WORLD_WIDTH || tileY < 0 || tileY >= WORLD_HEIGHT) return true; /* Out of bound check */
+      if (world->tiles[translate_index(tileX, tileY)].type != TypeAir) return true; /* Check if solid*/
+    }
   }
+  
   return false;
 }
 
+/* Old collision check, modified but still works :)*/
+bool check_collision(World *world, float x, float y) {
+  float world_x = x / TILE_SIZE / RENDER_SCALE; /* Do not use FULL_TILE_SIZE!! */
+  float world_y = y / TILE_SIZE / RENDER_SCALE;
+  int tileX = (int)floorf(world_x);
+  int tileY = (int)floorf(world_y);
+
+  if (tileX < 0 || tileX >= WORLD_WIDTH || tileY < 0 || tileY >= WORLD_HEIGHT) {
+    return true;
+  }
+  return world->tiles[translate_index(tileX, tileY)].type != TypeAir;
+}
+
 void handle_input(Player *player, World *world, float dt) {
+  float playerWidth = TILE_SIZE * RENDER_SCALE; /* Actual size(rendered size)*/
+  float playerHeight = TILE_SIZE * RENDER_SCALE;
+  
   Vector2 new_position = player->position;
+  
   if (IsKeyDown(KEY_W)) {
     new_position.y -= player->speed * dt;
     player->direction = 0;
@@ -42,24 +73,46 @@ void handle_input(Player *player, World *world, float dt) {
 
   player->selector = GetMousePosition();
 
-  if (!(check_collision(world, new_position.x, player->position.y)) && !(check_collision(world, player->position.x, new_position.y))) {
-    player->position = new_position;
+  if (!check_collision_box(world, new_position.x, player->position.y, playerWidth, playerHeight)) {
+    player->position.x = new_position.x;
+  }
+  
+  if (!check_collision_box(world, player->position.x, new_position.y, playerWidth, playerHeight)) {
+    player->position.y = new_position.y;
   }
 }
 
 void update_player(Player *player, World *world, float dt) {
-  if (!player->onGround) player->accel.y = +GRAVITY;
+  float playerWidth = TILE_SIZE * RENDER_SCALE;
+  float playerHeight = TILE_SIZE * RENDER_SCALE;
+  
+  if (!player->onGround) player->accel.y = GRAVITY;
   else player->accel.y = 0;
 
   player->velocity.x += player->accel.x * dt;
   player->velocity.y += player->accel.y * dt;
-  player->position.x += player->velocity.x * dt;
-  player->position.y += player->velocity.y * dt;
-
-  if (check_collision(world, player->position.x, player->position.y+1)) {
+  
+  /* Enhanced functions*/
+  float newX = player->position.x + player->velocity.x * dt;
+  float newY = player->position.y + player->velocity.y * dt;
+  
+  /* Check if player is touching a wall, x-check*/
+  if (!check_collision_box(world, newX, player->position.y, playerWidth, playerHeight)) {
+    player->position.x = newX;
+  } else {
+    player->velocity.x = 0.0f;
+  }
+  
+  /* Check if player is on the ground, y-check */
+  if (!check_collision_box(world, player->position.x, newY, playerWidth, playerHeight)) {
+    player->position.y = newY;
+    player->onGround = false;
+  } else {
     player->velocity.y = 0.0f;
-    player->onGround = true;
-  } else player->onGround = false;
+    if (player->velocity.y > 0 || check_collision_box(world, player->position.x, player->position.y + 1, playerWidth, playerHeight)) {
+      player->onGround = true;
+    }
+  }
 }
 
 int translate_index(int x, int y) {

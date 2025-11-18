@@ -58,7 +58,7 @@ void render_game(Camera2D* camera, Player* player, World* world){
       int tileX = (int)(x);
       int tileY = (int)(y);
       Tile tile = world->tiles[translate_index(tileX, tileY)];
-      Vector2 position = (Vector2){(float)x*TILE_SIZE*RENDER_SCALE, (float)y*TILE_SIZE*RENDER_SCALE};
+      Vector2 position = (Vector2){(float)(x*TILE_SIZE*RENDER_SCALE), (float)(y*TILE_SIZE*RENDER_SCALE)};
       if ((tileX >= 0) && (tileX < WORLD_WIDTH) && (tileY >= 0) && (tileY < WORLD_HEIGHT) && (tile.type != TypeAir)) {
         //drawTile(world.tiles[tileX][tileY], x - startX, y - startY);
         DrawTextureEx(textures[tile.type], position, 0.0f, RENDER_SCALE, WHITE);
@@ -66,9 +66,8 @@ void render_game(Camera2D* camera, Player* player, World* world){
     }
   }
 
-  DrawTextureEx(textures[TypeStone], (Vector2){3, 3}, 0.0f, RENDER_SCALE, WHITE);
+  DrawTextureEx(textures[TypeStone], (Vector2){0, 0}, 0.0f, RENDER_SCALE, WHITE); /* Test tile, used as (0,0) reference*/
 
-  //DrawRectangle(player->selector.x, player->selector.y, 40, 40, RED);
   DrawTextureEx(textures[player->direction], player->position, 0.0f, RENDER_SCALE, WHITE);
 
   EndMode2D();

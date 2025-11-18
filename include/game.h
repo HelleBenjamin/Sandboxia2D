@@ -7,7 +7,7 @@
 #define WORLD_SIGNATURE 0xBEEF
 
 #define GRAVITY     400
-#define JUMP_POWER  300
+#define JUMP_POWER  175
 
 #define WORLD_WIDTH 128
 #define WORLD_HEIGHT 128
