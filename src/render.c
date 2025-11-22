@@ -46,6 +46,10 @@ void render_game(Camera2D* camera, Player* player, World* world){
 
   BeginMode2D(*camera);
 
+  Vector2 worldPos = GetScreenToWorld2D(player->selector, *camera);
+  int selX = (int)(worldPos.x / (TILE_SIZE * RENDER_SCALE));
+  int selY = (int)(worldPos.y / (TILE_SIZE * RENDER_SCALE));
+
   // Use rounding to fix clipping, maybe even use int instead of float?
   float startX = ((camera->target.x - camera->offset.x / camera->zoom) / TILE_SIZE / RENDER_SCALE);
   float startY = ((camera->target.y - camera->offset.y / camera->zoom) / TILE_SIZE / RENDER_SCALE);
@@ -70,9 +74,16 @@ void render_game(Camera2D* camera, Player* player, World* world){
 
   DrawTextureEx(textures[player->direction], player->position, 0.0f, RENDER_SCALE, WHITE);
 
+  /* Draw selector */
+  if (selX >= 0 && selX < WORLD_WIDTH && selY >= 0 && selY < WORLD_HEIGHT) {
+    Vector2 selectorWorldPos = (Vector2){(float)selX * TILE_SIZE * RENDER_SCALE,(float)selY * TILE_SIZE * RENDER_SCALE};
+    DrawTextureEx(textures[TypeSelector], selectorWorldPos, 0.0f, RENDER_SCALE, WHITE);
+    //DrawRectangleLines((int)selectorWorldPos.x, (int)selectorWorldPos.y, TILE_SIZE * RENDER_SCALE, TILE_SIZE * RENDER_SCALE, BLACK);
+  }
+
   EndMode2D();
 
-  DrawRectangleLines(player->selector.x, player->selector.y, 40, 40, BLACK);
+  //DrawRectangleLines(player->selector.x, player->selector.y, 40, 40, BLACK);
 
   DrawFPS(10, 10);
 
@@ -80,6 +91,9 @@ void render_game(Camera2D* camera, Player* player, World* world){
   Vector2 actual_coords = (Vector2){player->position.x / TILE_SIZE / RENDER_SCALE, player->position.y / TILE_SIZE / RENDER_SCALE};
   sprintf(buffer, "X: %d Y: %d", (int)actual_coords.x, (int)actual_coords.y);
   DrawText(buffer, 10, 30, 20, BLACK);
+
+  sprintf(buffer, "Selected tileID: %d", player->selected_tile);
+  DrawText(buffer, 10, 50, 20, BLACK);
 
   EndDrawing();
 }

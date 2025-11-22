@@ -23,8 +23,8 @@ Currently the game is being rewritten in C, so expect missing features and bugs.
 ## How to play
 
 - W, A, S, D to move
-- Left mouse button to destroy blocks(WIP)
-- Right mouse button to place blocks(WIP)
+- Left mouse button to destroy blocks
+- Right mouse button to place blocks
 - T to open console(WIP)
 
 ## Pre-requisites for Linux

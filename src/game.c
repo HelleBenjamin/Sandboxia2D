@@ -31,7 +31,7 @@ bool check_collision_box(World *world, float x, float y, float width, float heig
   return false;
 }
 
-/* Old collision check, modified but still works :)*/
+/* Old collision check, modified but still usefull :)*/
 bool check_collision(World *world, float x, float y) {
   float world_x = x / TILE_SIZE / RENDER_SCALE; /* Do not use FULL_TILE_SIZE!! */
   float world_y = y / TILE_SIZE / RENDER_SCALE;
@@ -44,9 +44,24 @@ bool check_collision(World *world, float x, float y) {
   return world->tiles[translate_index(tileX, tileY)].type != TypeAir;
 }
 
-void handle_input(Player *player, World *world, float dt) {
+void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
   float playerWidth = TILE_SIZE * RENDER_SCALE; /* Actual size(rendered size)*/
   float playerHeight = TILE_SIZE * RENDER_SCALE;
+
+  /*
+    Old selector
+    int SelX = static_cast<int>((player.SelectorX / TILE_SIZE / SCALER)  + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)); // Calculate x + offset
+    int SelY = static_cast<int>((player.SelectorY / TILE_SIZE / SCALER)  + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)); // Calculate y + offset
+  */
+
+  player->selector = GetMousePosition();
+
+  int new_selected_tile = (int)((float)(player->selected_tile) + roundf(GetMouseWheelMove()));
+  if (new_selected_tile >= 4 && new_selected_tile <= 10) player->selected_tile = new_selected_tile;
+
+  Vector2 worldPos = GetScreenToWorld2D(player->selector, *camera); /* Simple conversion*/
+  int selX = (int)(worldPos.x / (TILE_SIZE * RENDER_SCALE)); /* Use FULL_TILE_SIZE? */
+  int selY = (int)(worldPos.y / (TILE_SIZE * RENDER_SCALE));
   
   Vector2 new_position = player->position;
   
@@ -71,7 +86,14 @@ void handle_input(Player *player, World *world, float dt) {
     player->direction = 0;
   }
 
-  player->selector = GetMousePosition();
+  if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+    if (selX >= 0 && selX < WORLD_WIDTH && selY >= 0 && selY < WORLD_HEIGHT) world->tiles[translate_index(selX, selY)].type = TypeAir;
+  }
+
+  if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+    if (selX >= 0 && selX < WORLD_WIDTH && selY >= 0 && selY < WORLD_HEIGHT) world->tiles[translate_index(selX, selY)].type = player->selected_tile;
+  }
+
 
   if (!check_collision_box(world, new_position.x, player->position.y, playerWidth, playerHeight)) {
     player->position.x = new_position.x;

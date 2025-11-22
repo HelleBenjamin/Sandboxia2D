@@ -49,6 +49,7 @@ int main(int argc, char* argv[]) {
 
   /* Make a constant?*/
   player.speed = 200.0f;
+  player.selected_tile = 4;
 
   /* Initialize camera */
   camera.target = player.position;
@@ -66,7 +67,7 @@ int main(int argc, char* argv[]) {
   float dt = 0.0f;
   while(!WindowShouldClose()) {
     dt = GetFrameTime();
-    handle_input(&player, &world, dt);
+    handle_input(&player, &world, &camera, dt);
 
     /* Credit to the raylib examples*/
 

@@ -61,6 +61,6 @@ bool check_collision(World *world, float x, float y);
 
 void update_player(Player* player, World* world, float dt);
 
-void handle_input(Player* player, World* world, float dt);
+void handle_input(Player* player, World* world, Camera2D* camera, float dt);
 
 #endif
