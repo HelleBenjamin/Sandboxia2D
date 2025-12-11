@@ -48,7 +48,7 @@ Linux is currently the only tested platform.
     3. Run `cmake --build build -j(number of threads)` to build the game.
 - Run `./build/Sandboxia` to play the game.
 
-If you get compile errors on arm64, try adding `-lpthread -ldl` to the linker flags in your `CMakeLists.txt`.
+If you get compile errors of stb_perlin, try to comment line `#define STB_PERLIN_IMPLEMENTATION` in `src/game.c`
 
 ### Windows(Old instructions, might not work anymore)
 Windows support is still experimental. Currently only VS 2022 is supported. To build the game, press the green play button at the top in Visual Studio. You can select between Release and Debug.

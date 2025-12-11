@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define STB_PERLIN_IMPLEMENTATION
 #include "../include/stb_perlin.h"
