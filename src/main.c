@@ -11,7 +11,7 @@
 
 int   SCREEN_WIDTH  = 800;
 int   SCREEN_HEIGHT = 600;
-bool  ENABLE_VSYNC  = true;
+int   TARGET_FPS    = 60;
 bool  ENABLE_COLLISION = true;
 bool  ENABLE_DEBUG  = false;
 bool  ENABLE_MODS   = false;
@@ -30,22 +30,30 @@ void gamelog(int type, const char* fmt, ...) {
 int main(int argc, char* argv[]) {
   srand(time(NULL));
 
-  for (int i = 0; i < argc; i++) {
-    if (strncmp(argv[i], "--width=", 8) == 0) {
-      SCREEN_WIDTH = atoi(argv[i] + 9);
-    } else if (strncmp(argv[i], "--height=", 9) == 0) {
-      SCREEN_HEIGHT = atoi(argv[i] + 9);
-    } else if (strncmp(argv[i], "--vsync=", 8) == 0) {
-      ENABLE_VSYNC = atoi(argv[i] + 7);
-    } else if (strncmp(argv[i], "--collision=", 12) == 0) {
-      ENABLE_COLLISION = atoi(argv[i] + 12);
-    }
-  }
+  printf("Sandboxia2D %s\n", VERSION_STR);
 
   /* Main components */
   Player    player = {0};
   World     world  = {0};
   Camera2D  camera = {0};
+
+  bool load_world = false;
+  char *world_filename = NULL;
+
+  for (int i = 0; i < argc; i++) {
+    if (strncmp(argv[i], "--width=", 8) == 0) {
+      SCREEN_WIDTH = atoi(argv[i] + 8);
+    } else if (strncmp(argv[i], "--height=", 9) == 0) {
+      SCREEN_HEIGHT = atoi(argv[i] + 9);
+    } else if (strncmp(argv[i], "--fps=", 6) == 0) {
+      TARGET_FPS = atoi(argv[i] + 6);
+    } else if (strncmp(argv[i], "--collision=", 12) == 0) {
+      ENABLE_COLLISION = atoi(argv[i] + 12);
+    } else if (strncmp(argv[i], "--world=", 8) == 0) {
+      load_world = true;
+      world_filename = argv[i] + 8;
+    }
+  }
 
   /* Make a constant?*/
   player.speed = 200.0f;
@@ -57,12 +65,16 @@ int main(int argc, char* argv[]) {
   camera.rotation = 0.0f;
   camera.zoom = 1.0f;
 
-  world.tiles = (Tile*)malloc(WORLD_WIDTH * WORLD_HEIGHT * sizeof(Tile));
-
   /* Initialize renderer(eg. load textures)*/
   render_init();
 
-  generateWorld(&world, -1);
+  if (load_world) {
+    printf("Loading world: %s\n", world_filename);
+    loadWorld(world_filename, &world);
+  } else {
+    strcpy(world.name, "world");
+    generateWorld(&world, -1);
+  }
 
   float dt = 0.0f;
   while(!WindowShouldClose()) {

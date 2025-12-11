@@ -2,8 +2,10 @@
 #include "../include/render.h"
 #include "../include/game.h"
 #include <raylib.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define STB_PERLIN_IMPLEMENTATION
 #include "../include/stb_perlin.h"
@@ -102,6 +104,14 @@ void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
   if (!check_collision_box(world, player->position.x, new_position.y, playerWidth, playerHeight)) {
     player->position.y = new_position.y;
   }
+
+  /* World loading/saving*/
+  if (IsKeyPressed(KEY_F1)) {
+    saveWorld("world.dat", world);
+  }
+  if (IsKeyPressed(KEY_F2)) {
+    loadWorld("world.dat", world);
+  }
 }
 
 void update_player(Player *player, World *world, float dt) {
@@ -149,7 +159,9 @@ void generateWorld(World* world, int seed) { // The best world generation ever :
     world->seed = seed;
   }
 
-  world->tiles = (Tile*)malloc((WORLD_WIDTH * WORLD_HEIGHT) * sizeof(Tile*));
+  world->tiles = (Tile*)malloc(WORLD_SIZE * sizeof(Tile*));
+  world->height = WORLD_HEIGHT;
+  world->width = WORLD_WIDTH;
 
   int terrainHeight[WORLD_WIDTH];
 
@@ -180,62 +192,53 @@ void generateWorld(World* world, int seed) { // The best world generation ever :
   }
 }
 
-/*int loadWorld(const char* filePath, World* world) {
-    FILE* file = fopen(filePath, "rb");
-    if (!file) {
-        gamelog(GAMELOG_ERR,"Failed to open world '%s'", filePath);
-        return 1;
-    }
+int loadWorld(const char* filePath, World* world) {
+  FILE* file = fopen(filePath, "rb");
+  if (!file) {
+    gamelog(GAMELOG_ERR,"Failed to open world '%s'", filePath);
+    fclose(file);
+    return 1;
+  }
 
-    // Free the old world
-    if (world->tiles) {
-        for (int i = 0; i < world->width; i++) {
-            delete[] world->tiles[i];
-        }
+  // Free the old world
+  if (world->tiles) {
+    free(world->tiles);
+    world->tiles = NULL;
+  }
 
-        delete[] world->tiles;
-    }
+  uint32_t signature = 0;
+  fread(&signature, sizeof(uint32_t), 1, file); // Read the world signature
+  if (signature != WORLD_SIGNATURE) {
+    gamelog(GAMELOG_ERR,"Invalid world signature! Expected %04x, got %04x", WORLD_SIGNATURE, signature);
+    return 1;
+  }
 
-	World newWorld = {0}; // Temporary world to load the world from file
+	/* Read the world data */
+  fread(&world->width, sizeof(uint16_t), 1, file);
+  fread(&world->height, sizeof(uint16_t), 1, file);
+	fread(&world->seed, sizeof(uint32_t), 1, file);
+	fread(world->name, sizeof(char), 32, file);
 
-    int signature = 0;
-    fread(&signature, sizeof(int), 1, file); // Read the world signature
-    if (signature != WORLD_SIGNATURE) {
-      gamelog(GAMELOG_ERR,"Invalid world signature! Expected %04x, got %04x", WORLD_SIGNATURE, signature);
-      return 1;
-    }
 
-	// Read the world dimensions
-    fread(&newWorld.width, sizeof(int), 1, file);
-    fread(&newWorld.height, sizeof(int), 1, file);
+  world->tiles = (Tile*)malloc((world->width * world->height) * sizeof(Tile));
 
-	// Now read the world seed
-	fread(&newWorld.seed, sizeof(int), 1, file);
+  if (!world->tiles) {
+    gamelog(GAMELOG_ERR,"Failed to allocate memory for world");
+    return 1;
+  }
 
-	// Read the world name
-	fread(newWorld.name, sizeof(char), 32, file);
+  fread(world->tiles, sizeof(Tile), world->width * world->height, file);
 
-	for (int x = 0; x < newWorld.width; ++x) {
-		newWorld.tiles[x] = new Tile[newWorld.height];
-		fread(newWorld.tiles[x], sizeof(Tile), newWorld.height, file);
-	}
 
-    // Put the new world in place
-	*world = newWorld;
-
-  free(newWorld.tiles);
-
-  // Print new world stuff
   gamelog(GAMELOG_INFO,"Loaded world '%s'", world->name);
   gamelog(GAMELOG_INFO,"World seed: %d", world->seed);
 
-  // Finish
   fclose(file);
 
   return 0;
-}*/
+}
 
-/*void saveWorld(const char* filePath, const World* world) {
+void saveWorld(const char* filePath, const World* world) {
 
   FILE* file = fopen(filePath, "wb"); // Save as a raw binary
 
@@ -247,20 +250,14 @@ void generateWorld(World* world, int seed) { // The best world generation ever :
   int signature = WORLD_SIGNATURE; // Signature to check if the world is corrupted
   fwrite(&signature, sizeof(int), 1, file);
 
-	// Then write the world seed
-	fwrite(&world->seed, sizeof(int), 1, file);
-
-	// Write the world name
+	/* Write the world data */
+  fwrite(&world->width, sizeof(uint16_t), 1, file);
+  fwrite(&world->height, sizeof(uint16_t), 1, file);
+	fwrite(&world->seed, sizeof(uint32_t), 1, file);
 	fwrite(world->name, sizeof(char), 32, file);
-
-  // Write the tile matrix
-  for (int x = 0; x < WORLD_WIDTH*WORLD_HEIGHT; ++x) {
-    fwrite(world->tiles[x], sizeof(Tile), 1, file);
-  }
-
-  // This way the world loading/saving is less error-prone
+  fwrite(world->tiles, sizeof(Tile), WORLD_WIDTH*WORLD_HEIGHT, file);
 
   gamelog(GAMELOG_INFO,"Saved world '%s'", filePath);
 
   fclose(file);
-}*/
+}

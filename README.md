@@ -10,26 +10,28 @@ Currently the game is being rewritten in C, so expect missing features and bugs.
 ## Features
 - Bugs may be present
 - 2D World
-- VSYNC(WIP)
-- World saving/loading(WIP)
+- World saving/loading
 - Debug mode(WIP)
 - Console(WIP)
 - Support for mods!(WIP)
 
 # Supported platforms
 - Linux: x64, x86, aarch64
-- Windows: x64, x86 (experimental)
+- Windows: x64, x86 (not tested yet)
 
 ## How to play
 
+## Controls
 - W, A, S, D to move
 - Left mouse button to destroy blocks
 - Right mouse button to place blocks
 - T to open console(WIP)
+- F1 to save current world
+- F2 to load world named "world.dat"
 
 ## Pre-requisites for Linux
 - `cmake`
-- `g++`
+- `gcc`
 - `raylib` (See https://github.com/raysan5/raylib/wiki)
 
 ### Windows
@@ -39,6 +41,7 @@ Currently the game is being rewritten in C, so expect missing features and bugs.
 ## Building
 
 ### Linux
+Linux is currently the only tested platform.
 - Building instructions:
     1. Run `mkdir build`  
     2. Run `cmake -B build` This will generate the Makefile
@@ -47,7 +50,7 @@ Currently the game is being rewritten in C, so expect missing features and bugs.
 
 If you get compile errors on arm64, try adding `-lpthread -ldl` to the linker flags in your `CMakeLists.txt`.
 
-### Windows
+### Windows(Old instructions, might not work anymore)
 Windows support is still experimental. Currently only VS 2022 is supported. To build the game, press the green play button at the top in Visual Studio. You can select between Release and Debug.
 
 ## To build a simple mod(WIP)
@@ -71,8 +74,9 @@ Mods will be loaded automatically.
 
 - `--width=` to set the width of the window
 - `--height=` to set the height of the window
-- `--vsync=` to set the VSYNC, Default is 1
+- `--fps=` to set the target framerate
 - `--collision=` to set the collision, Default is 1
+- `--world=` to set the world file
 
 These doesn't work yet:
 - `-d` to set the debug, Default is 0

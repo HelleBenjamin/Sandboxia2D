@@ -9,8 +9,9 @@
 #define GRAVITY     400
 #define JUMP_POWER  175
 
-#define WORLD_WIDTH 128
-#define WORLD_HEIGHT 128
+#define WORLD_WIDTH   128
+#define WORLD_HEIGHT  128
+#define WORLD_SIZE    (WORLD_WIDTH * WORLD_HEIGHT)
 
 typedef struct {
   uint8_t type;   /* Tile type */
@@ -21,6 +22,8 @@ typedef struct {
   char name[32];  /* World name */
   uint32_t seed;  /* World seed */
   uint32_t size;  /* World size */
+  uint16_t width; /* World width */
+  uint16_t height; /* World height */
   Tile* tiles;    /* World tiles */ 
 } World;
 

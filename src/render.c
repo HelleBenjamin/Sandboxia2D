@@ -14,7 +14,7 @@ uint8_t allocated_textures = 0;
 int render_init() {
 
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Sandboxia2D");
-  SetTargetFPS(60);
+  SetTargetFPS(TARGET_FPS);
   DisableCursor();
 
   const char* path = "assets/textures/"; // Texture directory

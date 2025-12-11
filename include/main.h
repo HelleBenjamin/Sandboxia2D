@@ -6,7 +6,7 @@
 
 extern int  SCREEN_WIDTH;
 extern int  SCREEN_HEIGHT;
-extern bool ENABLE_VSYNC;
+extern int  TARGET_FPS;
 extern bool ENABLE_COLLISION;
 extern bool ENABLE_DEBUG;
 extern bool ENABLE_MODS;
