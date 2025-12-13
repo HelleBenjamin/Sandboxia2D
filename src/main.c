@@ -141,12 +141,27 @@ int mod_new_tile(lua_State *L) {
   return 1; /* Tile ID*/
 }
 
-
 int mod_new_texture(lua_State *L) {
   /* Params: path */
   /* Returns: texture ID */
   textures[++num_textures] = LoadTexture(lua_tostring(L, 1));
   lua_pushnumber(L, num_textures);
+  return 1;
+}
+
+int mod_iskeydown(lua_State *L) {
+  /* Params: key */
+  /* Returns: bool */
+  int key = lua_tonumber(L, 1);
+  lua_pushboolean(L, IsKeyDown(key));
+  return 1;
+}
+
+int mod_iskeypressed(lua_State *L) {
+  /* Params: key */
+  /* Returns: bool */
+  int key = lua_tonumber(L, 1);
+  lua_pushboolean(L, IsKeyPressed(key));
   return 1;
 }
 

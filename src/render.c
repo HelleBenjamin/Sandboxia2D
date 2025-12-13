@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 Texture2D textures[0xFF]; /* Maybe make this dynamic*/
 uint8_t num_textures = 0;
