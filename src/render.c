@@ -9,7 +9,7 @@
 #include <math.h>
 
 Texture2D textures[0xFF]; /* Maybe make this dynamic*/
-uint8_t allocated_textures = 0;
+uint8_t num_textures = 0;
  
 int render_init() {
 
@@ -25,7 +25,7 @@ int render_init() {
     strcpy(filepath, path);
     strcat(filepath, filenames[i]);
     textures[i] = LoadTexture(filepath);
-    allocated_textures++;
+    num_textures++;
     free(filepath);
   }
 
@@ -33,7 +33,7 @@ int render_init() {
 }
 
 int render_exit() {
-  for (int i = 0; i < allocated_textures; i++) {
+  for (int i = 0; i < num_textures; i++) {
     UnloadTexture(textures[i]);
   }
   CloseWindow();
@@ -61,30 +61,24 @@ void render_game(Camera2D* camera, Player* player, World* world){
     for (int y = startY; y < endY; ++y) {
       int tileX = (int)(x);
       int tileY = (int)(y);
-      Tile tile = world->tiles[translate_index(tileX, tileY)];
+      TileConfig config = tile_configs[world->tiles[translate_index(tileX, tileY)].type];
       Vector2 position = (Vector2){(float)(x*TILE_SIZE*RENDER_SCALE), (float)(y*TILE_SIZE*RENDER_SCALE)};
-      if ((tileX >= 0) && (tileX < WORLD_WIDTH) && (tileY >= 0) && (tileY < WORLD_HEIGHT) && (tile.type != TypeAir)) {
+      if ((tileX >= 0) && (tileX < WORLD_WIDTH) && (tileY >= 0) && (tileY < WORLD_HEIGHT) && (config.is_visible)) {
         //drawTile(world.tiles[tileX][tileY], x - startX, y - startY);
-        DrawTextureEx(textures[tile.type], position, 0.0f, RENDER_SCALE, WHITE);
+        DrawTextureEx(textures[config.texture_id], position, 0.0f, RENDER_SCALE, WHITE);
       }
     }
   }
-
-  DrawTextureEx(textures[TypeStone], (Vector2){0, 0}, 0.0f, RENDER_SCALE, WHITE); /* Test tile, used as (0,0) reference*/
 
   DrawTextureEx(textures[player->direction], player->position, 0.0f, RENDER_SCALE, WHITE);
 
   /* Draw selector */
   if (selX >= 0 && selX < WORLD_WIDTH && selY >= 0 && selY < WORLD_HEIGHT) {
     Vector2 selectorWorldPos = (Vector2){(float)selX * TILE_SIZE * RENDER_SCALE,(float)selY * TILE_SIZE * RENDER_SCALE};
-    DrawTextureEx(textures[TypeSelector], selectorWorldPos, 0.0f, RENDER_SCALE, WHITE);
-    //DrawRectangleLines((int)selectorWorldPos.x, (int)selectorWorldPos.y, TILE_SIZE * RENDER_SCALE, TILE_SIZE * RENDER_SCALE, BLACK);
+    DrawTextureEx(textures[TypeSelector_Texture], selectorWorldPos, 0.0f, RENDER_SCALE, WHITE);
   }
 
   EndMode2D();
-
-  //DrawRectangleLines(player->selector.x, player->selector.y, 40, 40, BLACK);
-
   DrawFPS(10, 10);
 
   char buffer[32];
@@ -92,7 +86,7 @@ void render_game(Camera2D* camera, Player* player, World* world){
   sprintf(buffer, "X: %d Y: %d", (int)actual_coords.x, (int)actual_coords.y);
   DrawText(buffer, 10, 30, 20, BLACK);
 
-  sprintf(buffer, "Selected tileID: %d", player->selected_tile);
+  sprintf(buffer, "Selected tile: %s", tile_configs[player->selected_tile].name);
   DrawText(buffer, 10, 50, 20, BLACK);
 
   EndDrawing();

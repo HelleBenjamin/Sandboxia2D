@@ -2,6 +2,7 @@
 #include "../include/render.h"
 #include "../include/game.h"
 #include <raylib.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +12,20 @@
 #define STB_PERLIN_IMPLEMENTATION
 #include "../include/stb_perlin.h"
 
+TileConfig tile_configs[0xFF] = {
+  /* Default tile config*/
+  {TypeAir_ID, false, false, TypeAir_Texture , "air"},
+  {TypeGrass_ID, true, true, TypeGrass_Texture, "grass"},
+  {TypeStone_ID, true, true, TypeStone_Texture, "stone"},
+  {TypeDirt_ID, true, true, TypeDirt_Texture, "dirt"},
+  {TypeSand_ID, true, true, TypeSand_Texture, "sand"},
+  {TypeWood_ID, true, true, TypeWood_Texture, "wood"},
+  {TypeLeaves_ID, true, true, TypeLeaves_Texture, "leaves"},
+};
+
+int num_tile_configs = 6; /* Number of tile configs */
+
+
 bool check_collision_box(World *world, float x, float y, float width, float height) {
   /* This checks all the bounds of the box*/
   float world_x = x / TILE_SIZE / RENDER_SCALE;
@@ -18,7 +33,6 @@ bool check_collision_box(World *world, float x, float y, float width, float heig
   float world_width = width / TILE_SIZE / RENDER_SCALE;
   float world_height = height / TILE_SIZE / RENDER_SCALE;
   
-  /* Four corners, faces?*/
   int minX = (int)floorf(world_x);
   int minY = (int)floorf(world_y);
   int maxX = (int)floorf(world_x + world_width - 0.001f);
@@ -27,7 +41,7 @@ bool check_collision_box(World *world, float x, float y, float width, float heig
   for (int tileX = minX; tileX <= maxX; tileX++) {
     for (int tileY = minY; tileY <= maxY; tileY++) {
       if (tileX < 0 || tileX >= WORLD_WIDTH || tileY < 0 || tileY >= WORLD_HEIGHT) return true; /* Out of bound check */
-      if (world->tiles[translate_index(tileX, tileY)].type != TypeAir) return true; /* Check if solid*/
+      if (tile_configs[world->tiles[translate_index(tileX, tileY)].type].is_solid) return true; /* Check if solid*/
     }
   }
   
@@ -41,10 +55,12 @@ bool check_collision(World *world, float x, float y) {
   int tileX = (int)floorf(world_x);
   int tileY = (int)floorf(world_y);
 
+  TileConfig* config = &tile_configs[world->tiles[translate_index(tileX, tileY)].type];
+
   if (tileX < 0 || tileX >= WORLD_WIDTH || tileY < 0 || tileY >= WORLD_HEIGHT) {
     return true;
   }
-  return world->tiles[translate_index(tileX, tileY)].type != TypeAir;
+  return config->is_solid;
 }
 
 void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
@@ -60,7 +76,7 @@ void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
   player->selector = GetMousePosition();
 
   int new_selected_tile = (int)((float)(player->selected_tile) + roundf(GetMouseWheelMove()));
-  if (new_selected_tile >= 4 && new_selected_tile <= 10) player->selected_tile = new_selected_tile;
+  if (new_selected_tile >= 0 && new_selected_tile <= num_tile_configs) player->selected_tile = new_selected_tile;
 
   Vector2 worldPos = GetScreenToWorld2D(player->selector, *camera); /* Simple conversion*/
   int selX = (int)(worldPos.x / (TILE_SIZE * RENDER_SCALE)); /* Use FULL_TILE_SIZE? */
@@ -68,6 +84,7 @@ void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
   
   Vector2 new_position = player->position;
   
+  /* Player movement */
   if (IsKeyDown(KEY_W)) {
     new_position.y -= player->speed * dt;
     player->direction = 0;
@@ -90,7 +107,7 @@ void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
   }
 
   if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-    if (selX >= 0 && selX < WORLD_WIDTH && selY >= 0 && selY < WORLD_HEIGHT) world->tiles[translate_index(selX, selY)].type = TypeAir;
+    if (selX >= 0 && selX < WORLD_WIDTH && selY >= 0 && selY < WORLD_HEIGHT) world->tiles[translate_index(selX, selY)].type = TypeAir_ID;
   }
 
   if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
@@ -181,13 +198,13 @@ void generateWorld(World* world, int seed) { // The best world generation ever :
     for (int y = 0; y < WORLD_HEIGHT; ++y) {
       int terrainY = WORLD_HEIGHT - 1 - y;
       if (terrainY > terrainHeight[x]) {
-        world->tiles[translate_index(x, y)].type = TypeAir;
+        world->tiles[translate_index(x, y)].type = TypeAir_ID;
       } else if (terrainY == terrainHeight[x]) {
-        world->tiles[translate_index(x, y)].type = TypeGrass;
+        world->tiles[translate_index(x, y)].type = TypeGrass_ID;
       } else if (terrainY > terrainHeight[x] - 4) {
-        world->tiles[translate_index(x, y)].type = TypeDirt;
+        world->tiles[translate_index(x, y)].type = TypeDirt_ID;
       } else {
-        world->tiles[translate_index(x, y)].type = TypeStone;
+        world->tiles[translate_index(x, y)].type = TypeStone_ID;
       }
     }
   }

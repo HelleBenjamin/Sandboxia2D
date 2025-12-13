@@ -6,6 +6,9 @@
 #define TILE_SIZE 8
 #define FULL_TILE_SIZE TILE_SIZE * RENDER_SCALE
 
+extern Texture2D textures[0xFF];
+extern uint8_t num_textures;
+
 int render_init();
 int render_exit();
 
