@@ -1,6 +1,7 @@
 # Sandboxia2D
 ![Logo](./assets/logo.png)
 
+"Fast, simple and open source sandbox game"
 
 Sandboxia is a sandbox game written in C using Raylib. It was originally written in C++ and used OpenGL based renderer, but it became too messy to maintain.
  It's designed to be a simple sandbox game that is easy to run on older machines. There aren't any goals in the game. The game is still in development. Sandboxia2D comes with a simple Lua API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still partially experimental. 
@@ -33,7 +34,7 @@ Currently the game is being rewritten in C, so expect missing features and bugs.
 - `cmake`
 - `gcc`
 - `raylib` (See https://github.com/raysan5/raylib/wiki)
-- `lua 5.4`
+- `lua 5.4` (Other versions may work, but I haven't tested them)
 
 These could be installed using your package manager. If they aren't available, you can build them from source.
 

@@ -16,7 +16,8 @@ set(SRC_FILES
 
 
 add_executable(Sandboxia ${SRC_FILES})
-target_link_libraries(Sandboxia PRIVATE raylib m dl pthread lua)
+target_link_libraries(Sandboxia PRIVATE raylib m dl pthread lua5.4)
+# If gives lua5.4 error, change to "lua"
 
 # Set building flags
 set(CMAKE_CFLAGS "${CMAKE_CFLAGS} -O0 -g -fsanitize=address") # Use -O2 or -O3 for better performance, may increase compile time, default is -O1, for debug use -O0 and -g
