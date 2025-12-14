@@ -39,7 +39,7 @@ extern int  LOG_LEVEL;
 void gamelog(int type, const char* fmt, ...);
 
 void register_lua_api(lua_State* L);
-Mod load_mod(const char* path);
+Mod  load_mod(const char* path);
 void load_mods();
 
 /* Mod API functions*/
@@ -53,8 +53,8 @@ int mod_set_tile(lua_State* L);
 int mod_new_tile(lua_State* L);
 int mod_new_texture(lua_State* L);
 
-int mod_iskeydown(lua_State* L);
-int mod_iskeypressed(lua_State* L);
+int mod_is_key_down(lua_State* L);
+int mod_is_key_pressed(lua_State* L);
 
 
 

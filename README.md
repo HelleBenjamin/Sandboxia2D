@@ -35,6 +35,8 @@ Currently the game is being rewritten in C, so expect missing features and bugs.
 - `raylib` (See https://github.com/raysan5/raylib/wiki)
 - `lua 5.4`
 
+These could be installed using your package manager. If they aren't available, you can build them from source.
+
 ### Windows
 - Visual Studio 2022
 - x86-based processor, arm64 isn't officially supported yet.
@@ -66,9 +68,8 @@ See `MODDING.md` for more info
 - `--collision=` to set the collision, Default is 1
 - `--world=` to set the world file
 
-These doesn't work yet:
+These doesn't work yet(Obsolete):
 - `-d` to set the debug, Default is 0
-- `-world` to set the world file
 - `-noMods` to disable mods
 - `-noSounds` to disable sounds
 

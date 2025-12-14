@@ -149,7 +149,7 @@ int mod_new_texture(lua_State *L) {
   return 1;
 }
 
-int mod_iskeydown(lua_State *L) {
+int mod_is_key_down(lua_State *L) {
   /* Params: key */
   /* Returns: bool */
   int key = lua_tonumber(L, 1);
@@ -157,7 +157,7 @@ int mod_iskeydown(lua_State *L) {
   return 1;
 }
 
-int mod_iskeypressed(lua_State *L) {
+int mod_is_key_pressed(lua_State *L) {
   /* Params: key */
   /* Returns: bool */
   int key = lua_tonumber(L, 1);
@@ -184,6 +184,11 @@ void register_lua_api(lua_State* L) {
   lua_setglobal(L, "new_tile");
   lua_pushcfunction(L, mod_new_texture);
   lua_setglobal(L, "new_texture");
+
+  lua_pushcfunction(L, mod_is_key_down);
+  lua_setglobal(L, "is_key_down");
+  lua_pushcfunction(L, mod_is_key_pressed);
+  lua_setglobal(L, "is_key_pressed");
 }
 
 Mod load_mod(const char *path) {
