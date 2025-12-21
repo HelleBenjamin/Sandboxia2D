@@ -36,6 +36,8 @@ Currently the game is being rewritten in C, so expect missing features and bugs.
 - `raylib` (See https://github.com/raysan5/raylib/wiki)
 - `lua 5.4` (Other versions may work, but I haven't tested them)
 
+For debian based distros, run `sudo apt install gcc cmake liblua5.4-dev` to install the necessary packages. You need to manually install raylib.
+
 These could be installed using your package manager. If they aren't available, you can build them from source.
 
 ### Windows

@@ -56,6 +56,9 @@ int mod_new_texture(lua_State* L);
 int mod_is_key_down(lua_State* L);
 int mod_is_key_pressed(lua_State* L);
 
+int mod_check_collision(lua_State* L);
+
+
 
 
 #endif 

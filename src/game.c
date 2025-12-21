@@ -25,6 +25,9 @@ TileConfig tile_configs[0xFF] = {
 
 int num_tile_configs = 6; /* Number of tile configs */
 
+Entity entities[0xFF];
+int num_entities = 0; /* Number of entities */
+
 
 bool check_collision_box(World *world, float x, float y, float width, float height) {
   /* This checks all the bounds of the box*/
@@ -48,30 +51,29 @@ bool check_collision_box(World *world, float x, float y, float width, float heig
   return false;
 }
 
-/* Old collision check, modified but still usefull :)*/
-bool check_collision(World *world, float x, float y) {
-  float world_x = x / TILE_SIZE / RENDER_SCALE; /* Do not use FULL_TILE_SIZE!! */
-  float world_y = y / TILE_SIZE / RENDER_SCALE;
-  int tileX = (int)floorf(world_x);
-  int tileY = (int)floorf(world_y);
+uint8_t check_collision_mask(World *world, float x, float y, float w, float h) {
+  uint8_t mask = 0; /* Bitmask: bit 0 = left, bit 1 = right, bit 2 = top, bit 3 = bottom*/
+  const float eps = 0.001f;
 
-  TileConfig* config = &tile_configs[world->tiles[translate_index(tileX, tileY)].type];
+  /* Left */
+  if (check_collision_box(world, x - eps, y, w, h)) mask |= COL_LEFT;
 
-  if (tileX < 0 || tileX >= WORLD_WIDTH || tileY < 0 || tileY >= WORLD_HEIGHT) {
-    return true;
-  }
-  return config->is_solid;
+  /* Right */
+  if (check_collision_box(world, x + eps, y, w, h)) mask |= COL_RIGHT;
+
+  /* Top */
+  if (check_collision_box(world, x, y - eps, w, h)) mask |= COL_TOP;
+
+  /* Bottom */
+  if (check_collision_box(world, x, y + eps, w, h)) mask |= COL_BOTTOM;
+
+  return mask;
 }
 
-void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
-  float playerWidth = TILE_SIZE * RENDER_SCALE; /* Actual size(rendered size)*/
-  float playerHeight = TILE_SIZE * RENDER_SCALE;
 
-  /*
-    Old selector
-    int SelX = static_cast<int>((player.SelectorX / TILE_SIZE / SCALER)  + (camera.posX - camera.width / TILE_SIZE / SCALER / 2)); // Calculate x + offset
-    int SelY = static_cast<int>((player.SelectorY / TILE_SIZE / SCALER)  + (camera.posY - camera.height / TILE_SIZE / SCALER / 2)); // Calculate y + offset
-  */
+void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
+  float playerWidth  = PLAYER_COLLISION_W;
+  float playerHeight = PLAYER_COLLISION_H;
 
   player->selector = GetMousePosition();
 
@@ -82,28 +84,28 @@ void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
   int selX = (int)(worldPos.x / (TILE_SIZE * RENDER_SCALE)); /* Use FULL_TILE_SIZE? */
   int selY = (int)(worldPos.y / (TILE_SIZE * RENDER_SCALE));
   
-  Vector2 new_position = player->position;
+  Vector2 new_position = player->player.position;
   
   /* Player movement */
   if (IsKeyDown(KEY_W)) {
-    new_position.y -= player->speed * dt;
-    player->direction = 0;
+    new_position.y -= player->player.speed * dt;
+    player->player.direction = DIR_UP;
   }
   if (IsKeyDown(KEY_S)) {
-    new_position.y += player->speed * dt;
-    player->direction = 0;
+    new_position.y += player->player.speed * dt;
+    player->player.direction = DIR_DOWN;
   }
   if (IsKeyDown(KEY_A)) {
-    new_position.x -= player->speed * dt;
-    player->direction = 1;
+    new_position.x -= player->player.speed * dt;
+    player->player.direction = DIR_LEFT;
   }
   if (IsKeyDown(KEY_D)) {
-    new_position.x += player->speed * dt;
-    player->direction = 2;
+    new_position.x += player->player.speed * dt;
+    player->player.direction = DIR_RIGHT;
   }
   if (IsKeyDown(KEY_SPACE)) {
-    player->velocity.y = -JUMP_POWER;
-    player->direction = 0;
+    player->player.velocity.y = -JUMP_POWER;
+    player->player.direction = DIR_UP;
   }
 
   if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
@@ -115,12 +117,12 @@ void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
   }
 
 
-  if (!check_collision_box(world, new_position.x, player->position.y, playerWidth, playerHeight)) {
-    player->position.x = new_position.x;
+  if ((check_collision_mask(world, new_position.x, player->player.position.y, playerWidth, playerHeight) & 3) == 0) {
+    player->player.position.x = new_position.x;
   }
-  
-  if (!check_collision_box(world, player->position.x, new_position.y, playerWidth, playerHeight)) {
-    player->position.y = new_position.y;
+
+  if ((check_collision_mask(world, player->player.position.x, new_position.y, playerWidth, playerHeight) & 12) == 0) {
+    player->player.position.y = new_position.y;
   }
 
   /* World loading/saving*/
@@ -133,35 +135,42 @@ void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
 }
 
 void update_player(Player *player, World *world, float dt) {
-  float playerWidth = TILE_SIZE * RENDER_SCALE;
-  float playerHeight = TILE_SIZE * RENDER_SCALE;
+  float playerWidth  = PLAYER_COLLISION_W;
+  float playerHeight = PLAYER_COLLISION_H;
   
-  if (!player->onGround) player->accel.y = GRAVITY;
-  else player->accel.y = 0;
+  if (!player->player.onGround) player->player.accel.y = GRAVITY;
+  else player->player.accel.y = 0;
 
-  player->velocity.x += player->accel.x * dt;
-  player->velocity.y += player->accel.y * dt;
+  player->player.velocity.x += player->player.accel.x * dt;
+  player->player.velocity.y += player->player.accel.y * dt;
   
   /* Enhanced functions*/
-  float newX = player->position.x + player->velocity.x * dt;
-  float newY = player->position.y + player->velocity.y * dt;
+  float newX = player->player.position.x + player->player.velocity.x * dt;
+  float newY = player->player.position.y + player->player.velocity.y * dt;
   
   /* Check if player is touching a wall, x-check*/
-  if (!check_collision_box(world, newX, player->position.y, playerWidth, playerHeight)) {
-    player->position.x = newX;
+  if (!check_collision_box(world, newX, player->player.position.y, playerWidth, playerHeight)) {
+    player->player.position.x = newX;
   } else {
-    player->velocity.x = 0.0f;
+    player->player.velocity.x = 0.0f;
   }
   
   /* Check if player is on the ground, y-check */
-  if (!check_collision_box(world, player->position.x, newY, playerWidth, playerHeight)) {
-    player->position.y = newY;
-    player->onGround = false;
+  if (!check_collision_box(world, player->player.position.x, newY, playerWidth, playerHeight)) {
+    player->player.position.y = newY;
+    player->player.onGround = false;
   } else {
-    player->velocity.y = 0.0f;
-    if (player->velocity.y > 0 || check_collision_box(world, player->position.x, player->position.y + 1, playerWidth, playerHeight)) {
-      player->onGround = true;
+    player->player.velocity.y = 0.0f;
+    if (player->player.velocity.y > 0 || check_collision_box(world, player->player.position.x, player->player.position.y + 1, playerWidth, playerHeight)) {
+      player->player.onGround = true;
     }
+  }
+}
+
+void update_entities(World *world, float dt) {
+  /* TODO*/
+  for (int i=0; i < num_entities; i++) {
+    
   }
 }
 

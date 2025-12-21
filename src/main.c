@@ -87,7 +87,7 @@ int mod_get_game_version(lua_State *L) {
 int mod_get_player_pos(lua_State* L) {
   /* Params: none */
   /* Returns: x, y*/
-  Vector2 pos = current_player->position;
+  Vector2 pos = current_player->player.position;
   pos.x /= TILE_SIZE * RENDER_SCALE;
   pos.y /= TILE_SIZE * RENDER_SCALE;
   lua_pushnumber(L, pos.x);
@@ -102,7 +102,7 @@ int mod_set_player_pos(lua_State *L) {
   float y = lua_tonumber(L, 2);
   x = x * (TILE_SIZE * RENDER_SCALE);
   y = y * (TILE_SIZE * RENDER_SCALE);
-  current_player->position = (Vector2){x, y};
+  current_player->player.position = (Vector2){x, y};
   return 0;
 }
 
@@ -248,11 +248,11 @@ int main(int argc, char* argv[]) {
   }
 
   /* Make a constant?*/
-  player.speed = 200.0f;
+  player.player.speed = 200.0f;
   player.selected_tile = 4;
 
   /* Initialize camera */
-  camera.target = player.position;
+  camera.target = player.player.position;
   camera.offset = (Vector2){(float)SCREEN_WIDTH/2.0f, (float)SCREEN_HEIGHT/2.0f};
   camera.rotation = 0.0f;
   camera.zoom = 1.0f;
@@ -300,10 +300,10 @@ int main(int argc, char* argv[]) {
     Vector2 bboxWorldMax = GetScreenToWorld2D((Vector2){ (1 + bbox.x)*0.5f*SCREEN_WIDTH, (1 + bbox.y)*0.5f*SCREEN_HEIGHT }, camera);
     camera.offset = (Vector2){ (1 - bbox.x)*0.5f*SCREEN_WIDTH, (1 - bbox.y)*0.5f*SCREEN_HEIGHT };
 
-    if (player.position.x < bboxWorldMin.x) camera.target.x = player.position.x;
-    if (player.position.y < bboxWorldMin.y) camera.target.y = player.position.y;
-    if (player.position.x > bboxWorldMax.x) camera.target.x = bboxWorldMin.x + (player.position.x - bboxWorldMax.x);
-    if (player.position.y > bboxWorldMax.y) camera.target.y = bboxWorldMin.y + (player.position.y - bboxWorldMax.y);
+    if (player.player.position.x < bboxWorldMin.x) camera.target.x = player.player.position.x;
+    if (player.player.position.y < bboxWorldMin.y) camera.target.y = player.player.position.y;
+    if (player.player.position.x > bboxWorldMax.x) camera.target.x = bboxWorldMin.x + (player.player.position.x - bboxWorldMax.x);
+    if (player.player.position.y > bboxWorldMax.y) camera.target.y = bboxWorldMin.y + (player.player.position.y - bboxWorldMax.y);
     
     update_player(&player, &world, dt);
 

@@ -1,12 +1,12 @@
-# Sandboxia2D Modding Guide TODO
+# Sandboxia2D Modding Guide
 
-This is a guide for modding Sandboxia2D with Lua.
+This is a guide for modding Sandboxia2D with Lua. It's partially documented, but it's still a work in progress.
 
 ## Why Lua?
 
 I chose it because it's a simple language that is easy to learn and understand. Also, it's very portable, so you can use it on any platform without any recompilation.
 
-## API functions
+## API functions in Lua
 
 ### get_api_version() -> api_version
 

@@ -39,6 +39,11 @@ int render_exit() {
   return 0;
 }
 
+/* Translate player direction to texture index*/
+uint8_t player_dir[4] = {
+  0, 0, 1, 2
+};
+
 void render_game(Camera2D* camera, Player* player, World* world){
   BeginDrawing();
   ClearBackground(SKYBLUE);
@@ -69,7 +74,7 @@ void render_game(Camera2D* camera, Player* player, World* world){
     }
   }
 
-  DrawTextureEx(textures[player->direction], player->position, 0.0f, RENDER_SCALE, WHITE);
+  DrawTextureEx(textures[player_dir[player->player.direction]], player->player.position, 0.0f, RENDER_SCALE, WHITE);
 
   /* Draw selector */
   if (selX >= 0 && selX < WORLD_WIDTH && selY >= 0 && selY < WORLD_HEIGHT) {
@@ -81,7 +86,7 @@ void render_game(Camera2D* camera, Player* player, World* world){
   DrawFPS(10, 10);
 
   char buffer[32];
-  Vector2 actual_coords = (Vector2){player->position.x / TILE_SIZE / RENDER_SCALE, player->position.y / TILE_SIZE / RENDER_SCALE};
+  Vector2 actual_coords = (Vector2){player->player.position.x / TILE_SIZE / RENDER_SCALE, player->player.position.y / TILE_SIZE / RENDER_SCALE};
   sprintf(buffer, "X: %d Y: %d", (int)actual_coords.x, (int)actual_coords.y);
   DrawText(buffer, 10, 30, 20, BLACK);
 
