@@ -23,6 +23,7 @@ Currently the game is being rewritten in C, so expect missing features and bugs.
 ## How to play
 
 ## Controls
+- Esc to exit
 - W, A, S, D to move
 - Left mouse button to destroy blocks
 - Right mouse button to place blocks

@@ -108,6 +108,7 @@ void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
     player->player.direction = DIR_UP;
   }
 
+  /* Tile placement */
   if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
     if (selX >= 0 && selX < WORLD_WIDTH && selY >= 0 && selY < WORLD_HEIGHT) world->tiles[translate_index(selX, selY)].type = TypeAir_ID;
   }
@@ -116,11 +117,12 @@ void handle_input(Player *player, World *world, Camera2D *camera, float dt) {
     if (selX >= 0 && selX < WORLD_WIDTH && selY >= 0 && selY < WORLD_HEIGHT) world->tiles[translate_index(selX, selY)].type = player->selected_tile;
   }
 
-
+  /* X-axis*/
   if ((check_collision_mask(world, new_position.x, player->player.position.y, playerWidth, playerHeight) & 3) == 0) {
     player->player.position.x = new_position.x;
   }
 
+  /* Y-axis*/
   if ((check_collision_mask(world, player->player.position.x, new_position.y, playerWidth, playerHeight) & 12) == 0) {
     player->player.position.y = new_position.y;
   }
@@ -149,19 +151,20 @@ void update_player(Player *player, World *world, float dt) {
   float newY = player->player.position.y + player->player.velocity.y * dt;
   
   /* Check if player is touching a wall, x-check*/
-  if (!check_collision_box(world, newX, player->player.position.y, playerWidth, playerHeight)) {
+  
+  if ((check_collision_mask(world, newX, player->player.position.y, playerWidth, playerHeight) & 3) == 0) {
     player->player.position.x = newX;
   } else {
     player->player.velocity.x = 0.0f;
   }
   
   /* Check if player is on the ground, y-check */
-  if (!check_collision_box(world, player->player.position.x, newY, playerWidth, playerHeight)) {
+  if ((check_collision_mask(world, player->player.position.x, newY, playerWidth, playerHeight) & 12) == 0) {
     player->player.position.y = newY;
     player->player.onGround = false;
   } else {
     player->player.velocity.y = 0.0f;
-    if (player->player.velocity.y > 0 || check_collision_box(world, player->player.position.x, player->player.position.y + 1, playerWidth, playerHeight)) {
+    if (player->player.velocity.y > 0 || check_collision_mask(world, player->player.position.x, player->player.position.y + 1, playerWidth, playerHeight)) {
       player->player.onGround = true;
     }
   }
@@ -193,7 +196,7 @@ void generateWorld(World* world, int seed) { // The best world generation ever :
   int terrainHeight[WORLD_WIDTH];
 
   // Perlin noise parameters
-  float scale = 0.1f; // Controls smoothness (lower = smoother, higher = rougher)
+  float scale = 0.075f; // Controls smoothness (lower = smoother, higher = rougher)
   float amplitude = 10.0f; // Controls terrain height variation
 
   for (int x = 0; x < WORLD_WIDTH; ++x) {
@@ -217,6 +220,8 @@ void generateWorld(World* world, int seed) { // The best world generation ever :
       }
     }
   }
+
+  /*TODO: Generate caves, lakes, trees, etc..*/
 }
 
 int loadWorld(const char* filePath, World* world) {
