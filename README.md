@@ -47,7 +47,7 @@ These could be installed using your package manager. If they aren't available, y
 Linux is currently the only tested platform.
 - Building instructions:
     1. Run `mkdir build`  
-    2. Run `cmake -B build` This will generate the Makefile
+    2. Run `cmake -B build -DCMAKE_BUILD_TYPE=Release` This will generate the Makefile, for debug use `cmake -B build -DCMAKE_BUILD_TYPE=Debug`
     3. Run `cmake --build build -j(number of threads)` to build the game.
 - Run `./build/Sandboxia` to play the game.
 
