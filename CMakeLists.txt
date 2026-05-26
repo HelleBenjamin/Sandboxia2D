@@ -9,9 +9,13 @@ include_directories(include)
 
 # Main files
 set(SRC_FILES
+    src/collision.c
+    src/entity.c
     src/main.c
-    src/game.c
+    src/mod.c
+    src/player.c
     src/render.c
+    src/world.c
 )
 
 

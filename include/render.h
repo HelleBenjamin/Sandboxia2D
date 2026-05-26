@@ -1,10 +1,24 @@
 #ifndef RENDER_H
 #define RENDER_H
-#include "game.h"
+#include "world.h"
+#include "player.h"
+#include <raylib.h>
+#include <stdint.h>
 
-#define RENDER_SCALE 5.0f
-#define TILE_SIZE 8
-#define FULL_TILE_SIZE TILE_SIZE * RENDER_SCALE
+enum TextureIDs {
+  TypePlayer_Texture = 0,
+  TypePlayer_Left_Texture,
+  TypePlayer_Right_Texture,
+  TypeSelector_Texture,
+  TypeAir_Texture, /* Placeable tiles start here */
+  TypeGrass_Texture,
+  TypeStone_Texture,
+  TypeDirt_Texture,
+  TypeSand_Texture,
+  TypeWood_Texture,
+  TypeLeaves_Texture,
+};
+
 
 extern Texture2D textures[0xFF];
 extern uint8_t num_textures;

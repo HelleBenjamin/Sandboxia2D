@@ -117,6 +117,6 @@ If you have any suggestions, bug reports, or feature requests, please open an is
 
 
 ## License
-Copyright (c) 2024-2025 Benjamin Helle
+Copyright (c) 2024-2026 Benjamin Helle
 
 Sandboxia2D is licensed under the GPL-3.0 license.

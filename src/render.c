@@ -74,7 +74,14 @@ void render_game(Camera2D* camera, Player* player, World* world){
     }
   }
 
+  /* Draw player */
   DrawTextureEx(textures[player_dir[player->player.direction]], player->player.position, 0.0f, RENDER_SCALE, WHITE);
+
+  /* Draw entities */
+  for (int i = 0; i < num_entities; i++) {
+    DrawTextureEx(textures[entities[i].texture_id], entities[i].position, 0.0f, RENDER_SCALE, WHITE);
+  }
+  
 
   /* Draw selector */
   if (selX >= 0 && selX < WORLD_WIDTH && selY >= 0 && selY < WORLD_HEIGHT) {

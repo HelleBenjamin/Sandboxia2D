@@ -47,3 +47,44 @@ Returns true if the given key is down. The key parameter is ASCII.
 ### is_key_pressed(key) -> bool
 
 Returns true if the given key is pressed. The key parameter is ASCII.
+
+### get_delta() -> delta
+
+Returns the delta time since the last frame.
+
+
+## Entity behavior functions in Lua
+Each entity behavior is defined in a Lua file. All entities have the same functions as defined in the API.
+
+
+All entites must have the following functions:
+
+### init() -> none
+
+Called when the entity is created.
+
+### update() -> none
+
+Called every frame.
+
+### damage() -> none
+
+Called when the entity is damaged.
+
+These are extras:
+
+### move_relative(dir, tiles) -> none
+
+Moves the entity in the given direction by the given number of tiles.
+
+### move_absolute(x, y) -> none
+
+Moves the entity to the given position.
+
+### get_pos() -> x, y
+
+Returns the position of the entity.
+
+### get_collision_mask() -> collision_mask
+
+Returns the collision mask of the entity.
