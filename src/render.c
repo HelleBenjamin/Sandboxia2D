@@ -16,16 +16,13 @@ int render_init() {
   SetTargetFPS(TARGET_FPS);
   DisableCursor();
 
-  const char* path = "assets/textures/"; // Texture directory
   const char* filenames[] = {"player.png", "player_left.png", "player_right.png", "selector.png", "air.png", "grass.png", "stone.png", "dirt.png", "sand.png", "wood.png", "leaves.png"}; // The order must be the same as defined in world.h
 
   for (int i = 0; i < sizeof(filenames)/sizeof(filenames[0]); i++) {
-    char* filepath = (char*)malloc(strlen(path) + strlen(filenames[i]) + 1);
-    strcpy(filepath, path);
-    strcat(filepath, filenames[i]);
+    char filepath[512];
+    snprintf(filepath, sizeof(filepath), "%sassets/textures/%s", gamepath, filenames[i]);
     textures[i] = LoadTexture(filepath);
     num_textures++;
-    free(filepath);
   }
 
   return 0;

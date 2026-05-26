@@ -23,6 +23,8 @@ extern Camera2D  *current_camera ;
 extern Mod mods[32]; /* Max of 32 mods */
 extern int num_mods;
 
+extern char gamepath[512]; /* Path to the game directory */
+
 extern int  SCREEN_WIDTH;
 extern int  SCREEN_HEIGHT;
 extern int  TARGET_FPS;

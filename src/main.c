@@ -5,20 +5,28 @@
 #include <lua5.4/lauxlib.h>
 #include <lua5.4/lua.h>
 #include <raylib.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <time.h>
 #include <dirent.h>
+#include <unistd.h>
 
 Mod mods[32]; /* Max of 32 mods */
 int num_mods;
+
+/* Path to the game directory, this is used to load mods, assets, etc..*/
+char gamepath[512];
 
 /* These are global variables, points to the current player, world, and camera */
 Player    *current_player = NULL;
 World     *current_world  = NULL;
 Camera2D  *current_camera = NULL;
+
+/* Log file*/
+FILE* log_file = NULL;
 
 int   SCREEN_WIDTH  = 800;
 int   SCREEN_HEIGHT = 600;
@@ -33,9 +41,57 @@ const char* LOG_LEVEL_STR[] = {"NULL", "ERR", "WARN", "INFO", "DEBUG", "MOD"};
 
 void gamelog(int type, const char* fmt, ...) {
   va_list args;
+  /* write to stdout*/
+  printf("[%s] ", LOG_LEVEL_STR[type]);
   va_start(args, fmt);
   vprintf(fmt, args);
   va_end(args);
+  printf("\n");
+
+  /* if log file exists, write to it*/
+  if (log_file) {
+    fprintf(log_file, "[%s] ", LOG_LEVEL_STR[type]);
+    va_start(args, fmt);
+    vfprintf(log_file, fmt, args);
+    va_end(args);
+    fprintf(log_file, "\n");
+  }
+}
+
+void raylib_log_callback(int msgType, const char* text, va_list args) {
+  /* wrapper for raylib logging*/
+  switch (msgType) {
+    case LOG_INFO:
+      gamelog(GAMELOG_INFO, text, args);
+      break;
+    case LOG_WARNING:
+      gamelog(GAMELOG_WARN, text, args);
+      break;
+    case LOG_ERROR:
+      gamelog(GAMELOG_ERR, text, args);
+      break;
+    case LOG_DEBUG:
+      gamelog(GAMELOG_DEBUG, text, args);
+      break;
+    default: /* nothing */
+      break;
+  }
+}
+int init_gamelog() {
+  char logpath[512];
+  snprintf(logpath, sizeof(logpath), "%slog.txt", gamepath);
+  log_file = fopen(logpath, "w");
+  if (!log_file) {
+    gamelog(GAMELOG_ERR, "Failed to open log file");
+    return 1;
+  }
+  return 0;
+}
+
+void close_gamelog() {
+  if (log_file) {
+    fclose(log_file);
+  }
 }
 
 int translate_index(int x, int y) {
@@ -101,7 +157,11 @@ int static inline ends_with(const char* str, const char* suffix) {
 int main(int argc, char* argv[]) {
   srand(time(NULL));
 
-  printf("Sandboxia2D %s\n", VERSION_STR);
+  init_gamelog();
+
+  gamelog(GAMELOG_INFO, "Sandboxia2D %s", VERSION_STR);
+
+  SetTraceLogCallback(raylib_log_callback);
 
   /* Main components */
   Player    player = {0};
@@ -130,6 +190,21 @@ int main(int argc, char* argv[]) {
     }
   }
 
+  /* Set game path */
+  char self_path[512];
+  size_t len = readlink("/proc/self/exe", self_path, sizeof(self_path)); /* points to the symlink, which points to the executable*/
+  if (len != -1) {
+    self_path[len] = '\0';
+    strncpy(gamepath, self_path, sizeof(gamepath));
+    /* trim */
+    char *p = strrchr(gamepath, '/');
+    if (p) {
+      *(p+1) = '\0';
+    }
+  }
+
+  gamelog(GAMELOG_INFO, "The game path is %s", gamepath);
+
   /* Make a constant?*/
   player.player.speed = 200.0f;
   player.player.damage = 1;
@@ -145,9 +220,9 @@ int main(int argc, char* argv[]) {
   render_init();
 
   if (load_world) {
-    printf("Loading world: %s\n", world_filename);
+    gamelog(GAMELOG_INFO, "Loading world: %s", world_filename);
     loadWorld(world_filename, &world);
-  } else {
+  } else { /* if no world, generate one */
     strcpy(world.name, "world");
     generateWorld(&world, -1);
   }
@@ -155,14 +230,22 @@ int main(int argc, char* argv[]) {
   float dt = 0.0f;
 
   /* Load mods after everything is initialized*/
-  DIR* dir = opendir("mods");
-  struct dirent* entry;
-  while ((entry = readdir(dir)) != NULL) {
-    if (ends_with(entry->d_name, ".lua")) {
-      char path[256];
-      sprintf(path, "mods/%s", entry->d_name);
-      mods[num_mods++] = load_mod(path);
-      printf("Loaded mod: %s\n", entry->d_name);
+  char modpath[512];
+  snprintf(modpath, sizeof(modpath), "%smods", gamepath);
+  gamelog(GAMELOG_INFO, "Looking for mods in: %s", modpath);
+  DIR* dir = opendir(modpath);
+  if (dir == NULL) {
+    gamelog(GAMELOG_INFO, "No mod folder found, skipping mods");
+  }
+  else { 
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != NULL) {
+      if (ends_with(entry->d_name, ".lua")) {
+        char path[512];
+        snprintf(path, sizeof(path), "%smods/%s", gamepath, entry->d_name);
+        gamelog(GAMELOG_INFO, "Found mod: %s", path);
+        mods[num_mods++] = load_mod(path);
+      }
     }
   }
 
@@ -201,6 +284,8 @@ int main(int argc, char* argv[]) {
   for (int i = 0; i < num_mods; i++) {
     lua_close(mods[i].L);
   }
+
+  close_gamelog();
 
   return 0;
 }
