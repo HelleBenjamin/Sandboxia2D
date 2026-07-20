@@ -63,7 +63,6 @@ void render_game(Camera2D* camera, Player* player, World* world){
       TileConfig config = tile_configs[world->tiles[translate_index(tileX, tileY)].type];
       Vector2 position = (Vector2){(float)(x*TILE_SIZE*RENDER_SCALE), (float)(y*TILE_SIZE*RENDER_SCALE)};
       if ((tileX >= 0) && (tileX < WORLD_WIDTH) && (tileY >= 0) && (tileY < WORLD_HEIGHT) && (config.is_visible)) {
-        //drawTile(world.tiles[tileX][tileY], x - startX, y - startY);
         DrawTextureEx(textures[config.texture_id], position, 0.0f, RENDER_SCALE, WHITE);
       }
     }

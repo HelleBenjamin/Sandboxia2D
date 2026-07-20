@@ -63,8 +63,8 @@ extern int  LOG_LEVEL;
 #define PLAYER_COLLISION_H (TILE_SIZE * RENDER_SCALE * 0.98f)
 
 /* Versioning */
-#define VERSION_STR "0.2.0-beta"
-#define VERSION_NUM 20
+#define VERSION_STR "0.2.1-beta"
+#define VERSION_NUM 21
 #define API_VERSION_NUM 01
 #define API_VERSION_STR "Mod API v0.1"
 
