@@ -26,4 +26,9 @@ int mod_is_key_pressed(lua_State* L);
 int mod_check_collision(lua_State* L);
 int mod_get_delta_time(lua_State* L);
 
+/* entity related*/
+int mod_spawn_entity(lua_State *L);
+int mod_get_entity_pos(lua_State *L);
+int mod_set_entity_pos(lua_State *L);
+
 #endif

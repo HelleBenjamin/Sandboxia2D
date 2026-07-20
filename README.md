@@ -88,6 +88,10 @@ Debug keys(Doesn't work yet):
 ## Screenshots
 ![Sandboxia](./assets/screenshot1.png)
 
+# Textures
+
+All textures are 8x8 in size. Texture size may change in the future
+
 ## TODO
 - [ ] Release v1.0.0 version
 - [x] Add audio support

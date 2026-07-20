@@ -4,8 +4,6 @@
 #include <raymath.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 Texture2D textures[0xFF]; /* Maybe make this dynamic*/
 uint8_t num_textures = 0;
@@ -89,6 +87,7 @@ void render_game(Camera2D* camera, Player* player, World* world){
   EndMode2D();
   DrawFPS(10, 10);
 
+  /* Draw coordinates and selected tile*/
   char buffer[32];
   Vector2 actual_coords = (Vector2){player->player.position.x / TILE_SIZE / RENDER_SCALE, player->player.position.y / TILE_SIZE / RENDER_SCALE};
   sprintf(buffer, "X: %d Y: %d", (int)actual_coords.x, (int)actual_coords.y);

@@ -33,7 +33,7 @@ extern Entity entities[0xFF];
 extern int num_entities;
 
 void update_entities(World *world, float dt);
-int  create_entity(uint8_t texture_id, lua_State* L);
+int  create_entity(uint8_t texture_id, char* path);
 void free_entities();
 int  damage_entity(Vector2 position, uint8_t damage);
 

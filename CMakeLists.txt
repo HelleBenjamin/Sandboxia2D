@@ -37,4 +37,6 @@ set_target_properties(Sandboxia PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINA
 add_custom_command(TARGET Sandboxia POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:Sandboxia>/assets
+    ${CMAKE_SOURCE_DIR}/scripts $<TARGET_FILE_DIR:Sandboxia>/scripts
+    ${CMAKE_SOURCE_DIR}/mods $<TARGET_FILE_DIR:Sandboxia>/mods
 )

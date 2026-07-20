@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  /* Set game path */
+  /* Set game path, like root directory */
   char self_path[512];
   size_t len = readlink("/proc/self/exe", self_path, sizeof(self_path)); /* points to the symlink, which points to the executable*/
   if (len != -1) {
@@ -252,6 +252,11 @@ int main(int argc, char* argv[]) {
   /* Call init*/
   mod_call_at_start();
 
+  char epath[512];
+  snprintf(epath, sizeof(epath), "%sscripts/entity/test.lua", gamepath);
+  create_entity(TypeGrass_Texture, epath);
+  entities[0].position = (Vector2){5.0f,5.0f};
+
   while(!WindowShouldClose()) {
     dt = GetFrameTime();
     /* Call on_tick */
@@ -270,13 +275,15 @@ int main(int argc, char* argv[]) {
     if (player.player.position.x > bboxWorldMax.x) camera.target.x = bboxWorldMin.x + (player.player.position.x - bboxWorldMax.x);
     if (player.player.position.y > bboxWorldMax.y) camera.target.y = bboxWorldMin.y + (player.player.position.y - bboxWorldMax.y);
     
-    /* Update player and world*/
+    /* Update player, world and entities*/
     handle_input(&player, &world, &camera, dt);
     update_player(&player, &world, dt);
+    update_entities(&world, dt);
 
     render_game(&camera, &player, &world);
   }
 
+  free_entities();
   free(world.tiles);
 
   render_exit();
