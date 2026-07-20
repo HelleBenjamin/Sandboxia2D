@@ -1,94 +1,84 @@
 # Sandboxia2D
 ![Logo](./assets/logo.png)
 
-# This is version is unsupported onwards. Please use [v0.2.0-beta](https://github.com/HelleBenjamin/Sandboxia2D/tree/v0.2.0-beta) or higher.
+"Fast, simple and open source sandbox game"
 
-Sandboxia is a sandbox game written in C++ using OpenGL 3.0. It's designed to be a simple sandbox game that is easy to run on older machines. There aren't any goals in the game. The game is still in development. Sandboxia2D comes with a simple API for mods to add new features to the game. For deeper modding, modify the source code directly. Windows support is still partially experimental.
+Sandboxia is a sandbox game written in C using Raylib. It was originally written in C++ and used OpenGL based renderer, but it became too messy to maintain.
+It's designed to be a simple sandbox game that is easy to run on older machines. There aren't any goals in the game. The game is still in development. Sandboxia2D comes with a simple Lua API for mods to add new features to the game. For deeper modding, modify the source code directly. Official Windows support was dropped in version v0.2.0-beta.
+
+Currently the game is being rewritten in C, so expect missing features and bugs.
 
 ## Features
 - Bugs may be present
 - 2D World
-- OpenGL 3.0
-- VSYNC
 - World saving/loading
-- Debug mode
-- Console
-- Support for mods!
+- Debug mode(WIP)
+- Console(WIP)
+- Support for mods!(Partially implemented)
 
 # Supported platforms
-- Linux: x64, aarch64
-- Windows: x64, x86 (experimental)
+- Linux: x64, x86, aarch64
 
 ## How to play
 
+## Controls
+- Esc to exit
 - W, A, S, D to move
 - Left mouse button to destroy blocks
 - Right mouse button to place blocks
-- T to open console
+- T to open console(WIP)
+- F1 to save current world
+- F2 to load world named "world.dat"
 
-## Pre-requisites
-### Linux
-- `mesa-common-dev` (for OpenGL)
-- `libopenal-dev` (for audio)
-- `libsndfile-dev` (for audio)
+## Pre-requisites for Linux
 - `cmake`
-- `g++`
+- `gcc`
+- `raylib` (See https://github.com/raysan5/raylib/wiki)
+- `lua 5.4` (Other versions may work, but I haven't tested them)
 
-You can install these via your package manager.
+For debian based distros, run `sudo apt install gcc cmake liblua5.4-dev` to install the necessary packages. You need to manually install raylib.
 
-### Windows
-- Visual Studio 2022
-- x86-based processor, arm64 isn't officially supported yet.
+These could be installed using your package manager. If they aren't available, you can build them from source.
+
 
 ## Building
 
 ### Linux
+Linux is currently the only tested platform.
 - Building instructions:
     1. Run `mkdir build`  
-    2. Run `cmake -B build` This will generate the Makefile
+    2. Run `cmake -B build -DCMAKE_BUILD_TYPE=Release` This will generate the Makefile, for debug use `cmake -B build -DCMAKE_BUILD_TYPE=Debug`
     3. Run `cmake --build build -j(number of threads)` to build the game.
 - Run `./build/Sandboxia` to play the game.
-### Windows
-Windows support is still experimental. Currently only VS 2022 is supported. To build the game, press the green play button at the top in Visual Studio. You can select between Release and Debug.
 
-#### Important!
-In windows you must have `OpenAL32.dll` and `libsndfile.dll` in the same folder as the executable. You can find these in the `libs` folder.
+If you get compile errors of stb_perlin, try to comment line `#define STB_PERLIN_IMPLEMENTATION` in `src/game.c`
 
 ## To build a simple mod
-This is a simple tutorial on how to build a mod for Sandboxia2D. The `testmod` is included in the `mods` folder. You can use it as a template.
-### Linux
-    1. Create a `.cpp` file in `mods` folder
-    2. Include `mod_api.h` in the mod file
-    3. Compile with `g++ -shared -fPIC testmod.cpp -o testmod.so`.
 
-### Windows
-    1. Create a `.cpp` file in `mods` folder
-    2. Include `mod_api.h` in the mod file
-    3. Open Developer Command Prompt(use x64 Native Tools Command Prompt for 64-bit) and cd to the mods folder.
-    4. Run `cl /LD testmod.cpp /I"../include" /Fe:testmod.dll` to compile the mod. You can delete other files except the `.dll` file.
-
-Replace `testmod` with your mod name.
-If you get errors, make sure you compile to right architecture. And if the game is built with Release, make sure the mod is built with Release too.
-Mods will be loaded automatically.
+See `MODDING.md` for more info
 
 ## Launch args
 
-- `-w` to set the width of the window
-- `-h` to set the height of the window
-- `-v` to set the VSYNC, Default is 1
-- `-c` to set the collision, Default is 1
+- `--width=` to set the width of the window
+- `--height=` to set the height of the window
+- `--fps=` to set the target framerate
+- `--collision=` to set the collision, Default is 1
+- `--world=` to set the world file
+
+These doesn't work yet(Obsolete):
 - `-d` to set the debug, Default is 0
 - `-noMods` to disable mods
 - `-noSounds` to disable sounds
 
 #### Example
 
-`./build/Sandboxia -v 1 -d`
+`./build/Sandboxia --width=800 --height=600`
 
 ### For debug
-There is still legacy renderer included. Use that if you get OpenGL related errors.
+The legacy renderer was removed in v0.1.9-beta.
+The OpenGL renderer was removed in v0.2.0-beta.
 
-Debug keys:
+Debug keys(Doesn't work yet):
 
 - P to print the player position
 - O to print the selector position
@@ -97,6 +87,10 @@ Debug keys:
 
 ## Screenshots
 ![Sandboxia](./assets/screenshot1.png)
+
+# Textures
+
+All textures are 8x8 in size. Texture size may change in the future
 
 ## TODO
 - [ ] Release v1.0.0 version
@@ -109,18 +103,17 @@ Debug keys:
 - [ ] Make Windows fully functional
 - [x] Implement modding API
 - [x] Replace OpenGL 2.1 with 3.0 core
+- [ ] Rewrite the whole game in C using raylib
 
 ## Third-party libraries used
-- [ImGui](https://github.com/ocornut/imgui)
-- [GLFW](https://github.com/glfw/glfw)
-- [GLAD](https://github.com/Dav1dde/glad)
-- [stb_image](https://github.com/nothings/stb)
-- [GLM](https://github.com/g-truc/glm)
+- [raylib](https://github.com/raysan5/raylib)
 - [stb_perlin](https://github.com/nothings/stb)
-- [OpenAL Soft](https://github.com/kcat/openal-soft)
-- [libsndfile](https://github.com/libsndfile/libsndfile)
+
+## Contributing
+If you have any suggestions, bug reports, or feature requests, please open an issue.
+
 
 ## License
-Copyright (c) 2024-2025 Benjamin Helle
+Copyright (c) 2024-2026 Benjamin Helle
 
 Sandboxia2D is licensed under the GPL-3.0 license.
